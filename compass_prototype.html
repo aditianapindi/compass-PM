@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Compass — Your PM Career GPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --bg: #09090B;
+    --surface: #18181B;
+    --elevated: #27272A;
+    --border: #3F3F46;
+    --border-bright: #52525B;
+    --text: #FAFAFA;
+    --muted: #A1A1AA;
+    --faint: #71717A;
+    --accent: #818CF8;
+    --accent-bright: #6366F1;
+    --violet: #A78BFA;
+    --amber: #FBBF24;
+    --emerald: #34D399;
+    --rose: #F87171;
+    --orange: #FB923C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  h1, h2, h3, h4, .syne { font-family: 'Syne', system-ui, sans-serif; }
+  h1 { letter-spacing: -0.045em; line-height: 1.05; }
+  h2 { letter-spacing: -0.03em; line-height: 1.1; }
+  h3 { letter-spacing: -0.02em; }
+  p { letter-spacing: -0.01em; }
+  .dot-grid { background-image: radial-gradient(circle, #3F3F46 1px, transparent 1px); background-size: 28px 28px; }
+  .screen { display: none; min-height: 100vh; opacity: 0; transition: opacity 0.2s ease; }
+  .screen.active { display: block; opacity: 1; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  .card-elevated { background: var(--elevated); border: 1px solid var(--border-bright); border-radius: 16px; }
+  .btn-primary { background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; border: none; border-radius: 10px; padding: 13px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: -0.01em; transition: all 0.15s; display: inline-block; text-align: center; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 12px 24px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: -0.01em; transition: all 0.15s; }
+  .btn-secondary:hover { background: var(--elevated); border-color: var(--border-bright); }
+  .gradient-text { background: linear-gradient(135deg, #818CF8, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .navbar { position: sticky; top: 0; z-index: 50; background: rgba(9,9,11,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .option-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 0.15s ease; text-align: left; width: 100%; }
+  .option-card:hover { border-color: var(--accent); background: rgba(129,140,248,0.06); }
+  .option-card.selected { border-color: var(--accent); background: rgba(129,140,248,0.1); }
+  .dim-bar-bg { background: var(--elevated); border-radius: 99px; height: 8px; overflow: hidden; }
+  .dim-bar-fill { height: 8px; border-radius: 99px; width: 0%; transition: width 0.9s cubic-bezier(.4,0,.2,1); }
+  .input-dark { background: var(--elevated); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 12px 16px; font-size: 15px; font-family: 'DM Sans', sans-serif; width: 100%; outline: none; transition: border-color 0.15s; }
+  .input-dark:focus { border-color: var(--accent); }
+  .input-dark::placeholder { color: var(--faint); }
+  .textarea-dark { background: var(--elevated); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: 16px; font-size: 15px; font-family: 'DM Sans', sans-serif; width: 100%; outline: none; transition: border-color 0.15s; resize: vertical; line-height: 1.6; }
+  .textarea-dark:focus { border-color: var(--accent); }
+  .textarea-dark::placeholder { color: var(--faint); }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; }
+  .badge-accent { background: rgba(129,140,248,0.15); color: var(--accent); border: 1px solid rgba(129,140,248,0.25); }
+  .badge-emerald { background: rgba(52,211,153,0.12); color: var(--emerald); border: 1px solid rgba(52,211,153,0.25); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); }
+  .badge-rose { background: rgba(248,113,113,0.12); color: var(--rose); border: 1px solid rgba(248,113,113,0.25); }
+  .badge-orange { background: rgba(251,146,60,0.12); color: var(--orange); border: 1px solid rgba(251,146,60,0.25); }
+  .progress-bar-outer { height: 3px; background: var(--elevated); border-radius: 99px; overflow: hidden; }
+  .progress-bar-inner { height: 3px; background: linear-gradient(90deg, #6366F1, #8B5CF6); border-radius: 99px; transition: width 0.3s; }
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { animation: spin-slow 2.5s linear infinite; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.5s ease forwards; }
+  .drag-zone { border: 1.5px dashed var(--border-bright); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .drag-zone:hover, .drag-zone.dragging { border-color: var(--accent); background: rgba(129,140,248,0.05); }
+  .connect-card { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .connect-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  @keyframes checkIn { from { opacity:0; transform: scale(0.8); } to { opacity:1; transform: scale(1); } }
+  .check-appear { opacity: 0; }
+  .check-appear.visible { animation: checkIn 0.3s ease forwards; }
+  .job-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; transition: all 0.15s; cursor: pointer; }
+  .job-card:hover { border-color: var(--border-bright); background: var(--elevated); transform: translateY(-2px); }
+  .signal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .north-chip { background:var(--elevated);border:1px solid var(--border-bright);color:var(--muted);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap; }
+  .north-chip:hover { border-color:var(--accent);color:var(--text);background:rgba(129,140,248,0.06); }
+  @keyframes popIn { from { opacity:0;transform:scale(0.85) translateY(10px); } to { opacity:1;transform:scale(1) translateY(0); } }
+  .north-pop { animation: popIn 0.28s cubic-bezier(.34,1.4,.64,1) forwards; }
+  @keyframes bubblePulse { 0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.4); } 50% { box-shadow:0 4px 32px rgba(99,102,241,0.7); } }
+  .north-pulse { animation: bubblePulse 2s ease-in-out infinite; }
+  @keyframes rivaBreath { 0%,100% { transform:scale(1); opacity:0.6; } 50% { transform:scale(1.08); opacity:1; } }
+  @keyframes rivaSpeak { 0%,100% { transform:scale(1); } 25% { transform:scale(1.04); } 75% { transform:scale(0.97); } }
+  @keyframes ringExpand { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.6); opacity:0; } }
+  .riva-ring { animation: ringExpand 2s ease-out infinite; }
+  .riva-ring-2 { animation: ringExpand 2s ease-out 0.7s infinite; }
+  .round-card { background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all 0.15s;text-align:left; }
+  .round-card:hover { border-color:var(--accent);background:rgba(129,140,248,0.05); }
+  .round-card.selected { border-color:var(--accent);background:rgba(129,140,248,0.1); }
+  .company-pill { background:var(--elevated);border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;color:var(--muted); }
+  .company-pill:hover { border-color:var(--accent);color:var(--text); }
+  .company-pill.selected { border-color:var(--accent);background:rgba(129,140,248,0.1);color:var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- SCREEN: LANDING                                               -->
+<!-- ============================================================ -->
+<div id="s-landing" class="screen active dot-grid">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/>
+        <polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/>
+        <polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/>
+        <polygon points="4,14 14,12 12,14 14,16" fill="#52525B"/>
+        <polygon points="24,14 14,16 16,14 14,12" fill="#818CF8"/>
+        <circle cx="14" cy="14" r="2" fill="#FBBF24"/>
+      </svg>
+      <span style="font-weight:800;font-size:17px;color:#FAFAFA;font-family:'Syne',sans-serif;letter-spacing:-0.02em">Compass</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <button class="btn-secondary" style="padding:8px 18px;font-size:14px" onclick="showScreen('s-signin')">Sign in</button>
+      <button class="btn-primary" style="padding:9px 20px;font-size:14px" onclick="showScreen('s-q1')">Get Started</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div style="max-width:760px;margin:0 auto;padding:96px 24px 64px;text-align:center">
+    <div class="badge badge-accent" style="margin-bottom:24px">Built for the PM Explorer · India 🇮🇳</div>
+    <h1 style="font-size:clamp(38px,6vw,58px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:24px">
+      You've spent months<br/>exploring PM.<br/>
+      <span class="gradient-text">You still don't have a map.</span>
+    </h1>
+    <p style="font-size:18px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:560px;margin-left:auto;margin-right:auto">
+      5 newsletters. 3 YouTube channels. 10+ hours a week. Zero active practice. No verdict on whether PM is even right for you. Compass changes that.
+    </p>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <button class="btn-primary" style="font-size:16px;padding:15px 36px" onclick="showScreen('s-q1')">Find My Direction — it's free →</button>
+      <span style="font-size:13px;color:var(--faint)">No account needed · Takes 5 minutes</span>
+    </div>
+    <div style="margin-top:52px;padding-top:32px;border-top:1px solid var(--border)">
+      <p style="font-size:12px;color:var(--faint);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Used by PMs at</p>
+      <p style="font-size:14px;color:var(--border-bright);font-weight:600;letter-spacing:0.5px">Razorpay · Meesho · Swiggy · CRED · Zepto · Darwinbox</p>
+    </div>
+  </div>
+
+  <!-- Pain points -->
+  <div style="max-width:1000px;margin:0 auto;padding:0 24px 80px">
+    <p style="text-align:center;font-size:13px;color:var(--faint);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">Does this sound like you?</p>
+    <h2 style="text-align:center;font-size:28px;font-weight:700;margin-bottom:40px;letter-spacing:-0.5px">The three walls every PM Explorer hits</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+      <div class="card" style="padding:28px;border-left:3px solid var(--accent)">
+        <div style="font-size:24px;margin-bottom:14px">🧭</div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:10px">No Fit Verdict</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.65">3 months in and you still don't know if PM is right for you. Or which PM sub-type suits your background. The ecosystem never tells you — it gives everyone the same content.</p>
+      </div>
+      <div class="card" style="padding:28px;border-left:3px solid var(--amber)">
+        <div style="font-size:24px;margin-bottom:14px">📍</div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:10px">No Personalised First Step</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.65">Every guide says the same thing: read Inspired, learn RICE, do mock interviews. None of it is designed for you. An engineer and a consultant need completely different starting points.</p>
+      </div>
+      <div class="card" style="padding:28px;border-left:3px solid var(--rose)">
+        <div style="font-size:24px;margin-bottom:14px">🔄</div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:10px">No Action Trigger</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.65">You've subscribed to 5 newsletters and watched 20 videos. You haven't written a single teardown. Nothing in the ecosystem forces you to stop consuming and start doing. Compass does.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div style="max-width:1000px;margin:0 auto;padding:0 24px 80px">
+    <p style="text-align:center;font-size:13px;color:var(--faint);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px">How it works</p>
+    <h2 style="text-align:center;font-size:28px;font-weight:700;margin-bottom:48px;letter-spacing:-0.5px">Your route from here to hired</h2>
+
+    <!-- Row 1: Steps 1–4 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px">
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">1</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Connect Your Signal</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">LinkedIn, resume, GitHub</p>
+      </div>
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">2</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Get Your Fit Verdict</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">PM type + your specific gap</p>
+      </div>
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">3</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Cross the Gate</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">One action before your path unlocks</p>
+      </div>
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">4</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Build Your Streak</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">Daily scored practice, not content</p>
+      </div>
+    </div>
+
+    <!-- Row 2: Steps 5–7 centred -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:750px;margin:0 auto">
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">5</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Build Your Portfolio</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">Scored teardowns that become proof of work</p>
+      </div>
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">6</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Create Connections</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">Cohort peers who become real referrals</p>
+      </div>
+      <div style="text-align:center;padding:20px 12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">7</div>
+        <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Apply When Ready</h4>
+        <p style="font-size:13px;color:var(--faint);line-height:1.5">Compass tells you exactly when</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer CTA -->
+  <div style="text-align:center;padding:60px 24px 80px;border-top:1px solid var(--border)">
+    <h2 style="font-size:30px;font-weight:800;margin-bottom:16px;letter-spacing:-0.5px">Ready to find your direction?</h2>
+    <p style="color:var(--muted);margin-bottom:28px;font-size:15px">Join 4,200 PM aspirants navigating with Compass.</p>
+    <button class="btn-primary" style="font-size:16px;padding:15px 36px" onclick="showScreen('s-q1')">Get Started — it's free →</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: SIGN IN                                               -->
+<!-- ============================================================ -->
+<div id="s-signin" class="screen">
+  <div style="min-height:100vh;display:grid;grid-template-columns:1fr 1fr" class="signin-grid">
+    <!-- Left panel -->
+    <div style="background:linear-gradient(145deg,#0D0E1F,#111827);padding:60px 56px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--border)" class="signin-left">
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/>
+          <polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/>
+          <polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/>
+          <polygon points="4,14 14,12 12,14 14,16" fill="#52525B"/>
+          <polygon points="24,14 14,16 16,14 14,12" fill="#818CF8"/>
+          <circle cx="14" cy="14" r="2" fill="#FBBF24"/>
+        </svg>
+        <span style="font-weight:800;font-size:17px;color:#FAFAFA">Compass</span>
+      </div>
+      <div>
+        <h2 style="font-size:32px;font-weight:800;line-height:1.2;margin-bottom:20px;letter-spacing:-0.8px"><span class="gradient-text">Navigate your<br/>PM career.</span><br/><span style="color:var(--text)">Don't drift through it.</span></h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.65;margin-bottom:36px">Like Google Maps for your career — Compass tells you exactly where you are, what's in your way, and the fastest route to your first PM role.</p>
+        <div class="card" style="padding:24px;border-left:3px solid var(--accent)">
+          <p style="font-size:15px;color:var(--text);line-height:1.6;margin-bottom:12px;font-style:italic">"Compass told me in 5 minutes what 6 months of YouTube couldn't. It said I was a Growth PM, not a Product PM — and gave me one specific first step. I landed at Slice 8 weeks later."</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">P</div>
+            <div>
+              <p style="font-size:13px;font-weight:600">Priya M.</p>
+              <p style="font-size:12px;color:var(--faint)">Growth PM · Slice · ex-engineer at Infosys</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--faint)">© 2026 Compass · Privacy · Terms</p>
+    </div>
+
+    <!-- Right panel -->
+    <div style="padding:60px 56px;display:flex;flex-direction:column;justify-content:center;max-width:480px;width:100%;margin:0 auto" class="signin-right">
+      <div class="badge badge-emerald" style="margin-bottom:16px;display:inline-flex">✓ Your verdict is ready</div>
+      <h2 style="font-size:26px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">One step to unlock it.</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:32px">Free account · takes 30 seconds · no card needed.</p>
+
+      <!-- Google -->
+      <button id="btn-google-signin" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--elevated);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.15s;margin-bottom:16px" onmouseover="this.style.borderColor='var(--border-bright)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <!-- LinkedIn -->
+      <button onclick="showScreen('s-connect')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#0A66C2;border:none;color:white;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:opacity 0.15s;margin-bottom:24px" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="white"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.389 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711zM4.05 6.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm1.337 9.764H2.711v-8.59H5.39v8.59zM17.668 0H.33C.149 0 0 .145 0 .324v17.352C0 17.855.149 18 .33 18h17.338c.183 0 .332-.145.332-.324V.324C18 .145 17.851 0 17.668 0z"/></svg>
+        Continue with LinkedIn
+      </button>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:13px;color:var(--faint)">or</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+        <input id="signup-email" type="email" class="input-dark" placeholder="Work or personal email"/>
+        <input id="signup-password" type="password" class="input-dark" placeholder="Create a password (min. 8 characters)"/>
+      </div>
+
+      <p id="signup-error" style="font-size:13px;color:var(--rose);margin-bottom:12px;display:none"></p>
+      <button id="btn-email-signup" class="btn-primary" style="width:100%;font-size:15px;padding:13px">Create Account →</button>
+
+      <p style="margin-top:20px;text-align:center;font-size:13px;color:var(--faint)">Already have an account? <span id="btn-signin-link" style="color:var(--accent);cursor:pointer">Sign in</span></p>
+      <p style="margin-top:12px;text-align:center;font-size:12px;color:var(--faint)">By signing up, you agree to our Terms. We won't spam you.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: CONNECT PROFILES                                      -->
+<!-- ============================================================ -->
+<div id="s-connect" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;color:#FAFAFA">Compass</span>
+    </div>
+    <span style="font-size:13px;color:var(--faint);background:var(--elevated);padding:5px 12px;border-radius:99px;border:1px solid var(--border)">Almost there — supercharge your verdict</span>
+  </nav>
+
+  <div style="max-width:680px;margin:0 auto;padding:52px 24px 80px">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.8px">Supercharge your fit verdict</h1>
+    <p style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:40px">Compass reads your actual professional signal — not just what you tell it. The more you connect, the more accurate your fit verdict and readiness score.</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:36px">
+
+      <!-- LinkedIn -->
+      <div class="connect-card" id="li-card">
+        <div class="connect-icon" style="background:#0A66C2">
+          <svg width="20" height="20" viewBox="0 0 18 18" fill="white"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.389 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711zM4.05 6.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm1.337 9.764H2.711v-8.59H5.39v8.59zM17.668 0H.33C.149 0 0 .145 0 .324v17.352C0 17.855.149 18 .33 18h17.338c.183 0 .332-.145.332-.324V.324C18 .145 17.851 0 17.668 0z"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">LinkedIn Profile</h4>
+              <p style="font-size:13px;color:var(--muted)">Your work history, skills, and network. The most important signal for your PM fit verdict.</p>
+            </div>
+            <button id="li-btn" onclick="handleConnect('li')" style="background:#0A66C2;color:white;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:16px;font-family:'Plus Jakarta Sans',sans-serif">Connect →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teal -->
+      <div class="connect-card">
+        <div class="connect-icon" style="background:rgba(20,184,166,0.15);border:1px solid rgba(20,184,166,0.3)">
+          <span style="font-weight:800;font-size:16px;color:#14B8A6">T</span>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">Teal Resume</h4>
+              <p style="font-size:13px;color:var(--muted)">Teal reads your resume and extracts your achievements, scope of work, and impact metrics automatically.</p>
+              <p style="font-size:12px;color:var(--faint);margin-top:6px">Don't have Teal? <span style="color:var(--accent);cursor:pointer">Upload your resume instead ↓</span></p>
+            </div>
+            <button id="teal-btn" onclick="handleConnect('teal')" style="background:rgba(20,184,166,0.15);color:#14B8A6;border:1px solid rgba(20,184,166,0.3);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:16px;font-family:'Plus Jakarta Sans',sans-serif">Connect →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume Upload -->
+      <div class="connect-card" style="flex-direction:column">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div class="connect-icon" style="background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div style="flex:1">
+            <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">Resume / CV Upload</h4>
+            <p style="font-size:13px;color:var(--muted)">Compass extracts your PM-relevant experience: scope, metrics owned, cross-functional work, and impact statements.</p>
+          </div>
+        </div>
+        <div id="drop-zone" class="drag-zone" style="margin-top:16px" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event)">
+          <input type="file" id="file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFileSelect(event)"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5" style="margin:0 auto 8px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p id="drop-label" style="font-size:14px;color:var(--muted)">Drag your resume here or <span style="color:var(--accent)">browse</span></p>
+          <p style="font-size:12px;color:var(--faint);margin-top:4px">PDF, DOC, DOCX · up to 5MB</p>
+        </div>
+      </div>
+
+      <!-- GitHub -->
+      <div class="connect-card">
+        <div class="connect-icon" style="background:rgba(255,255,255,0.06);border:1px solid var(--border)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--text)"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <h4 style="font-size:15px;font-weight:700">GitHub</h4>
+                <span style="font-size:11px;color:var(--faint);background:var(--elevated);padding:2px 8px;border-radius:99px;border:1px solid var(--border)">Optional · for engineers</span>
+              </div>
+              <p style="font-size:13px;color:var(--muted)">Shows your project scope, collaboration patterns, and technical depth. Strengthens Technical PM fit score.</p>
+            </div>
+            <button id="gh-btn" onclick="handleConnect('gh')" style="background:var(--elevated);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:16px;font-family:'Plus Jakarta Sans',sans-serif">Connect →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Substack -->
+      <div class="connect-card">
+        <div class="connect-icon" style="background:rgba(255,102,0,0.12);border:1px solid rgba(255,102,0,0.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6600" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        </div>
+        <div style="flex:1">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <h4 style="font-size:15px;font-weight:700">Writing Samples</h4>
+              <span style="font-size:11px;color:var(--faint);background:var(--elevated);padding:2px 8px;border-radius:99px;border:1px solid var(--border)">Optional</span>
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:10px">If you write about product, tech, or strategy, this signals product thinking before the interview.</p>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="input-dark" placeholder="https://yourname.substack.com" style="flex:1;padding:9px 14px;font-size:13px"/>
+              <button style="background:var(--elevated);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <button class="btn-primary" style="width:100%;max-width:400px;font-size:15px;padding:14px" onclick="showScreen('s-gate')">See My Gap Breakdown →</button>
+      <button style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="showScreen('s-gate')">Skip for now — I'll connect these later</button>
+      <p style="font-size:12px;color:var(--faint);text-align:center">You can always connect these from your dashboard later. We never post on your behalf.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREENS: Q1–Q5 (Onboarding Questions)                        -->
+<!-- ============================================================ -->
+
+<!-- Q1 -->
+<div id="s-q1" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-landing')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto">
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:20%"></div></div>
+      </div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">1 / 5</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Background</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">What's your current role?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Software / Data Engineer</div><div style="font-size:13px;color:var(--muted)">I build or analyse. Tech is my comfort zone.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Business / Data Analyst</div><div style="font-size:13px;color:var(--muted)">I live in spreadsheets and dashboards.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Designer (UX / UI / Product)</div><div style="font-size:13px;color:var(--muted)">I think in user flows and interfaces.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Consultant / MBA</div><div style="font-size:13px;color:var(--muted)">I've worked on strategy, not execution.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Operations / Sales / Marketing</div><div style="font-size:13px;color:var(--muted)">I own outcomes, not products.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Existing PM / APM</div><div style="font-size:13px;color:var(--muted)">I'm already in PM and want to level up or switch companies.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q1')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Other / Different background</div><div style="font-size:13px;color:var(--muted)">My path doesn't fit the options above.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div id="s-q2" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q1')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:40%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">2 / 5</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Journey</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">How long have you been thinking about PM?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Just started</div><div style="font-size:13px;color:var(--muted)">I'm in the curiosity phase, still researching.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">1–3 months</div><div style="font-size:13px;color:var(--muted)">I've read about it but haven't done much.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">3–6 months</div><div style="font-size:13px;color:var(--muted)">I've been consuming content. A lot of it.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">6+ months</div><div style="font-size:13px;color:var(--muted)">I've been at this for a while. Still stuck.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div id="s-q3" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q2')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:60%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">3 / 5</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Blocker</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">What's actually stopping you?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know if PM is right for me</div><div style="font-size:13px;color:var(--muted)">The role seems exciting but I can't tell if my background fits.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know where to specifically start</div><div style="font-size:13px;color:var(--muted)">Too much content. No clear first step for someone like me.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I can't stop consuming and start doing</div><div style="font-size:13px;color:var(--muted)">Reading and watching, but haven't actually practiced anything.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I applied and got rejected</div><div style="font-size:13px;color:var(--muted)">Tried. No feedback. Don't know what went wrong.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div id="s-q4" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q3')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:80%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">4 / 5</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Target</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">What kind of company excites you most?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q4')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">High-growth consumer startups</div><div style="font-size:13px;color:var(--muted)">Meesho, Swiggy, Zepto, CRED</div></button>
+          <button class="option-card" onclick="selectOption(this,'q4')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Fintech and payments</div><div style="font-size:13px;color:var(--muted)">Razorpay, PhonePe, Groww</div></button>
+          <button class="option-card" onclick="selectOption(this,'q4')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Large tech companies</div><div style="font-size:13px;color:var(--muted)">Flipkart, Amazon, Google</div></button>
+          <button class="option-card" onclick="selectOption(this,'q4')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">B2B SaaS / Enterprise</div><div style="font-size:13px;color:var(--muted)">Zoho, Freshworks, Darwinbox</div></button>
+          <button class="option-card" onclick="selectOption(this,'q4')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">AI-native / Deep tech</div><div style="font-size:13px;color:var(--muted)">Sarvam, Krutrim, AI-first startups</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div id="s-q5" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q4')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">5 / 5</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Be honest</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:8px;line-height:1.2;letter-spacing:-0.5px">How much have you actually practiced?</h2>
+        <p style="font-size:14px;color:var(--faint);margin-bottom:28px">Not watched or read — practiced. Teardowns written, mocks done, cases answered.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Zero</div><div style="font-size:13px;color:var(--muted)">No teardowns. No mocks. Nothing produced yet.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Minimal</div><div style="font-size:13px;color:var(--muted)">Maybe 1–2 things. Nothing consistent.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Some</div><div style="font-size:13px;color:var(--muted)">A few teardowns or case questions.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Regular</div><div style="font-size:13px;color:var(--muted)">Weekly practice but no signal on whether I'm improving.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: LOADING                                               -->
+<!-- ============================================================ -->
+<div id="s-loading" class="screen">
+  <div style="min-height:100vh;background:linear-gradient(145deg,#0D0E1F 0%,#13111F 50%,#0A0A0B 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center">
+    <svg class="spin" width="72" height="72" viewBox="0 0 28 28" fill="none" style="margin-bottom:36px">
+      <circle cx="14" cy="14" r="13" stroke="rgba(129,140,248,0.3)" stroke-width="1.5"/>
+      <polygon points="14,2 16.5,14 14,11.5 11.5,14" fill="#818CF8"/>
+      <polygon points="14,26 11.5,14 14,16.5 16.5,14" fill="#52525B"/>
+      <polygon points="2,14 14,11.5 11.5,14 14,16.5" fill="#52525B"/>
+      <polygon points="26,14 14,16.5 16.5,14 14,11.5" fill="#818CF8"/>
+      <circle cx="14" cy="14" r="2.5" fill="#FBBF24"/>
+    </svg>
+    <h2 style="font-size:26px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Reading your signal…</h2>
+    <p style="font-size:15px;color:var(--muted);margin-bottom:48px">This takes about 5 seconds</p>
+    <div style="display:flex;flex-direction:column;gap:16px;text-align:left;min-width:300px">
+      <div id="load-1" class="check-appear" style="display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        Mapping your professional background…
+      </div>
+      <div id="load-2" class="check-appear" style="display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        Comparing against 40+ company hiring rubrics…
+      </div>
+      <div id="load-3" class="check-appear" style="display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        Calculating your PM fit score…
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: FIT VERDICT                                           -->
+<!-- ============================================================ -->
+<div id="s-verdict" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <span style="font-size:13px;color:var(--faint);background:var(--elevated);padding:5px 12px;border-radius:99px;border:1px solid var(--border)">Your Fit Verdict</span>
+  </nav>
+
+  <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
+    <div style="margin-bottom:8px"><span style="font-size:13px;color:var(--emerald);font-weight:600">✓ Analysis complete</span></div>
+    <h1 style="font-size:34px;font-weight:800;margin-bottom:8px;letter-spacing:-0.8px">Your Signal Is Clear.</h1>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:36px">Based on your background and target companies, here's where you stand today.</p>
+
+    <div style="display:grid;gap:16px;margin-bottom:32px">
+
+      <!-- PM Type -->
+      <div class="card" style="padding:28px">
+        <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Your PM Type</p>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2));border:1px solid rgba(129,140,248,0.3);border-radius:12px;padding:10px 20px">
+            <span class="gradient-text" style="font-size:22px;font-weight:800" id="verdict-pm-type">Growth PM</span>
+          </div>
+          <span style="font-size:13px;color:var(--muted)">Best match for your profile</span>
+        </div>
+        <p id="verdict-pm-desc" style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:12px">Growth PMs run experiments, own acquisition and retention metrics, and drive revenue loops. Your engineering background gives you a technical edge — most growth PMs struggle to speak the language of engineering teams. You don't have that problem.</p>
+        <p style="font-size:13px;color:var(--faint)">Also suited for: <span id="verdict-pm-also" style="color:var(--text)">Fintech PM · Consumer PM · Growth-stage B2B PM</span></p>
+      </div>
+
+      <!-- Fit Score — locked until LinkedIn/resume + gate task -->
+      <div class="card" style="padding:28px;display:flex;align-items:center;gap:28px;background:rgba(99,102,241,0.02)">
+        <div style="flex-shrink:0">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="var(--elevated)" stroke-width="9"/>
+            <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(129,140,248,0.2)" stroke-width="9" stroke-dasharray="150 152" transform="rotate(-90 60 60)"/>
+            <text x="60" y="52" text-anchor="middle" font-size="26" fill="var(--border-bright)" font-family="DM Sans, sans-serif">?</text>
+            <text x="60" y="70" text-anchor="middle" font-size="10" fill="var(--faint)" font-family="DM Sans, sans-serif">not yet scored</text>
+          </svg>
+        </div>
+        <div style="flex:1">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Readiness Score</p>
+          <p style="font-size:15px;color:var(--text);font-weight:600;margin-bottom:14px">Your score generates after 2 steps.</p>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+              <div style="width:20px;height:20px;border-radius:50%;background:var(--elevated);border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;color:var(--faint)">1</div>
+              Connect LinkedIn or upload your resume
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+              <div style="width:20px;height:20px;border-radius:50%;background:var(--elevated);border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;color:var(--faint)">2</div>
+              Complete a short product analysis task (~10 min)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Gap -->
+      <div class="card" style="padding:28px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04)">
+        <p style="font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:600">The Pattern We See For Your Background</p>
+        <p id="verdict-gap-text" style="font-size:15px;color:var(--text);line-height:1.65;margin-bottom:12px">You default to building solutions before diagnosing the problem. You walk into a case with a feature in mind before you've asked a single user question. That's the most common screen-out reason at Razorpay and Meesho — not lack of skill, just a trained reflex.</p>
+        <p id="verdict-gap-fix" style="font-size:13px;color:var(--muted)">This is a hypothesis based on your background — not a verdict. Log in and complete your first task to find out if it applies to you specifically.</p>
+      </div>
+    </div>
+
+    <!-- Login unlock wall -->
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06));border:1px solid rgba(129,140,248,0.3);border-radius:20px;padding:32px;text-align:center;margin-top:8px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:5px 14px;margin-bottom:18px">
+        <svg width="12" height="12" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        <span style="font-size:12px;color:var(--emerald);font-weight:600">Fit verdict ready · free forever</span>
+      </div>
+      <h3 style="font-size:22px;font-weight:800;margin-bottom:10px;letter-spacing:-0.4px">Your full breakdown is one step away.</h3>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:10px;max-width:480px;margin-left:auto;margin-right:auto">Create a free account to unlock your <strong style="color:var(--text)">6-dimension gap table</strong>, <strong style="color:var(--text)">readiness score calibrated to your target companies</strong>, and your <strong style="color:var(--text)">6-week navigation path</strong>.</p>
+      <p style="font-size:12px;color:var(--faint);margin-bottom:24px">No card. No trial. Free while you're preparing.</p>
+      <button class="btn-primary" style="font-size:15px;padding:14px 36px;margin-bottom:12px" onclick="showScreen('s-signin')">Login to unlock my full path — it's free →</button>
+      <div><span style="font-size:12px;color:var(--faint)">Already have an account? <span style="color:var(--accent);cursor:pointer" onclick="showScreen('s-signin')">Sign in</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: GATE                                                  -->
+<!-- ============================================================ -->
+<div id="s-gate" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <nav class="navbar">
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+        <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+      </div>
+      <div style="display:flex;gap:20px">
+        <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+        <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+        <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+        <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+        <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+      </div>
+      <div id="avatar-initial-gate" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+    </nav>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:640px;width:100%">
+        <span class="badge badge-accent" style="margin-bottom:20px">Step 1 of your path</span>
+        <h1 style="font-size:30px;font-weight:800;margin-bottom:14px;letter-spacing:-0.6px">Before you see your path,<br/>one step.</h1>
+        <p style="font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:28px">This isn't gatekeeping. A path built from how you actually think is more accurate than one based on your stated background alone. This 10-minute task tells Compass whether your instinct is to diagnose or to build.</p>
+
+        <div class="card" style="padding:24px;border-left:3px solid var(--accent);margin-bottom:24px">
+          <p style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Your First Task</p>
+          <p style="font-size:15px;color:var(--text);line-height:1.7">Open any app you used in the last 24 hours. Pick one feature. In 5 sentences:<br/><br/>
+          <span style="color:var(--accent)">→</span> Who is this feature for?<br/>
+          <span style="color:var(--accent)">→</span> What problem does it solve?<br/>
+          <span style="color:var(--accent)">→</span> How would you know if it's working?<br/>
+          <span style="color:var(--accent)">→</span> What would you change — and why?</p>
+        </div>
+
+        <textarea id="gate-input" class="textarea-dark" rows="6" maxlength="300" placeholder="Start with the app name and the feature… e.g. 'I'm looking at Swiggy's reorder feature. It's designed for…'" oninput="validateGate()"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;margin-bottom:24px">
+          <p style="font-size:12px;color:var(--faint)">This becomes the first entry in your proof-of-work portfolio.</p>
+          <p id="gate-counter" style="font-size:12px;color:var(--faint)">300 characters remaining</p>
+        </div>
+
+        <div style="text-align:center">
+          <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="submitGate()">Submit and See My Path →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: GAP DIAGNOSIS                                         -->
+<!-- ============================================================ -->
+<div id="s-gaps" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <span style="font-size:13px;color:var(--faint);background:var(--elevated);padding:5px 12px;border-radius:99px;border:1px solid var(--border)">Gap Breakdown</span>
+  </nav>
+
+  <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.8px">Here's exactly what's in your way.</h1>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:28px">Two gaps. One major advantage. All fixable.</p>
+
+    <div class="card" style="padding:20px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04);margin-bottom:32px">
+      <p style="font-size:14px;color:var(--text);line-height:1.6">Razorpay's published hiring framework explicitly tests on two of your six dimensions. <strong>Analytical Depth</strong> and <strong>AI Fluency</strong> — they eliminate 60% of candidates before the product sense round even begins.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0" id="dim-list">
+      <!-- rows inserted by JS -->
+    </div>
+
+    <div style="text-align:center;margin-top:36px">
+      <button class="btn-primary" style="font-size:15px;padding:14px 36px" onclick="showScreen('s-readiness')">See Your Readiness Score →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: READINESS SCORE                                       -->
+<!-- ============================================================ -->
+<div id="s-readiness" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-path')">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-readiness" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <div style="max-width:920px;margin:0 auto;padding:48px 24px 80px">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">You're 19 points from ready.</h1>
+    <p id="readiness-subtitle" style="color:var(--muted);font-size:15px;margin-bottom:40px">Application-ready for Growth PM roles at fintech companies means a Compass score of 75. You're at 56. Here's what your profile looks like across all 6 dimensions.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start">
+      <!-- Left: Radar chart -->
+      <div>
+        <div class="card" style="padding:28px;text-align:center">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px">Your PM Readiness Profile</p>
+          <!-- Spider/Radar Chart SVG -->
+          <svg viewBox="0 0 440 430" style="width:100%;max-width:380px;margin:0 auto;display:block" id="radar-svg">
+            <defs>
+              <linearGradient id="radarFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6366F1" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.2"/>
+              </linearGradient>
+              <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#818CF8"/>
+                <stop offset="100%" stop-color="#A78BFA"/>
+              </linearGradient>
+            </defs>
+            <!-- Background grid hexagons -->
+            <polygon points="220,80 326,140 326,260 220,320 114,260 114,140" fill="none" stroke="#3F3F46" stroke-width="1"/>
+            <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="none" stroke="#27272A" stroke-width="0.75"/>
+            <polygon points="220,140 281,170 281,230 220,260 159,230 159,170" fill="none" stroke="#27272A" stroke-width="0.75"/>
+            <polygon points="220,170 258.5,185 258.5,215 220,230 181.5,215 181.5,185" fill="none" stroke="#27272A" stroke-width="0.5"/>
+            <!-- Axis lines -->
+            <line x1="220" y1="200" x2="220" y2="80" stroke="#27272A" stroke-width="1"/>
+            <line x1="220" y1="200" x2="326" y2="140" stroke="#27272A" stroke-width="1"/>
+            <line x1="220" y1="200" x2="326" y2="260" stroke="#27272A" stroke-width="1"/>
+            <line x1="220" y1="200" x2="220" y2="320" stroke="#27272A" stroke-width="1"/>
+            <line x1="220" y1="200" x2="114" y2="260" stroke="#27272A" stroke-width="1"/>
+            <line x1="220" y1="200" x2="114" y2="140" stroke="#27272A" stroke-width="1"/>
+            <!-- Target polygon (75) — dashed amber -->
+            <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="rgba(251,191,36,0.04)" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <!-- Score polygon — animated opacity -->
+            <polygon id="score-poly" points="220,200 220,200 220,200 220,200 220,200 220,200" fill="url(#radarFill)" stroke="url(#radarStroke)" stroke-width="2" stroke-linejoin="round" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <!-- Score dots -->
+            <circle id="dot0" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <circle id="dot1" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <circle id="dot2" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <circle id="dot3" cx="220" cy="200" r="5" fill="#34D399" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <circle id="dot4" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <circle id="dot5" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+            <!-- Axis labels -->
+            <text x="220" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Product Sense</text>
+            <text x="220" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">58</text>
+            <text x="350" y="126" text-anchor="start" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Analytical</text>
+            <text x="350" y="138" text-anchor="start" font-size="11" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">44</text>
+            <text x="350" y="272" text-anchor="start" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Business</text>
+            <text x="350" y="284" text-anchor="start" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">53</text>
+            <text x="220" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Technical</text>
+            <text x="220" y="354" text-anchor="middle" font-size="11" font-weight="700" fill="#34D399" font-family="DM Sans, sans-serif">81</text>
+            <text x="90" y="272" text-anchor="end" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">AI Fluency</text>
+            <text x="90" y="284" text-anchor="end" font-size="11" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">37</text>
+            <text x="90" y="126" text-anchor="end" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Behavioural</text>
+            <text x="90" y="138" text-anchor="end" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">62</text>
+            <!-- Legend -->
+            <rect x="140" y="392" width="12" height="3" rx="1.5" fill="url(#radarStroke)"/>
+            <text x="158" y="397" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Your score</text>
+            <rect x="240" y="392" width="12" height="3" rx="1.5" fill="#FBBF24" stroke="#FBBF24"/>
+            <text x="258" y="397" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Target (75)</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right: Stats + insights -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Confidence indicator -->
+        <div id="confidence-banner" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px"></div>
+          <div>
+            <p id="confidence-title" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">3 of 6 dimensions measured · 3 estimated</p>
+            <p id="confidence-detail" style="font-size:12px;color:var(--faint);line-height:1.55">Measured: Product Sense (gate task) · Technical Credibility · Business Framing (LinkedIn). Complete a Riva session to measure the remaining 3.</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="card" style="padding:16px;text-align:center">
+            <div class="syne" style="font-size:28px;font-weight:800;color:var(--accent)">56</div>
+            <div style="font-size:11px;color:var(--faint);margin-top:2px">Your score</div>
+          </div>
+          <div class="card" style="padding:16px;text-align:center">
+            <div class="syne" style="font-size:28px;font-weight:800;color:var(--amber)">75</div>
+            <div style="font-size:11px;color:var(--faint);margin-top:2px">Ready threshold</div>
+          </div>
+          <div class="card" style="padding:16px;text-align:center">
+            <div class="syne" style="font-size:28px;font-weight:800;color:var(--emerald)">6w</div>
+            <div style="font-size:11px;color:var(--faint);margin-top:2px">Daily practice</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px;border-left:3px solid var(--rose);background:rgba(248,113,113,0.04)">
+          <p style="font-size:12px;color:var(--rose);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">2 Critical Gaps</p>
+          <p style="font-size:14px;color:var(--text);margin-bottom:4px"><strong>Analytical Depth (44)</strong> and <strong>AI Fluency (37)</strong> are your priority gaps. These two dimensions are explicitly tested in round 1 at Razorpay and Meesho.</p>
+        </div>
+
+        <div class="card" style="padding:20px;border-left:3px solid var(--emerald);background:rgba(52,211,153,0.04)">
+          <p style="font-size:12px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">Your Advantage</p>
+          <p style="font-size:14px;color:var(--text)"><strong>Technical Credibility (81)</strong> is your biggest edge. Most growth PMs at your target companies can't speak engineering fluently. You can. Don't undersell it.</p>
+        </div>
+
+        <div class="card" style="padding:20px">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Competitive after 6 weeks</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="badge badge-emerald">Slice</span>
+            <span class="badge badge-emerald">Darwinbox</span>
+            <span class="badge badge-emerald">Jar</span>
+            <span class="badge badge-amber">Razorpay (8 weeks)</span>
+          </div>
+        </div>
+
+        <button class="btn-primary" style="font-size:15px;padding:14px 28px;width:100%" onclick="showScreen('s-paywall')">See Your 6-Week Path →</button>
+      </div>
+    </div>
+
+    <!-- Dimension breakdown -->
+    <div style="margin-top:40px;padding-top:36px;border-top:1px solid var(--border)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:6px">All 6 Dimensions</h3>
+      <p style="font-size:13px;color:var(--faint);margin-bottom:24px">What each score means for your specific target companies.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="dim-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: PAYWALL / UPGRADE                                     -->
+<!-- ============================================================ -->
+<div id="s-paywall" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-paywall" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <div style="max-width:640px;margin:0 auto;padding:52px 24px 80px">
+
+    <!-- Score confirm banner -->
+    <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:36px">
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 16 16"><polyline points="2,8 6,12 14,4" stroke="#34D399" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--emerald);margin-bottom:2px">Your readiness score is ready.</p>
+        <p style="font-size:13px;color:var(--muted)">Compass scored you at <strong style="color:var(--text)">56 / 75</strong> for <span id="paywall-pm-type">Growth PM</span> roles. Your 6-week path to close that gap is waiting.</p>
+      </div>
+    </div>
+
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.8px">One plan. Your gap, your target.</h1>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:36px">Everything you've done so far is free. The path — and every practice round, peer review, and score update after it — is Compass Pro.</p>
+
+    <!-- Pricing cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+
+      <!-- Monthly -->
+      <div class="card" style="padding:28px;position:relative">
+        <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Monthly</p>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">
+          <span style="font-size:32px;font-weight:800;letter-spacing:-1px">₹999</span>
+          <span style="font-size:13px;color:var(--muted)">/month</span>
+        </div>
+        <p style="font-size:13px;color:var(--faint);margin-bottom:24px">Billed monthly. Cancel anytime.</p>
+        <button class="btn-secondary" style="width:100%;font-size:14px;padding:12px" onclick="showScreen('s-path')">Start Monthly</button>
+      </div>
+
+      <!-- Annual — highlighted -->
+      <div class="card" style="padding:28px;position:relative;border-color:rgba(129,140,248,0.5);background:rgba(99,102,241,0.04)">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:99px;padding:4px 14px;white-space:nowrap">
+          <span style="font-size:11px;font-weight:700;color:#fff">MOST POPULAR</span>
+        </div>
+        <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Annual</p>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px">
+          <span style="font-size:32px;font-weight:800;letter-spacing:-1px" class="gradient-text">₹7,999</span>
+          <span style="font-size:13px;color:var(--muted)">/year</span>
+        </div>
+        <p style="font-size:13px;color:var(--emerald);margin-bottom:24px;font-weight:600">Save 33% vs monthly</p>
+        <button class="btn-primary" style="width:100%;font-size:14px;padding:12px" onclick="showScreen('s-path')">Start Annual — Best Value</button>
+      </div>
+    </div>
+
+    <!-- What's included -->
+    <div class="card" style="padding:24px;margin-bottom:20px">
+      <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Everything in Compass Pro</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Personalized 6-week path
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Live PM Readiness Score
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Practice rounds with Riva (AI coach)
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Calibrated peer feedback
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Post-rejection remediation plan
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
+          <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Score updates as you practice
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:12px;color:var(--faint)">No lock-in. Cancel anytime from your profile. Questions? <span style="color:var(--accent);cursor:pointer">Talk to us.</span></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: NAVIGATION PATH                                       -->
+<!-- ============================================================ -->
+<div id="s-path" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-path" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:8px;letter-spacing:-0.8px">Your Route to 75.</h1>
+    <p id="path-subtitle" style="color:var(--muted);font-size:15px;margin-bottom:36px">Calibrated to Growth PM roles at fintech companies. Not a generic 12-week plan.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px">
+      <!-- Phase 1 -->
+      <div class="card" style="padding:28px;border-left:3px solid var(--accent)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span class="badge badge-accent">Phase 1 · Weeks 1–2</span>
+          <span style="font-size:12px;color:var(--accent);font-weight:600">Product Sense: 58 → 68</span>
+        </div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">User Empathy Foundation</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Observe 3 user flows in any Razorpay product. Write what the user is actually trying to accomplish — not what the feature does.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Rewrite 2 feature announcements from a user problem perspective. Submit for Compass scoring.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">First scored case question: <em>"How would you improve Razorpay's merchant onboarding?"</em></p></div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="card" style="padding:28px;border-left:3px solid var(--rose)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span class="badge badge-rose">Phase 2 · Weeks 3–4</span>
+          <span style="font-size:12px;color:var(--rose);font-weight:600">Analytical Depth: 44 → 60</span>
+        </div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">Analytical Depth</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Apply the North Star metric framework to Meesho. 200 words. Scored against Meesho's actual growth priorities.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Diagnose a metric drop. Compass gives you a real case from a fintech company.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Build a mock metrics dashboard for a growth feature. Explain your choices in plain language.</p></div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="card" style="padding:28px;border-left:3px solid var(--violet)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--violet);border:1px solid rgba(167,139,250,0.25)">Phase 3 · Weeks 5–6</span>
+          <span style="font-size:12px;color:var(--violet);font-weight:600">AI Fluency: 37 → 55</span>
+        </div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">AI Fluency + Mock Interviews</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Design an AI-native feature for an Indian fintech product. Not an AI wrapper — a genuinely new capability.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">First full live mock interview. Scored across all 6 dimensions in real time.</p></div>
+          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Second mock + Compass re-assessment. If you've crossed 75, you'll see your application list.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:20px;border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.04);margin-bottom:32px">
+      <p style="font-size:14px;color:var(--text);line-height:1.65">After Week 6, Compass re-scores you. If you hit 75, you'll receive a specific list of companies to apply to — with names of PMs to reach out to for referrals.</p>
+    </div>
+
+    <div style="text-align:center">
+      <button class="btn-primary" style="font-size:15px;padding:14px 36px" onclick="showScreen('s-dashboard')">Start Day 1 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: DASHBOARD                                             -->
+<!-- ============================================================ -->
+<div id="s-dashboard" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-dash" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <!-- Welcome banner -->
+  <div style="background:linear-gradient(90deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border-bottom:1px solid rgba(129,140,248,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:15px;font-weight:700">Day 1 🔥 Don't break your streak.</span>
+    <span class="badge badge-accent">Readiness Score: 56</span>
+  </div>
+
+  <!-- Dashboard grid -->
+  <div style="max-width:1200px;margin:0 auto;padding:28px 24px 60px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px" class="dash-grid">
+
+    <!-- LEFT: Streak + Challenge -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card" style="padding:22px">
+        <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Your Streak</p>
+        <div style="font-size:42px;font-weight:800;margin-bottom:4px">🔥 1</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">day streak · Your streak tracks doing, not watching.</p>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+          <div style="height:28px;border-radius:6px;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">M</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">T</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">W</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">T</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">F</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">S</div>
+          <div style="height:28px;border-radius:6px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)">S</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px;border-left:3px solid var(--accent)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span class="badge badge-accent" style="font-size:11px">Phase 1 · Day 1</span>
+          <span style="font-size:12px;color:var(--faint)">~15 min</span>
+        </div>
+        <h4 style="font-size:15px;font-weight:700;margin-bottom:8px">User Empathy: Razorpay Observation</h4>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">Observe 3 user flows in Razorpay's merchant dashboard. For each, write what the user is actually trying to accomplish — not what the feature does.</p>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <span style="font-size:11px;background:var(--elevated);color:var(--faint);padding:4px 8px;border-radius:6px;border:1px solid var(--border)">Medium</span>
+          <span style="font-size:11px;background:var(--elevated);color:var(--faint);padding:4px 8px;border-radius:6px;border:1px solid var(--border)">Product Sense +4</span>
+        </div>
+        <button class="btn-primary" style="width:100%;font-size:13px;padding:11px" onclick="showScreen('s-gate')">Submit Response →</button>
+      </div>
+    </div>
+
+    <!-- CENTER: Job Fit -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Job Fit Matches</h3>
+        <p style="font-size:12px;color:var(--faint)">Updated daily · 3 new matches this week</p>
+      </div>
+      <div class="job-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <h4 style="font-size:15px;font-weight:700">Growth PM</h4>
+            <p style="font-size:13px;color:var(--muted)">Slice · Series C · Fintech · Bengaluru</p>
+          </div>
+          <span class="badge badge-emerald">76% fit</span>
+        </div>
+        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">2 gaps before ready</p>
+        <button style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
+      </div>
+      <div class="job-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <h4 style="font-size:15px;font-weight:700">Technical PM</h4>
+            <p style="font-size:13px;color:var(--muted)">Darwinbox · Series D · B2B SaaS · Hyderabad</p>
+          </div>
+          <span class="badge badge-emerald">82% fit</span>
+        </div>
+        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">1 gap before ready</p>
+        <button style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
+      </div>
+      <div class="job-card" style="border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <h4 style="font-size:15px;font-weight:700">Growth PM</h4>
+              <span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600">Your Target</span>
+            </div>
+            <p style="font-size:13px;color:var(--muted)">Razorpay · Unicorn · Fintech · Bengaluru</p>
+          </div>
+          <span class="badge badge-amber">68% fit</span>
+        </div>
+        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">~6 weeks away</p>
+        <button style="background:none;border:1px solid rgba(129,140,248,0.3);color:var(--accent);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Hiring Trends -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Hiring Trend Signals</h3>
+        <p style="font-size:12px;color:var(--faint)">Updated daily via Compass Market Intelligence</p>
+      </div>
+      <div class="signal-card">
+        <div class="dot" style="background:var(--emerald)"></div>
+        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Fintech PM postings on LinkedIn India up <strong>22%</strong> this month. 47 new roles added in the last 7 days.</p><p style="font-size:11px;color:var(--faint)">Updated 2 hours ago</p></div>
+      </div>
+      <div class="signal-card">
+        <div class="dot" style="background:var(--amber)"></div>
+        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">AI Fluency is now a <strong>first-round screen</strong> at 3 of your top 5 target companies. This is your most urgent gap to close.</p><p style="font-size:11px;color:var(--faint)">Updated today</p></div>
+      </div>
+      <div class="signal-card">
+        <div class="dot" style="background:var(--accent)"></div>
+        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Take-home assignments are now standard at <strong>Meesho and Darwinbox</strong>. Good news for analytical backgrounds.</p><p style="font-size:11px;color:var(--faint)">Updated yesterday</p></div>
+      </div>
+      <div class="signal-card">
+        <div class="dot" style="background:var(--rose)"></div>
+        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Edtech PM roles down <strong>34%</strong> YoY. If Byju's or Unacademy are in your list, consider removing them.</p><p style="font-size:11px;color:var(--faint)">Updated 3 days ago</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: INTERVIEW ROOM                                        -->
+<!-- ============================================================ -->
+<div id="s-interview" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-interview" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <div style="max-width:1060px;margin:0 auto;padding:40px 24px 80px">
+
+    <!-- Header -->
+    <div style="margin-bottom:36px">
+      <div class="badge badge-emerald" style="margin-bottom:14px">Live AI Interview Simulation</div>
+      <h1 style="font-size:30px;font-weight:800;letter-spacing:-0.6px;margin-bottom:8px">The Interview Room</h1>
+      <p style="font-size:15px;color:var(--muted)">Practice with Riva — a calibrated AI interviewer. Scored against real company rubrics. No hand-holding.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:28px;align-items:start" class="interview-grid">
+
+      <!-- LEFT: Riva avatar panel -->
+      <div>
+        <div class="card" style="padding:32px;text-align:center;background:linear-gradient(160deg,#0f0c24,#111827)">
+
+          <!-- Avatar with breathing rings -->
+          <div style="position:relative;width:140px;height:140px;margin:0 auto 24px">
+            <!-- Outer ring 1 -->
+            <div class="riva-ring" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.35)"></div>
+            <!-- Outer ring 2 -->
+            <div class="riva-ring-2" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.2)"></div>
+            <!-- Avatar circle -->
+            <div style="width:140px;height:140px;border-radius:50%;background:linear-gradient(145deg,#312e81,#4c1d95);border:2px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+              <!-- Abstract face: geometric illustration -->
+              <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                <!-- Head shape -->
+                <ellipse cx="36" cy="34" rx="22" ry="24" fill="rgba(129,140,248,0.15)" stroke="rgba(129,140,248,0.5)" stroke-width="1.5"/>
+                <!-- Eyes -->
+                <ellipse cx="28" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
+                <ellipse cx="44" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
+                <!-- Eye shine -->
+                <circle cx="29.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
+                <circle cx="45.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
+                <!-- Neutral line mouth — firm, professional -->
+                <path d="M29 42 Q36 45 43 42" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <!-- Hair / top detail -->
+                <path d="M14 30 Q14 10 36 10 Q58 10 58 30" stroke="rgba(129,140,248,0.4)" stroke-width="1.5" fill="rgba(129,140,248,0.06)" stroke-linecap="round"/>
+                <!-- Collar / shoulders hint -->
+                <path d="M18 60 Q24 52 36 54 Q48 52 54 60" stroke="rgba(129,140,248,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Name & credentials -->
+          <h2 style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.03em;margin-bottom:4px">Riva</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:6px">AI Interview Partner</p>
+          <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+            <span class="badge badge-accent" style="font-size:11px">Ex-Razorpay PM</span>
+            <span class="badge" style="background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);font-size:11px">200+ interviews</span>
+          </div>
+
+          <!-- Status indicator -->
+          <div id="riva-status" style="display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:7px 16px;margin-bottom:24px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--emerald)"></div>
+            <span style="font-size:13px;font-weight:600;color:var(--emerald)">Ready to interview you</span>
+          </div>
+
+          <!-- Riva intro quote -->
+          <div style="background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:14px 16px;text-align:left">
+            <p style="font-size:13px;color:var(--muted);line-height:1.65;font-style:italic">"I'm not here to make you feel good. I'm here to make you interview-ready. I'll probe your reasoning, push on your assumptions, and tell you exactly what a Razorpay PM interviewer would think of that answer."</p>
+            <p style="font-size:11px;color:var(--faint);margin-top:8px">— Riva</p>
+          </div>
+        </div>
+
+        <!-- Previous sessions -->
+        <div class="card" style="padding:20px;margin-top:16px">
+          <p style="font-size:13px;font-weight:700;margin-bottom:14px">Previous Sessions</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--elevated);border-radius:10px">
+              <div>
+                <p style="font-size:13px;font-weight:600;margin-bottom:2px">Product Sense · Razorpay</p>
+                <p style="font-size:11px;color:var(--faint)">Not attempted yet</p>
+              </div>
+              <span class="badge" style="background:var(--elevated);color:var(--faint);border:1px solid var(--border);font-size:11px">—</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--elevated);border-radius:10px">
+              <div>
+                <p style="font-size:13px;font-weight:600;margin-bottom:2px">Metrics · Meesho</p>
+                <p style="font-size:11px;color:var(--faint)">Not attempted yet</p>
+              </div>
+              <span class="badge" style="background:var(--elevated);color:var(--faint);border:1px solid var(--border);font-size:11px">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Setup + live interface -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Round selector -->
+        <div class="card" style="padding:24px">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Choose Your Round</p>
+          <div style="display:flex;flex-direction:column;gap:10px" id="round-selector">
+            <button class="round-card selected" onclick="selectRound(this,'product-sense')">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:15px;font-weight:700">Product Sense</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:12px;color:var(--faint)">~30 min</span>
+                  <span class="badge badge-amber" style="font-size:11px">Your gap</span>
+                </div>
+              </div>
+              <p style="font-size:13px;color:var(--muted)">Improve a product, design a feature, diagnose a user problem. What Razorpay tests in Round 1.</p>
+            </button>
+            <button class="round-card" onclick="selectRound(this,'metrics')">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:15px;font-weight:700">Metrics & Analytics</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:12px;color:var(--faint)">~20 min</span>
+                  <span class="badge badge-rose" style="font-size:11px">Priority gap</span>
+                </div>
+              </div>
+              <p style="font-size:13px;color:var(--muted)">Diagnose a metric drop, define your north star, build a measurement framework.</p>
+            </button>
+            <button class="round-card" onclick="selectRound(this,'behavioural')">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:15px;font-weight:700">Behavioural</span>
+                <span style="font-size:12px;color:var(--faint)">~15 min</span>
+              </div>
+              <p style="font-size:13px;color:var(--muted)">STAR-format stories. Conflict resolution, stakeholder management, failure and what you learned.</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Company + mode -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card" style="padding:20px">
+            <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Interviewing For</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px" id="company-selector">
+              <button class="company-pill selected" onclick="selectCompany(this)">Razorpay</button>
+              <button class="company-pill" onclick="selectCompany(this)">Meesho</button>
+              <button class="company-pill" onclick="selectCompany(this)">Flipkart</button>
+              <button class="company-pill" onclick="selectCompany(this)">Swiggy</button>
+              <button class="company-pill" onclick="selectCompany(this)">CRED</button>
+            </div>
+          </div>
+          <div class="card" style="padding:20px">
+            <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Pressure Level</p>
+            <div style="display:flex;flex-direction:column;gap:8px" id="pressure-selector">
+              <button class="company-pill selected" style="width:100%;text-align:left" onclick="selectPressure(this)">🟡 Practice — hints on</button>
+              <button class="company-pill" style="width:100%;text-align:left" onclick="selectPressure(this)">🔴 Real pressure — no hints</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- What Riva scores -->
+        <div class="card" style="padding:20px;border-left:3px solid var(--accent)">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">What Riva Scores You On</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:2px">Product Sense</div>
+              <div style="font-size:10px;color:var(--faint)">Problem framing</div>
+            </div>
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--rose);margin-bottom:2px">Analytical</div>
+              <div style="font-size:10px;color:var(--faint)">Data reasoning</div>
+            </div>
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:2px">Structure</div>
+              <div style="font-size:10px;color:var(--faint)">MECE thinking</div>
+            </div>
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--emerald);margin-bottom:2px">Tech Credibility</div>
+              <div style="font-size:10px;color:var(--faint)">Feasibility sense</div>
+            </div>
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:2px">AI Fluency</div>
+              <div style="font-size:10px;color:var(--faint)">AI-native thinking</div>
+            </div>
+            <div style="text-align:center;padding:10px 8px;background:var(--elevated);border-radius:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:2px">Communication</div>
+              <div style="font-size:10px;color:var(--faint)">Clarity & confidence</div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--faint);margin-top:12px">Scores feed directly into your Readiness Score after each session.</p>
+        </div>
+
+        <!-- Start CTA -->
+        <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px" onclick="startInterview()">
+          Start Interview with Riva →
+        </button>
+
+        <!-- Live session panel (hidden until started) -->
+        <div id="riva-live" style="display:none">
+          <div class="card" style="padding:0;overflow:hidden;border-color:rgba(129,140,248,0.35)">
+            <!-- Session header -->
+            <div style="background:linear-gradient(135deg,#1a1035,#111827);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.2)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--rose)" id="rec-dot"></div>
+                <span style="font-size:13px;font-weight:700;color:#FAFAFA">Live · Product Sense · Razorpay</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span id="riva-timer" style="font-size:13px;color:var(--amber);font-weight:600;font-family:'Syne',sans-serif">00:00</span>
+                <button onclick="endInterview()" style="font-size:12px;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--rose);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif">End Session</button>
+              </div>
+            </div>
+            <!-- Chat area -->
+            <div id="riva-chat" style="padding:20px;display:flex;flex-direction:column;gap:14px;min-height:220px;max-height:320px;overflow-y:auto">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                  <span style="font-size:10px;font-weight:800;color:#818CF8">R</span>
+                </div>
+                <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:12px 16px;max-width:440px">
+                  <p style="font-size:14px;color:var(--text);line-height:1.65">Good. Let's begin. I'm interviewing you for a Growth PM role at Razorpay. You have 2 minutes to answer this.<br/><br/><strong>Razorpay's payment success rate dropped 8% last Tuesday. As the PM, walk me through how you'd diagnose this.</strong><br/><br/>Take a moment to structure your thinking before you answer.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Input -->
+            <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
+              <textarea id="riva-input" class="textarea-dark" rows="2" placeholder="Type your answer — or speak it if you have mic access…" style="flex:1;resize:none"></textarea>
+              <button onclick="rivaRespond()" style="background:var(--accent-bright);border:none;border-radius:10px;padding:0 16px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:white">Send →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: PROFILE                                               -->
+<!-- ============================================================ -->
+<div id="s-profile" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Profile</span>
+    </div>
+    <div id="avatar-initial-profile-nav" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer">A</div>
+  </nav>
+
+  <div style="max-width:920px;margin:0 auto;padding:40px 24px 80px">
+
+    <!-- Profile header -->
+    <div style="display:flex;align-items:center;gap:24px;margin-bottom:40px">
+      <div id="avatar-initial-profile-big" style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30px;flex-shrink:0">A</div>
+      <div style="flex:1">
+        <h1 id="profile-name" style="font-size:24px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px">Arjun Sharma</h1>
+        <p id="profile-subtitle" style="font-size:14px;color:var(--muted);margin-bottom:12px">Senior Software Engineer · 4 years at Infosys · Bengaluru</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span id="profile-track-badge" class="badge badge-accent">Growth PM Track</span>
+          <span class="badge badge-amber">Readiness: 56 / 100</span>
+          <span class="badge badge-emerald">🔥 Day 1 Streak</span>
+        </div>
+      </div>
+      <button class="btn-secondary" style="font-size:13px;padding:9px 18px;white-space:nowrap;flex-shrink:0">Edit Profile</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="profile-grid">
+
+      <!-- LEFT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Connected Signal Sources -->
+        <div class="card" style="padding:24px">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Connected Signal Sources</h3>
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:#0A66C2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="14" height="14" viewBox="0 0 18 18" fill="white"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.389 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711zM4.05 6.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm1.337 9.764H2.711v-8.59H5.39v8.59z"/></svg>
+                </div>
+                <div>
+                  <p style="font-size:13px;font-weight:600">LinkedIn</p>
+                  <p style="font-size:12px;color:var(--faint)">arjunsharma · 312 connections</p>
+                </div>
+              </div>
+              <span class="badge badge-emerald" style="font-size:11px">✓ Connected</span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                  <p style="font-size:13px;font-weight:600">Resume</p>
+                  <p style="font-size:12px;color:var(--faint)">arjun_resume_2026.pdf</p>
+                </div>
+              </div>
+              <span class="badge badge-emerald" style="font-size:11px">✓ Uploaded</span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span style="font-size:13px;font-weight:800;color:#14B8A6">T</span>
+                </div>
+                <div>
+                  <p style="font-size:13px;font-weight:600">Teal</p>
+                  <p style="font-size:12px;color:var(--faint)">Not connected</p>
+                </div>
+              </div>
+              <button style="font-size:11px;background:var(--elevated);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="showScreen('s-connect')">Connect →</button>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--muted)"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                </div>
+                <div>
+                  <p style="font-size:13px;font-weight:600">GitHub</p>
+                  <p style="font-size:12px;color:var(--faint)">Not connected · optional for engineers</p>
+                </div>
+              </div>
+              <button style="font-size:11px;background:var(--elevated);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="showScreen('s-connect')">Connect →</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PM Type Verdict -->
+        <div class="card" style="padding:24px;border-left:3px solid var(--accent)">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Your PM Type Verdict</p>
+          <div style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border:1px solid rgba(129,140,248,0.25);border-radius:10px;padding:12px 18px;margin-bottom:14px;display:inline-block">
+            <span id="profile-pm-type" class="gradient-text syne" style="font-size:20px;font-weight:800">Growth PM</span>
+          </div>
+          <p id="profile-pm-desc" style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:8px">Your engineering background creates a compounding edge: you're rare among growth PMs who can actually ship what they design.</p>
+          <p id="profile-pm-also" style="font-size:12px;color:var(--faint)">Also suited: <span style="color:var(--text)">Fintech PM · Consumer PM</span></p>
+        </div>
+
+        <!-- Dimension scores -->
+        <div class="card" style="padding:24px">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Readiness by Dimension</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">Product Sense</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:58%;background:var(--orange)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">58</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">Analytical Depth</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:44%;background:var(--rose)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--rose);min-width:26px;text-align:right">44</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">Business Framing</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:53%;background:var(--orange)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">53</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">Technical Cred.</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:81%;background:var(--emerald)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--emerald);min-width:26px;text-align:right">81</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">AI Fluency</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:37%;background:var(--rose)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--rose);min-width:26px;text-align:right">37</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--muted);min-width:120px">Behavioural</span>
+              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:62%;background:var(--orange)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">62</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <button class="btn-primary" style="width:100%;font-size:13px;padding:11px" onclick="showScreen('s-readiness')">View Full Radar Chart →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- PM-Relevant Highlights -->
+        <div class="card" style="padding:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h3 style="font-size:15px;font-weight:700">PM-Relevant Highlights</h3>
+            <span style="font-size:11px;color:var(--faint);background:var(--elevated);padding:3px 10px;border-radius:6px;border:1px solid var(--border);white-space:nowrap">From LinkedIn + Resume</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
+              <p style="font-size:13px;color:var(--text);line-height:1.65">Led a cross-functional team of 7 to ship a real-time payment reconciliation feature. <span style="color:var(--emerald);font-weight:600">↑ Strong PM signal.</span></p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
+              <p style="font-size:13px;color:var(--text);line-height:1.65">Reduced API latency by 34% through query optimisation — cited by PM team in quarterly review. <span style="color:var(--emerald);font-weight:600">↑ Impact ownership.</span></p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:6px"></div>
+              <p style="font-size:13px;color:var(--text);line-height:1.65">4 years at Infosys — client-delivery context, not product context. <span style="color:var(--amber);font-weight:600">⚠ Reframe in your narrative.</span></p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>
+              <p style="font-size:13px;color:var(--text);line-height:1.65">No public writing or product teardowns detected. <span style="color:var(--accent);font-weight:600">→ Build proof of work.</span></p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
+              <p style="font-size:13px;color:var(--text);line-height:1.65">Built 3 internal tools used by 200+ colleagues — shows product intuition beyond job description. <span style="color:var(--emerald);font-weight:600">↑ Use this in interviews.</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detected Skills -->
+        <div class="card" style="padding:24px">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Detected Skills</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <span class="badge badge-emerald">Java · Python</span>
+            <span class="badge badge-emerald">SQL</span>
+            <span class="badge badge-emerald">REST APIs</span>
+            <span class="badge badge-accent">Agile / Scrum</span>
+            <span class="badge badge-accent">Cross-functional</span>
+            <span class="badge badge-accent">JIRA</span>
+            <span class="badge badge-amber">Product Sense</span>
+            <span class="badge badge-orange">Data Analysis</span>
+            <span class="badge badge-rose">AI Fluency ↑ needs work</span>
+          </div>
+          <p style="font-size:12px;color:var(--faint)">Extracted from your resume and LinkedIn. Skills feed directly into your dimension scores.</p>
+        </div>
+
+        <!-- Narrative improvement prompt -->
+        <div class="card" style="padding:24px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04)">
+          <p style="font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">One Thing to Fix in Your Profile</p>
+          <p style="font-size:14px;color:var(--text);line-height:1.65;margin-bottom:14px">Your LinkedIn headline says <em>"Senior Software Engineer at Infosys"</em>. Hiring managers scanning for PM candidates won't stop here. Change it to signal your transition: <em>"Engineer → PM | Growth & Fintech | Bengaluru"</em>.</p>
+          <button class="btn-secondary" style="font-size:13px;padding:9px 16px">See All Profile Fixes →</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                    -->
+<!-- ============================================================ -->
+<script>
+const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, name:null, firstName:null, profileConnected:false };
+
+// Q1 background → PM type, description, gap insight
+const pmTypeMap = {
+  'Software / Data Engineer':       { type:'Growth PM',   desc:"Growth PMs run experiments, own acquisition and retention metrics, and drive revenue loops. Your engineering background gives you a technical edge — most growth PMs struggle to speak the language of engineering teams. You don't have that problem.", also:'Fintech PM · Consumer PM · Growth-stage B2B PM', gap:"Engineers transitioning to PM most commonly lead with solutions before diagnosing the problem — it's how they've been trained to think. Your gate task will tell us whether this pattern applies to you." },
+  'Business / Data Analyst':        { type:'Growth PM',   desc:"Growth PMs own metrics, run experiments, and connect data to product decisions. Your analytical background is a direct advantage — you already think in funnels and signals where most candidates are still learning.", also:'Data PM · Fintech PM · B2B SaaS PM', gap:"Analysts moving into PM most often struggle to anchor metrics in user problems first. Starting from numbers instead of needs is the most common pattern — your gate task will confirm whether it applies." },
+  'Designer (UX / UI / Product)':   { type:'Consumer PM', desc:"Consumer PMs obsess over user experience, adoption, and product-market fit. Your design foundation means you already think in user flows and friction points — most PMs have to spend years building that intuition.", also:'Growth PM · B2C PM · Mobile PM', gap:"Designers entering PM most often have strong user empathy but underdeveloped analytical and commercial framing — the parts interviews test heavily in round 2. Your gate task will tell us where you stand." },
+  'Consultant / MBA':               { type:'B2B PM',      desc:"B2B PMs drive business outcomes, manage enterprise stakeholders, and translate complex requirements into roadmaps. Your strategy background gives you commercial fluency that most technical candidates take years to develop.", also:'Platform PM · Strategy PM · Growth PM', gap:"Strategy backgrounds most often default to business-level framing before grounding in user needs — which product-first interviewers probe in round 1. Your gate task will tell us if that pattern applies to you." },
+  'Operations / Sales / Marketing': { type:'Consumer PM', desc:"Consumer PMs bridge customer needs and product capabilities. Your customer-facing background means you understand the jobs users are actually trying to do — that empathy is rarer than most candidates realise.", also:'Growth PM · B2C PM · Platform PM', gap:"Ops and go-to-market backgrounds typically have strong customer intuition but find it harder to translate that into product scope and metrics. Your gate task will reveal how you bridge that gap." },
+  'Existing PM / APM':              { type:'Senior PM',   desc:"You're already on the path — this is about accelerating it. Compass will map your gaps against senior-track expectations at your target companies and show you the fastest route to the next level.", also:'Senior PM · Group PM · Platform PM', gap:"Experienced PMs most commonly get screened out not on skill but on narrative — scope, impact, and ownership don't always come through clearly. Your gate task will show us how you communicate your thinking." },
+  'Other / Different background':   { type:'Growth PM',   desc:"Non-traditional paths into PM are increasingly common. Your background likely gives you a perspective most candidates don't have — Compass will surface where that creates an edge and where the gaps are.", also:'Growth PM · Consumer PM · B2B PM', gap:"Non-traditional backgrounds most often face questions in screening around PM-specific framing — not skill, but language. Your gate task is the first signal of how naturally you think in product terms." },
+};
+
+// Q4 target → primary company and sector label
+const companyMap = {
+  'High-growth consumer startups': { company:'Meesho',    sector:'consumer startup' },
+  'Fintech and payments':          { company:'Razorpay',  sector:'fintech' },
+  'Large tech companies':          { company:'Flipkart',  sector:'large tech' },
+  'B2B SaaS / Enterprise':         { company:'Darwinbox', sector:'B2B SaaS' },
+  'AI-native / Deep tech':         { company:'Sarvam',    sector:'AI-native' },
+};
+
+// Called at startLoading() — uses Q1 + Q4 to personalise verdict/readiness/path text
+function personalize() {
+  const pm = pmTypeMap[userData.q1] || pmTypeMap['Software / Data Engineer'];
+  const co = companyMap[userData.q4] || companyMap['Fintech and payments'];
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setHTML = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  set('verdict-pm-type',    pm.type);
+  set('verdict-pm-desc',    pm.desc);
+  set('verdict-pm-also',    pm.also);
+  set('verdict-score-label', `19 points from application-ready for ${pm.type} at ${co.company}`);
+  set('verdict-gap-text',   pm.gap);
+  setHTML('readiness-subtitle', `Application-ready for ${pm.type} roles at ${co.sector} companies means a Compass score of 75. You're at 56. Here's what your profile looks like across all 6 dimensions.`);
+  set('path-subtitle',      `Calibrated to ${pm.type} roles at ${co.sector} companies. Not a generic 12-week plan.`);
+  set('profile-pm-type',    pm.type);
+  set('profile-pm-desc',    pm.desc);
+  setHTML('profile-pm-also', `Also suited: <span style="color:var(--text)">${pm.also.split(' · ').slice(0,2).join(' · ')}</span>`);
+  set('profile-track-badge', pm.type + ' Track');
+  set('paywall-pm-type', pm.type);
+}
+
+// Called when LinkedIn is connected or resume is uploaded — applies name to avatar + profile
+function applyName() {
+  if (!userData.name) return;
+  userData.firstName = userData.name.split(' ')[0];
+  const initial = userData.firstName[0].toUpperCase();
+  ['avatar-initial-dash','avatar-initial-interview','avatar-initial-profile-big','avatar-initial-profile-nav','avatar-initial-gate','avatar-initial-readiness','avatar-initial-path','avatar-initial-paywall'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = initial;
+  });
+  const nameEl = document.getElementById('profile-name');
+  if (nameEl) nameEl.textContent = userData.name;
+  const subEl = document.getElementById('profile-subtitle');
+  if (subEl && userData.q1) subEl.textContent = `${userData.q1} · transitioning to PM`;
+}
+
+function showScreen(id) {
+  const cur = document.querySelector('.screen.active');
+  const nxt = document.getElementById(id);
+  if (!nxt || cur === nxt) return;
+  cur.style.opacity = '0';
+  setTimeout(() => {
+    cur.classList.remove('active');
+    cur.style.display = 'none';
+    nxt.style.display = 'block';
+    nxt.classList.add('active');
+    nxt.style.opacity = '0';
+    requestAnimationFrame(() => { nxt.style.opacity = '1'; });
+    window.scrollTo(0,0);
+    if (id === 's-readiness') { setTimeout(animateRadar, 400); setTimeout(buildAndAnimateGaps, 600); }
+    // North bubble: show on post-onboarding screens
+    const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall'];
+    const bubble = document.getElementById('north-bubble');
+    if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
+    // North auto-popup triggers
+    if (id === 's-verdict') northAutoPopup('s-verdict', "Your signal is in. Want to talk through what this verdict means for your path?", 4500);
+    if (id === 's-gaps') northAutoPopup('s-gaps', "Two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?", 3500);
+    if (id === 's-dashboard') northAutoPopup('s-dashboard', "Day 1. The streak starts now. Want me to walk you through today's task?", 5000);
+  }, 180);
+}
+
+function selectOption(el, group) {
+  document.querySelectorAll(`[onclick*="selectOption(this,'${group}')"]`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // Store the selected label so personalize() can use it
+  const label = el.querySelector('div');
+  if (label) userData[group] = label.textContent.trim();
+  // Auto-advance to next screen after a brief pause so selection is visible
+  const nextScreen = { q1:'s-q2', q2:'s-q3', q3:'s-q4', q4:'s-q5', q5:null };
+  const dest = nextScreen[group];
+  if (dest) setTimeout(() => showScreen(dest), 350);
+  else if (group === 'q5') setTimeout(() => startLoading(), 350);
+}
+
+function startLoading() {
+  personalize();
+  showScreen('s-loading');
+  const items = ['load-1','load-2','load-3'];
+  const delays = [900, 2200, 3600];
+  items.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, delays[i]);
+  });
+  setTimeout(() => showScreen('s-verdict'), 5200);
+}
+
+function animateScoreRing() {
+  const ring = document.getElementById('scoreRing');
+  const numEl = document.getElementById('scoreNum');
+  if (!ring) return;
+  const circ = 351.86, target = 56, duration = 1500;
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+    const val = Math.round(ease * target);
+    const filled = circ * (ease * target / 100);
+    ring.setAttribute('stroke-dasharray', `${filled} ${circ - filled}`);
+    if (numEl) numEl.textContent = val;
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function getDims() {
+  const pc = userData.profileConnected;
+  return [
+    { name:'Product Sense',         score:58, status:'Developing', color:'var(--orange)', badge:'badge-orange', note:'Strong on features, building on user empathy.',         measured:true,  source:'gate task' },
+    { name:'Analytical Depth',      score:44, status:'Gap',        color:'var(--rose)',   badge:'badge-rose',   note:'Can name metrics, not yet driving them.',               measured:false, action:'Complete a Metrics round with Riva' },
+    { name:'Business Framing',      score:53, status:'Developing', color:'var(--orange)', badge:'badge-orange', note:'Understands impact, developing commercial fluency.',     measured:pc,    source:'LinkedIn / resume', action:'Connect LinkedIn or upload resume' },
+    { name:'Technical Credibility', score:81, status:'Strong',     color:'var(--emerald)',badge:'badge-emerald', note:"Your biggest advantage. Don't undersell it.",           measured:pc,    source:'LinkedIn / resume', action:'Connect LinkedIn or upload resume' },
+    { name:'AI Fluency',            score:37, status:'Gap',        color:'var(--rose)',   badge:'badge-rose',   note:'Uses AI as a user, not yet as a PM.',                   measured:false, action:'Complete an AI Fluency task in your path' },
+    { name:'Behavioural',           score:62, status:'Developing', color:'var(--orange)', badge:'badge-orange', note:'Good stories, need PM-framing in delivery.',            measured:false, action:'Complete a Behavioural round with Riva' },
+  ];
+}
+
+function buildAndAnimateGaps() {
+  const list = document.getElementById('dim-list');
+  if (!list || list.children.length > 0) return;
+  updateConfidenceBanner();
+  getDims().forEach((d, i) => {
+    const sourceBadge = d.measured
+      ? `<span style="font-size:10px;background:rgba(52,211,153,0.1);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:2px 8px;white-space:nowrap">✓ Measured · ${d.source}</span>`
+      : `<span style="font-size:10px;background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);border-radius:99px;padding:2px 8px;white-space:nowrap">Estimated</span>`;
+    const actionNote = !d.measured
+      ? `<p style="font-size:11px;color:var(--faint);margin-top:5px">→ ${d.action} to measure this</p>` : '';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;opacity:0;transform:translateY(8px);transition:opacity 0.4s ease,transform 0.4s ease';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:700">${d.name}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px;font-weight:800;color:${d.color}">${d.score}</span>
+          <span class="badge ${d.badge}" style="font-size:10px">${d.status}</span>
+        </div>
+      </div>
+      <div style="margin-bottom:8px">${sourceBadge}</div>
+      <div class="dim-bar-bg" style="margin-bottom:8px"><div class="dim-bar-fill" id="bar-${i}" style="background:${d.color}"></div></div>
+      <p style="font-size:12px;color:var(--faint);line-height:1.5">${d.note}</p>${actionNote}`;
+    list.appendChild(card);
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+      const bar = document.getElementById(`bar-${i}`);
+      if (bar) bar.style.width = d.score + '%';
+    }, 100 + i * 80);
+  });
+}
+
+function updateConfidenceBanner() {
+  const dims = getDims();
+  const measured = dims.filter(d => d.measured).length;
+  const total = dims.length;
+  const titleEl = document.getElementById('confidence-title');
+  const detailEl = document.getElementById('confidence-detail');
+  if (titleEl) titleEl.textContent = `${measured} of ${total} dimensions measured · ${total - measured} estimated`;
+  if (detailEl) {
+    const measuredNames = dims.filter(d => d.measured).map(d => `${d.name} (${d.source})`).join(' · ');
+    const unmeasuredNames = dims.filter(d => !d.measured).map(d => d.name).join(', ');
+    detailEl.textContent = measured > 0
+      ? `Measured: ${measuredNames}. Complete practice sessions to measure: ${unmeasuredNames}.`
+      : `All dimensions estimated from your background. Connect LinkedIn or upload your resume to start measuring.`;
+  }
+}
+
+function submitGate() {
+  const btn = document.getElementById('gate-btn');
+  if (btn) { btn.textContent = 'Scoring your response…'; btn.disabled = true; btn.style.opacity = '0.7'; }
+  setTimeout(() => showScreen('s-readiness'), 2000);
+}
+
+function animateRadar() {
+  const poly = document.getElementById('score-poly');
+  if (!poly) return;
+  const pts = [[220,130],[266,174],[275,232],[220,297],[182,222],[156,163]];
+  setTimeout(() => {
+    poly.setAttribute('points', pts.map(p => p.join(',')).join(' '));
+    pts.forEach((d, i) => {
+      const dot = document.getElementById('dot' + i);
+      if (dot) { dot.setAttribute('cx', d[0]); dot.setAttribute('cy', d[1]); }
+    });
+  }, 100);
+}
+
+function validateGate() {
+  const ta = document.getElementById('gate-input');
+  const btn = document.getElementById('gate-btn');
+  const counter = document.getElementById('gate-counter');
+  if (!ta || !btn || !counter) return;
+  const len = ta.value.length;
+  const remaining = 300 - len;
+  counter.textContent = remaining === 300 ? '300 characters remaining'
+    : remaining === 0 ? 'Character limit reached'
+    : `${remaining} character${remaining === 1 ? '' : 's'} remaining`;
+  counter.style.color = remaining <= 0 ? 'var(--rose)' : remaining <= 30 ? 'var(--amber)' : 'var(--faint)';
+  btn.disabled = len < 20;
+}
+
+function handleConnect(service) {
+  const btn = document.getElementById(service + '-btn');
+  if (!btn) return;
+  btn.style.background = 'rgba(52,211,153,0.12)';
+  btn.style.color = 'var(--emerald)';
+  btn.style.border = '1px solid rgba(52,211,153,0.3)';
+  btn.disabled = true;
+
+  if (service === 'li') {
+    // Simulate LinkedIn OAuth name extraction (production: read from LinkedIn API response)
+    btn.textContent = '✓ Connected';
+    if (!userData.name) { userData.name = 'Alex Kumar'; applyName(); }
+    userData.profileConnected = true;
+  } else {
+    btn.textContent = '✓ Connected';
+  }
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) updateDropZone(file.name);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const dz = document.getElementById('drop-zone');
+  if (dz) dz.classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) updateDropZone(file.name);
+}
+
+function updateDropZone(name) {
+  const label = document.getElementById('drop-label');
+  const dz = document.getElementById('drop-zone');
+  if (label) label.innerHTML = `<span style="color:var(--emerald);font-weight:600">✓ ${name}</span>`;
+  if (dz) { dz.style.borderColor = 'var(--emerald)'; dz.style.background = 'rgba(52,211,153,0.05)'; }
+  userData.profileConnected = true;
+  // Try to extract a name from the resume filename (production: read from resume parser)
+  if (!userData.name) {
+    const cleaned = name.replace(/\.[^.]+$/, '').replace(/[_\-]/g, ' ').replace(/\b(resume|cv|2024|2025|2026|final|new)\b/gi, '').trim();
+    const words = cleaned.split(/\s+/).filter(w => w.length > 1);
+    if (words.length >= 1) {
+      userData.name = words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      applyName();
+    }
+  }
+}
+
+// Fix initial screen opacity
+document.addEventListener('DOMContentLoaded', () => {
+  const landing = document.getElementById('s-landing');
+  if (landing) { landing.style.display = 'block'; landing.style.opacity = '1'; }
+  // responsive: hide signin left panel on mobile
+  const style = document.createElement('style');
+  style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}}`;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- ============================================================ -->
+<!-- NORTH: FLOATING AI ASSISTANT                                  -->
+<!-- ============================================================ -->
+
+<!-- Bubble -->
+<div id="north-bubble" onclick="toggleNorth()" style="position:fixed;bottom:24px;right:24px;z-index:1000;cursor:pointer;display:none">
+  <div id="north-bubble-inner" class="north-pulse" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+    <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+      <polygon points="14,3 16.5,14 14,11.5 11.5,14" fill="white"/>
+      <polygon points="14,25 11.5,14 14,16.5 16.5,14" fill="rgba(255,255,255,0.45)"/>
+      <circle cx="14" cy="14" r="2.5" fill="#FBBF24"/>
+    </svg>
+  </div>
+  <!-- Notification badge -->
+  <div id="north-badge" style="position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#34D399;border:2.5px solid #09090B;display:none"></div>
+  <!-- Tooltip -->
+  <div id="north-tooltip" style="position:absolute;bottom:64px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;white-space:nowrap;font-size:13px;font-weight:600;color:var(--text);font-family:'DM Sans',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,0.3);display:none">
+    Ask North →
+    <div style="position:absolute;bottom:-5px;right:18px;width:8px;height:8px;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border);transform:rotate(45deg)"></div>
+  </div>
+</div>
+
+<!-- Chat panel -->
+<div id="north-panel" class="north-pop" style="position:fixed;bottom:92px;right:24px;width:368px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:0 24px 64px rgba(0,0,0,0.55);z-index:999;display:none;flex-direction:column;overflow:hidden;max-height:540px">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1a1035,#111827);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.2);flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 28 28" fill="none"><polygon points="14,3 16.5,14 14,11.5 11.5,14" fill="white"/><polygon points="14,25 11.5,14 14,16.5 16.5,14" fill="rgba(255,255,255,0.4)"/><circle cx="14" cy="14" r="2.5" fill="#FBBF24"/></svg>
+      </div>
+      <div>
+        <p style="font-size:14px;font-weight:800;font-family:'Syne',sans-serif;color:#FAFAFA;letter-spacing:-0.02em">North</p>
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#34D399"></div>
+          <p style="font-size:11px;color:rgba(161,161,170,0.85)">Your Compass AI · always honest</p>
+        </div>
+      </div>
+    </div>
+    <button onclick="toggleNorth()" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">×</button>
+  </div>
+
+  <!-- Messages -->
+  <div id="north-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:160px;max-height:260px">
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+        <svg width="10" height="10" viewBox="0 0 28 28" fill="none"><polygon points="14,3 16.5,14 14,11.5 11.5,14" fill="white"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      </div>
+      <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:10px 14px;max-width:270px">
+        <p id="north-greeting" style="font-size:13px;color:var(--text);line-height:1.6">Hey. I'm North — your Compass guide. I give honest signal, not motivation. What's on your mind?</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div style="padding:12px 16px 14px;border-top:1px solid var(--border);flex-shrink:0">
+    <p style="font-size:11px;color:var(--faint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px;font-family:'DM Sans',sans-serif">Quick actions</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+      <button class="north-chip" onclick="northQuickReply('feeling-stuck')">I'm feeling stuck</button>
+      <button class="north-chip" onclick="northQuickReply('how-doing')">How am I doing?</button>
+      <button class="north-chip" onclick="northQuickReply('mock-interview')" style="background:rgba(129,140,248,0.12);border-color:rgba(129,140,248,0.35);color:var(--accent)">🎯 Mock Interview</button>
+      <button class="north-chip" onclick="northQuickReply('what-today')">What to do today?</button>
+      <button class="north-chip" onclick="northQuickReply('got-rejected')" style="background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.3);color:var(--rose)">I got rejected</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <input id="north-input" type="text" placeholder="Ask North anything…" style="flex:1;background:var(--elevated);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 14px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s" onkeydown="if(event.key==='Enter')northSend()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+      <button onclick="northSend()" style="background:var(--accent-bright);border:none;border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Interview Room ──────────────────────────────────────────────
+let rivaTimerInterval = null;
+let rivaSeconds = 0;
+
+function selectRound(el, key) {
+  document.querySelectorAll('#round-selector .round-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectCompany(el) {
+  document.querySelectorAll('#company-selector .company-pill').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectPressure(el) {
+  document.querySelectorAll('#pressure-selector .company-pill').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function startInterview() {
+  const live = document.getElementById('riva-live');
+  const status = document.getElementById('riva-status');
+  if (live) live.style.display = 'block';
+  if (status) status.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:var(--rose);animation:bubblePulse 1s ease-in-out infinite"></div><span style="font-size:13px;font-weight:600;color:var(--rose)">Interview in progress</span>';
+  live.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  rivaSeconds = 0;
+  rivaTimerInterval = setInterval(() => {
+    rivaSeconds++;
+    const m = String(Math.floor(rivaSeconds / 60)).padStart(2, '0');
+    const s = String(rivaSeconds % 60).padStart(2, '0');
+    const el = document.getElementById('riva-timer');
+    if (el) el.textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function endInterview() {
+  clearInterval(rivaTimerInterval);
+  const live = document.getElementById('riva-live');
+  const status = document.getElementById('riva-status');
+  if (status) status.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:var(--emerald)"></div><span style="font-size:13px;font-weight:600;color:var(--emerald)">Ready to interview you</span>';
+  if (live) {
+    live.innerHTML = `<div class="card" style="padding:24px;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.04)">
+      <p style="font-size:12px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Session complete</p>
+      <p style="font-size:15px;font-weight:700;margin-bottom:8px">Riva's assessment is being scored.</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:16px">Your Product Sense response showed good problem awareness but jumped to a solution before isolating the root cause. This maps directly to your 58/100 on that dimension. Full breakdown will appear in your dashboard.</p>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" style="font-size:13px;padding:10px 20px" onclick="location.reload()">Try Another Round →</button>
+        <button class="btn-secondary" style="font-size:13px;padding:10px 20px" onclick="showScreen('s-dashboard')">Back to Dashboard</button>
+      </div>
+    </div>`;
+  }
+}
+
+function rivaRespond() {
+  const input = document.getElementById('riva-input');
+  const chat = document.getElementById('riva-chat');
+  if (!input || !chat || !input.value.trim()) return;
+  const userText = input.value.trim();
+  input.value = '';
+  // User message
+  const userDiv = document.createElement('div');
+  userDiv.style.cssText = 'display:flex;justify-content:flex-end';
+  userDiv.innerHTML = `<div style="background:rgba(99,102,241,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:14px 14px 4px 14px;padding:12px 16px;max-width:400px"><p style="font-size:14px;color:var(--text);line-height:1.6">${userText}</p></div>`;
+  chat.appendChild(userDiv);
+  chat.scrollTop = chat.scrollHeight;
+  // Riva follow-up
+  setTimeout(() => {
+    const rivaDiv = document.createElement('div');
+    rivaDiv.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+    rivaDiv.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><span style="font-size:10px;font-weight:800;color:#818CF8">R</span></div><div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:12px 16px;max-width:440px"><p style="font-size:14px;color:var(--text);line-height:1.65">You jumped straight to "check the payment gateway logs." Before you do that — what's your hypothesis on whether this is a frontend, backend, or third-party issue? And how does an 8% drop on a Tuesday specifically change your investigation approach versus a Monday or weekend drop?</p></div>`;
+    chat.appendChild(rivaDiv);
+    chat.scrollTop = chat.scrollHeight;
+  }, 900);
+}
+
+// ── North AI Assistant ──────────────────────────────────────────
+let northOpen = false;
+let northAutoShown = {};
+
+const northResponses = {
+  'feeling-stuck': {
+    user: "I'm feeling stuck",
+    bot: "Stuck is a signal, not a state. Where specifically — too much content with no direction, no feedback on whether you're improving, or not sure this is even the right path? Each has a different fix and I can help with any of them."
+  },
+  'how-doing': {
+    user: "How am I doing?",
+    bot: "Honest read: you're at 56 — top 40% of profiles we see at this stage, but 19 points below the 75 threshold for Razorpay. The gap isn't structural. Analytical Depth (44) and AI Fluency (37) are your two active blockers. Both are closeable in 4–6 weeks of targeted practice. You're not behind. You're just not done yet."
+  },
+  'mock-interview': {
+    user: "Start a mock interview",
+    bot: "Switching to interview mode. I'll be your Razorpay PM interviewer — honest feedback, no hand-holding.\n\nPick your round:\n1 · Product Sense (30 min)\n2 · Metrics & Analytics (20 min)\n3 · Behavioural (15 min)\n\nType 1, 2, or 3 and we'll start."
+  },
+  'what-today': {
+    user: "What should I do today?",
+    bot: "Your Phase 1 task is open: observe 3 user flows in Razorpay and write what each user is actually trying to accomplish — not what the feature does. 15 minutes. It directly targets your Product Sense gap and it's the exercise that separates builders from PMs. Do that before anything else today."
+  },
+  'got-rejected': {
+    user: "I got rejected",
+    bot: "I'm sorry. First tell me — did you get any feedback at all, or was it a ghost? If ghost: I can map the rejection against that company's known screening criteria to figure out where you likely lost them. If you got feedback: share it here and I'll map it to your dimension gaps so we know exactly what to fix."
+  }
+};
+
+function toggleNorth() {
+  northOpen = !northOpen;
+  const panel = document.getElementById('north-panel');
+  const badge = document.getElementById('north-badge');
+  if (northOpen) {
+    panel.style.display = 'flex';
+    panel.classList.remove('north-pop');
+    void panel.offsetWidth; // reflow to retrigger animation
+    panel.classList.add('north-pop');
+    if (badge) badge.style.display = 'none';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function northQuickReply(key) {
+  const resp = northResponses[key];
+  if (!resp) return;
+  addNorthMessage(resp.user, 'user');
+  setTimeout(() => addNorthMessage(resp.bot, 'bot'), 650);
+}
+
+function northSend() {
+  const input = document.getElementById('north-input');
+  if (!input || !input.value.trim()) return;
+  const msg = input.value.trim();
+  input.value = '';
+  addNorthMessage(msg, 'user');
+  setTimeout(() => addNorthMessage("That's a real question. Based on where you are — 56/100, Growth PM track — the most honest answer I can give: don't add more content. Add one focused practice session. Want me to set you a specific 15-minute task right now?", 'bot'), 750);
+}
+
+function addNorthMessage(text, sender) {
+  const container = document.getElementById('north-messages');
+  if (!container) return;
+  const isBot = sender === 'bot';
+  const div = document.createElement('div');
+  div.style.cssText = `display:flex;gap:8px;align-items:flex-start;${!isBot ? 'flex-direction:row-reverse' : ''}`;
+  div.innerHTML = isBot
+    ? `<div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><svg width="10" height="10" viewBox="0 0 28 28" fill="none"><polygon points="14,3 16.5,14 14,11.5 11.5,14" fill="white"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg></div><div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:10px 14px;max-width:268px"><p style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-line">${text}</p></div>`
+    : `<div style="background:rgba(99,102,241,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:14px 14px 4px 14px;padding:10px 14px;max-width:240px"><p style="font-size:13px;color:var(--text);line-height:1.6">${text}</p></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function northAutoPopup(screenId, message, delay) {
+  if (northAutoShown[screenId]) return;
+  northAutoShown[screenId] = true;
+  setTimeout(() => {
+    if (northOpen) return;
+    const badge = document.getElementById('north-badge');
+    const greeting = document.getElementById('north-greeting');
+    if (badge) badge.style.display = 'block';
+    if (greeting) greeting.textContent = message;
+  }, delay);
+}
+</script>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  // Init client
+  var sb = null;
+  try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { console.warn('Supabase init failed', e); }
+  if (!sb) return;
+
+  // After Google redirects back, pick up the session
+  sb.auth.onAuthStateChange(function (event, session) {
+    if (!session) return;
+    var user = session.user;
+    var name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email;
+    userData.name = name;
+    userData.profileConnected = true;
+    applyName();
+    // If we're still on signin or landing, send them to the connect screen
+    var current = document.querySelector('.screen.active');
+    if (!current || current.id === 's-signin' || current.id === 's-landing') {
+      showScreen('s-connect');
+    }
+  });
+
+  // Wire Google button
+  var googleBtn = document.getElementById('btn-google-signin');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', function () {
+      sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+      });
+    });
+  }
+
+  // Wire email sign-up
+  var signupBtn = document.getElementById('btn-email-signup');
+  var errorEl   = document.getElementById('signup-error');
+  if (signupBtn) {
+    signupBtn.addEventListener('click', async function () {
+      var email    = document.getElementById('signup-email').value.trim();
+      var password = document.getElementById('signup-password').value;
+      errorEl.style.display = 'none';
+
+      if (!email || !password) {
+        errorEl.textContent = 'Please enter your email and a password.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (password.length < 8) {
+        errorEl.textContent = 'Password must be at least 8 characters.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      signupBtn.textContent = 'Creating account…';
+      signupBtn.disabled = true;
+
+      var { data, error } = await sb.auth.signUp({ email, password });
+
+      if (error) {
+        errorEl.textContent = error.message;
+        errorEl.style.display = 'block';
+        signupBtn.textContent = 'Create Account →';
+        signupBtn.disabled = false;
+        return;
+      }
+
+      // Supabase may require email confirmation — check
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        errorEl.style.color = 'var(--amber)';
+        errorEl.textContent = 'An account with this email already exists. Use Sign in instead.';
+        errorEl.style.display = 'block';
+        signupBtn.textContent = 'Create Account →';
+        signupBtn.disabled = false;
+        return;
+      }
+
+      // If email confirmation is required, tell the user
+      if (!data.session) {
+        signupBtn.textContent = '✓ Check your email to confirm';
+        signupBtn.style.background = 'var(--emerald)';
+        return;
+      }
+
+      // Signed in immediately (email confirmation off) — proceed
+      showScreen('s-connect');
+    });
+  }
+
+  // Wire "Sign in" link — swaps to password sign-in
+  var signinLink = document.getElementById('btn-signin-link');
+  if (signinLink) {
+    signinLink.addEventListener('click', async function () {
+      var email    = document.getElementById('signup-email').value.trim();
+      var password = document.getElementById('signup-password').value;
+      errorEl.style.display = 'none';
+
+      if (!email || !password) {
+        errorEl.textContent = 'Enter your email and password to sign in.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      signupBtn.textContent = 'Signing in…';
+      signupBtn.disabled = true;
+
+      var { error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errorEl.textContent = error.message;
+        errorEl.style.display = 'block';
+        signupBtn.textContent = 'Create Account →';
+        signupBtn.disabled = false;
+        return;
+      }
+
+      showScreen('s-connect');
+    });
+  }
+}());
+</script>
+</body>
+</html>
