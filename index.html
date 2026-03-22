@@ -259,7 +259,12 @@
 
     <!-- Right panel -->
     <div style="padding:60px 56px;display:flex;flex-direction:column;justify-content:center;max-width:480px;width:100%;margin:0 auto" class="signin-right">
-      <div class="badge badge-emerald" style="margin-bottom:16px;display:inline-flex">✓ Your verdict is ready</div>
+      <div style="margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.22);border-radius:100px;padding:6px 16px 6px 10px">
+        <span style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.18);display:inline-flex;align-items:center;justify-content:center">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#34D399;letter-spacing:0.3px">Your verdict is ready</span>
+      </div>
       <h2 style="font-size:26px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">One step to unlock it.</h2>
       <p style="color:var(--muted);font-size:14px;margin-bottom:32px">Free account · takes 30 seconds · no card needed.</p>
 
@@ -597,7 +602,12 @@
   </nav>
 
   <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
-    <div style="margin-bottom:8px"><span style="font-size:13px;color:var(--emerald);font-weight:600">✓ Analysis complete</span></div>
+    <div style="margin-bottom:14px;display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.22);border-radius:100px;padding:6px 16px 6px 10px">
+      <span style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.18);display:inline-flex;align-items:center;justify-content:center">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#34D399;letter-spacing:0.3px">Analysis complete</span>
+    </div>
     <h1 style="font-size:34px;font-weight:800;margin-bottom:8px;letter-spacing:-0.8px">Your Signal Is Clear.</h1>
     <p style="color:var(--muted);font-size:15px;margin-bottom:36px">Based on your background and target companies, here's where you stand today.</p>
 
@@ -1935,9 +1945,9 @@ function showScreen(id) {
     const bubble = document.getElementById('north-bubble');
     if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
     // North auto-popup triggers
-    if (id === 's-verdict') northAutoPopup('s-verdict', "Your signal is in. Want to talk through what this verdict means for your path?", 4500);
-    if (id === 's-gaps') northAutoPopup('s-gaps', "Two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?", 3500);
-    if (id === 's-dashboard') northAutoPopup('s-dashboard', "Day 1. The streak starts now. Want me to walk you through today's task?", 5000);
+    if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
+    if (id === 's-gaps') northAutoPopup('s-gaps', `${userData.firstName || 'Hey'}, two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?`, 3500);
+    if (id === 's-dashboard') northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000);
   }, 180);
 }
 
@@ -2330,26 +2340,11 @@ let northOpen = false;
 let northAutoShown = {};
 
 const northResponses = {
-  'feeling-stuck': {
-    user: "I'm feeling stuck",
-    bot: "Stuck is a signal, not a state. Where specifically — too much content with no direction, no feedback on whether you're improving, or not sure this is even the right path? Each has a different fix and I can help with any of them."
-  },
-  'how-doing': {
-    user: "How am I doing?",
-    bot: "Honest read: you're at 56 — top 40% of profiles we see at this stage, but 19 points below the 75 threshold for Razorpay. The gap isn't structural. Analytical Depth (44) and AI Fluency (37) are your two active blockers. Both are closeable in 4–6 weeks of targeted practice. You're not behind. You're just not done yet."
-  },
-  'mock-interview': {
-    user: "Start a mock interview",
-    bot: "Switching to interview mode. I'll be your Razorpay PM interviewer — honest feedback, no hand-holding.\n\nPick your round:\n1 · Product Sense (30 min)\n2 · Metrics & Analytics (20 min)\n3 · Behavioural (15 min)\n\nType 1, 2, or 3 and we'll start."
-  },
-  'what-today': {
-    user: "What should I do today?",
-    bot: "Your Phase 1 task is open: observe 3 user flows in Razorpay and write what each user is actually trying to accomplish — not what the feature does. 15 minutes. It directly targets your Product Sense gap and it's the exercise that separates builders from PMs. Do that before anything else today."
-  },
-  'got-rejected': {
-    user: "I got rejected",
-    bot: "I'm sorry. First tell me — did you get any feedback at all, or was it a ghost? If ghost: I can map the rejection against that company's known screening criteria to figure out where you likely lost them. If you got feedback: share it here and I'll map it to your dimension gaps so we know exactly what to fix."
-  }
+  'feeling-stuck': { user: "I'm feeling stuck" },
+  'how-doing':     { user: "How am I doing?" },
+  'mock-interview':{ user: "Start a mock interview" },
+  'what-today':    { user: "What should I do today?" },
+  'got-rejected':  { user: "I got rejected" }
 };
 
 function toggleNorth() {
