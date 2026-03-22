@@ -8,17 +8,12 @@ export default async function handler(req, res) {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const prompt = `Extract information from this resume and return ONLY a JSON object — no markdown, no explanation, just raw JSON.
+  const prompt = `Extract information from this resume. Return ONLY a JSON object, nothing else.
 
-{
-  "name": "full name or null",
-  "email": "email address or null",
-  "phone": "phone number or null",
-  "experience": ["Job Title at Company (dates)", ... up to 5 items],
-  "awards": ["award or recognition", ... up to 3 items]
-}
+Required format:
+{"name":"string or null","email":"string or null","phone":"string or null","experience":["string"...],"awards":["string"...]}
 
-Resume text:
+Resume:
 ${text.slice(0, 4000)}`;
 
   try {
@@ -29,20 +24,29 @@ ${text.slice(0, 4000)}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.1 }
+          generationConfig: {
+            temperature: 0.0,
+            responseMimeType: 'application/json'
+          }
         })
       }
     );
 
     const data = await response.json();
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
+    // Try direct parse first
     try {
-      const parsed = JSON.parse(cleaned);
-      return res.status(200).json(parsed);
+      return res.status(200).json(JSON.parse(content));
     } catch {
-      return res.status(200).json({ error: 'Could not parse response', raw: content });
+      // Extract JSON object from anywhere in the string
+      const match = content.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          return res.status(200).json(JSON.parse(match[0]));
+        } catch {}
+      }
+      return res.status(200).json({ error: 'Could not parse response', raw: content.slice(0, 300) });
     }
   } catch (e) {
     return res.status(500).json({ error: e.message });
