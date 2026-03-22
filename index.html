@@ -300,11 +300,18 @@
 <!-- ============================================================ -->
 <div id="s-connect" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
-      <span style="font-weight:800;font-size:16px;color:#FAFAFA">Compass</span>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <span style="font-size:13px;color:var(--faint);background:var(--elevated);padding:5px 12px;border-radius:99px;border:1px solid var(--border)">Almost there — supercharge your verdict</span>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-connect" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
   </nav>
 
   <div style="max-width:680px;margin:0 auto;padding:52px 24px 80px">
@@ -1700,7 +1707,7 @@ function applyName() {
   if (!userData.name) return;
   userData.firstName = userData.name.split(' ')[0];
   const initial = userData.firstName[0].toUpperCase();
-  ['avatar-initial-dash','avatar-initial-interview','avatar-initial-profile-big','avatar-initial-profile-nav','avatar-initial-gate','avatar-initial-readiness','avatar-initial-path','avatar-initial-paywall'].forEach(id => {
+  ['avatar-initial-dash','avatar-initial-interview','avatar-initial-profile-big','avatar-initial-profile-nav','avatar-initial-gate','avatar-initial-readiness','avatar-initial-path','avatar-initial-paywall','avatar-initial-connect'].forEach(id => {
     const el = document.getElementById(id); if (el) el.textContent = initial;
   });
   const nameEl = document.getElementById('profile-name');
