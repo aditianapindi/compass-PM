@@ -1700,6 +1700,71 @@ function applyName() {
   if (subEl && userData.q1) subEl.textContent = `${userData.q1} · transitioning to PM`;
 }
 
+// ── Connect screen handlers ──────────────────────────────────────────────────
+
+function handleConnect(source) {
+  // LinkedIn / Teal — simulate connection, use name from auth session if available
+  const btn = document.getElementById(source + '-btn');
+  if (btn) { btn.textContent = 'Connected ✓'; btn.style.background = 'rgba(52,211,153,0.15)'; btn.style.color = 'var(--emerald)'; btn.style.border = '1px solid rgba(52,211,153,0.3)'; btn.disabled = true; }
+  userData.profileConnected = true;
+  applyName();
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragging');
+  const file = event.dataTransfer.files[0];
+  if (file) processResumeFile(file);
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processResumeFile(file);
+}
+
+async function processResumeFile(file) {
+  const label = document.getElementById('drop-label');
+  if (label) label.textContent = 'Reading your resume…';
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    let fullText = '';
+    for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      fullText += content.items.map(item => item.str).join(' ') + '\n';
+    }
+
+    // Extract name — first non-empty line that looks like a name (2-4 words, no digits)
+    const lines = fullText.split(/[\n|]+/).map(l => l.trim()).filter(l => l.length > 1);
+    let extractedName = null;
+    for (const line of lines.slice(0, 6)) {
+      const words = line.split(/\s+/);
+      if (words.length >= 2 && words.length <= 4 && !/\d/.test(line) && !/[@|•|:\/]/.test(line)) {
+        extractedName = line;
+        break;
+      }
+    }
+
+    if (extractedName) {
+      userData.name = extractedName;
+    }
+    userData.profileConnected = true;
+    applyName();
+
+    if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} parsed</span>${extractedName ? `<br/><span style="font-size:12px;color:var(--muted)">Name found: ${extractedName}</span>` : ''}`;
+
+  } catch (e) {
+    console.warn('PDF parse error:', e);
+    // Still mark as connected even if parsing fails
+    userData.profileConnected = true;
+    applyName();
+    if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} uploaded</span>`;
+  }
+}
+
 function showScreen(id) {
   const cur = document.querySelector('.screen.active');
   const nxt = document.getElementById(id);
@@ -2153,6 +2218,10 @@ function northAutoPopup(screenId, message, delay) {
   }, delay);
 }
 </script>
+
+<!-- PDF.js -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
