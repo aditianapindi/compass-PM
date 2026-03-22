@@ -708,6 +708,33 @@
         <div style="text-align:center">
           <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="submitGate()">Submit and See My Path →</button>
         </div>
+
+        <!-- Gate feedback — revealed after scoring -->
+        <div id="gate-feedback" style="display:none;margin-top:24px">
+          <div class="card" style="padding:24px;border-left:3px solid var(--accent)">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+              <div id="gate-score-ring" style="width:68px;height:68px;border-radius:50%;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span id="gate-score-number" style="font-size:24px;font-weight:800;color:var(--accent)">—</span>
+              </div>
+              <div>
+                <p style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:5px">PM Thinking Score</p>
+                <p id="gate-headline" style="font-size:15px;font-weight:700;line-height:1.4;color:var(--text)"></p>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:22px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:5px"></div>
+                <p id="gate-strength" style="font-size:13px;color:var(--text);line-height:1.65"></p>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px"></div>
+                <p id="gate-gap" style="font-size:13px;color:var(--text);line-height:1.65"></p>
+              </div>
+            </div>
+            <button class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="showScreen('s-readiness')">See My Full Readiness Score →</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2020,10 +2047,49 @@ function updateConfidenceBanner() {
   }
 }
 
-function submitGate() {
-  const btn = document.getElementById('gate-btn');
-  if (btn) { btn.textContent = 'Scoring your response…'; btn.disabled = true; btn.style.opacity = '0.7'; }
-  setTimeout(() => showScreen('s-readiness'), 2000);
+async function submitGate() {
+  const btn  = document.getElementById('gate-btn');
+  const text = (document.getElementById('gate-input').value || '').trim();
+  if (!text || text.length < 20) return;
+
+  btn.textContent = 'Scoring your thinking…';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  try {
+    const res  = await fetch('/api/score-gate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, background: userData.q1 || '' })
+    });
+    const data = await res.json();
+
+    if (data.error || !data.score) { showScreen('s-readiness'); return; }
+
+    userData.gateScore = data;
+
+    // Colour the ring by score
+    const color = data.score >= 70 ? 'var(--emerald)' : data.score >= 50 ? 'var(--amber)' : 'var(--rose)';
+    const ring  = document.getElementById('gate-score-ring');
+    const num   = document.getElementById('gate-score-number');
+    if (ring) ring.style.borderColor = color;
+    if (num)  { num.textContent = data.score; num.style.color = color; }
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
+    set('gate-headline',  data.headline);
+    set('gate-strength',  data.strength);
+    set('gate-gap',       data.gap);
+
+    const feedback = document.getElementById('gate-feedback');
+    if (feedback) {
+      feedback.style.display = 'block';
+      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    btn.style.display = 'none';
+
+  } catch (e) {
+    showScreen('s-readiness');
+  }
 }
 
 function animateRadar() {
