@@ -1758,11 +1758,15 @@ async function processResumeFile(file) {
         if (label) label.innerHTML = `<span style="color:var(--rose)">⚠ AI error: ${aiData.error}</span>`;
         console.warn('Gemini error:', aiData.error, aiData.raw || '');
       } else {
-        if (aiData.name)       parsed.name       = aiData.name;
-        if (aiData.email)      parsed.email      = aiData.email;
-        if (aiData.phone)      parsed.phone      = aiData.phone;
-        if (aiData.experience) parsed.experience = aiData.experience;
-        if (aiData.awards)     parsed.awards     = aiData.awards;
+        if (aiData.name)           parsed.name           = aiData.name;
+        if (aiData.email)          parsed.email          = aiData.email;
+        if (aiData.phone)          parsed.phone          = aiData.phone;
+        if (aiData.currentRole)    parsed.currentRole    = aiData.currentRole;
+        if (aiData.totalExperience)parsed.totalExperience= aiData.totalExperience;
+        if (aiData.experience)     parsed.experience     = aiData.experience;
+        if (aiData.awards)         parsed.awards         = aiData.awards;
+        if (aiData.pmHighlights)   parsed.pmHighlights   = aiData.pmHighlights;
+        if (aiData.skills)         parsed.skills         = aiData.skills;
       }
     } catch (aiErr) {
       console.warn('AI parse failed:', aiErr.message);
