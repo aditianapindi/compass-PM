@@ -1840,15 +1840,25 @@ function updateProfileFromResume(parsed) {
 
   // ── PM Highlights ────────────────────────────────────────────────────────
   const highlights = document.getElementById('pm-highlights-content');
-  if (highlights && parsed.pmHighlights && parsed.pmHighlights.length) {
-    const colorMap = { strength: 'var(--emerald)', warning: 'var(--amber)', action: 'var(--accent)' };
-    highlights.innerHTML = parsed.pmHighlights.map(h => {
-      const color = colorMap[h.type] || 'var(--accent)';
-      return `<div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;margin-top:6px"></div>
-        <p style="font-size:13px;color:var(--text);line-height:1.65">${h.text} <span style="color:${color};font-weight:600">${h.label}</span></p>
-      </div>`;
-    }).join('');
+  console.log('[Compass] pmHighlights raw:', parsed.pmHighlights);
+  if (highlights) {
+    const items = Array.isArray(parsed.pmHighlights) ? parsed.pmHighlights : [];
+    if (items.length) {
+      const colorMap = { strength: 'var(--emerald)', warning: 'var(--amber)', action: 'var(--accent)' };
+      highlights.innerHTML = items.map(h => {
+        if (!h || typeof h !== 'object') return '';
+        const type = (h.type || '').toLowerCase().trim();
+        const color = colorMap[type] || 'var(--accent)';
+        const text = h.text || h.observation || JSON.stringify(h);
+        const label = h.label || '';
+        return `<div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;margin-top:6px"></div>
+          <p style="font-size:13px;color:var(--text);line-height:1.65">${text} <span style="color:${color};font-weight:600">${label}</span></p>
+        </div>`;
+      }).filter(Boolean).join('');
+    } else {
+      console.warn('[Compass] pmHighlights missing or empty in parsed data');
+    }
   }
 
   // ── Connected Signal Sources — resume row ────────────────────────────────
