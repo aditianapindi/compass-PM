@@ -1763,13 +1763,20 @@ async function processResumeFile(file) {
         body: JSON.stringify({ text: fullText })
       });
       const aiData = await aiRes.json();
-      if (aiData.name)       parsed.name       = aiData.name;
-      if (aiData.email)      parsed.email      = aiData.email;
-      if (aiData.phone)      parsed.phone      = aiData.phone;
-      if (aiData.experience) parsed.experience = aiData.experience;
-      if (aiData.awards)     parsed.awards     = aiData.awards;
+      console.log('Gemini response:', JSON.stringify(aiData));
+      if (aiData.error) {
+        if (label) label.innerHTML = `<span style="color:var(--rose)">⚠ AI error: ${aiData.error}</span>`;
+        console.warn('Gemini error:', aiData.error, aiData.raw || '');
+      } else {
+        if (aiData.name)       parsed.name       = aiData.name;
+        if (aiData.email)      parsed.email      = aiData.email;
+        if (aiData.phone)      parsed.phone      = aiData.phone;
+        if (aiData.experience) parsed.experience = aiData.experience;
+        if (aiData.awards)     parsed.awards     = aiData.awards;
+      }
     } catch (aiErr) {
       console.warn('AI parse failed:', aiErr.message);
+      if (label) label.innerHTML = `<span style="color:var(--rose)">⚠ Could not reach AI: ${aiErr.message}</span>`;
     }
 
   } catch (e) {
