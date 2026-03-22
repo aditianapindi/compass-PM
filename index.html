@@ -1872,6 +1872,7 @@ function showScreen(id) {
     requestAnimationFrame(() => { nxt.style.opacity = '1'; });
     window.scrollTo(0,0);
     if (id === 's-readiness') { setTimeout(animateRadar, 400); setTimeout(buildAndAnimateGaps, 600); }
+    if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
     const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall'];
     const bubble = document.getElementById('north-bubble');
