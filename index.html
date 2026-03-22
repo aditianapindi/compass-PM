@@ -1684,6 +1684,7 @@ async function saveProfile() {
     q1: userData.q1, q2: userData.q2, q3: userData.q3, q4: userData.q4, q5: userData.q5,
     resume_data: userData.resumeData || null,
     gate_score: userData.gateScore || null,
+    readiness_scores: userData.readinessScores || null,
     updated_at: new Date().toISOString()
   };
   await _sb.from('profiles').upsert(row, { onConflict: 'id' });
@@ -1702,6 +1703,7 @@ async function loadProfile() {
   if (data.q5) userData.q5 = data.q5;
   if (data.resume_data) { userData.resumeData = data.resume_data; userData.profileConnected = true; }
   if (data.gate_score) userData.gateScore = data.gate_score;
+  if (data.readiness_scores) userData.readinessScores = data.readiness_scores;
   return data;
 }
 
@@ -1979,7 +1981,14 @@ function showScreen(id) {
     nxt.style.opacity = '0';
     requestAnimationFrame(() => { nxt.style.opacity = '1'; });
     window.scrollTo(0,0);
-    if (id === 's-readiness') { setTimeout(animateRadar, 400); setTimeout(buildAndAnimateGaps, 600); }
+    if (id === 's-readiness') {
+      // Fetch AI readiness scores if not already loaded, then animate
+      if (!userData.readinessScores) {
+        fetchReadinessScores().then(() => { animateRadar(); animateScoreRing(); buildAndAnimateGaps(); });
+      } else {
+        setTimeout(animateRadar, 400); setTimeout(() => { animateScoreRing(); buildAndAnimateGaps(); }, 600);
+      }
+    }
     if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
     const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall'];
@@ -2023,7 +2032,8 @@ function animateScoreRing() {
   const ring = document.getElementById('scoreRing');
   const numEl = document.getElementById('scoreNum');
   if (!ring) return;
-  const circ = 351.86, target = 56, duration = 1500;
+  const target = (userData.readinessScores && userData.readinessScores.overall) || 56;
+  const circ = 351.86, duration = 1500;
   const start = performance.now();
   function step(now) {
     const p = Math.min((now - start) / duration, 1);
@@ -2037,7 +2047,21 @@ function animateScoreRing() {
   requestAnimationFrame(step);
 }
 
+function statusColor(status) {
+  if (status === 'Strong' || status === 'Solid') return { color: 'var(--emerald)', badge: 'badge-emerald' };
+  if (status === 'Developing') return { color: 'var(--orange)', badge: 'badge-orange' };
+  return { color: 'var(--rose)', badge: 'badge-rose' };
+}
+
 function getDims() {
+  // Use AI-generated scores if available, otherwise fallback to hardcoded
+  if (userData.readinessScores && userData.readinessScores.dimensions) {
+    const hasMeasured = !!userData.resumeData || !!userData.gateScore;
+    return userData.readinessScores.dimensions.map(d => {
+      const sc = statusColor(d.status);
+      return { name: d.name, score: d.score, status: d.status, color: sc.color, badge: sc.badge, note: d.note, measured: hasMeasured, source: 'resume + gate task' };
+    });
+  }
   const pc = userData.profileConnected;
   return [
     { name:'Product Sense',         score:58, status:'Developing', color:'var(--orange)', badge:'badge-orange', note:'Strong on features, building on user empathy.',         measured:true,  source:'gate task' },
@@ -2047,6 +2071,30 @@ function getDims() {
     { name:'AI Fluency',            score:37, status:'Gap',        color:'var(--rose)',   badge:'badge-rose',   note:'Uses AI as a user, not yet as a PM.',                   measured:false, action:'Complete an AI Fluency task in your path' },
     { name:'Behavioural',           score:62, status:'Developing', color:'var(--orange)', badge:'badge-orange', note:'Good stories, need PM-framing in delivery.',            measured:false, action:'Complete a Behavioural round with Riva' },
   ];
+}
+
+async function fetchReadinessScores() {
+  try {
+    const res = await fetch('/api/score-readiness', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        background: userData.q1,
+        targetCompany: userData.q4,
+        resumeData: userData.resumeData || null,
+        gateScore: userData.gateScore || null
+      })
+    });
+    const data = await res.json();
+    if (data.dimensions && data.dimensions.length === 6) {
+      userData.readinessScores = data;
+      saveProfile();
+      return data;
+    }
+  } catch (e) {
+    console.warn('Readiness scoring failed:', e.message);
+  }
+  return null;
 }
 
 function buildAndAnimateGaps() {
@@ -2144,10 +2192,24 @@ async function submitGate() {
   }
 }
 
+function scoreToRadarPoint(index, score) {
+  // Radar center (220, 200), max radius ~120px, 6 axes starting from top (–90°)
+  const cx = 220, cy = 200, maxR = 120;
+  const angle = (Math.PI * 2 * index / 6) - Math.PI / 2;
+  const r = maxR * (score / 100);
+  return [Math.round(cx + r * Math.cos(angle)), Math.round(cy + r * Math.sin(angle))];
+}
+
 function animateRadar() {
   const poly = document.getElementById('score-poly');
   if (!poly) return;
-  const pts = [[220,130],[266,174],[275,232],[220,297],[182,222],[156,163]];
+  const dims = getDims();
+  const pts = dims.map((d, i) => scoreToRadarPoint(i, d.score));
+  // Update dot colours based on actual status
+  dims.forEach((d, i) => {
+    const dot = document.getElementById('dot' + i);
+    if (dot) dot.setAttribute('fill', d.score >= 66 ? '#34D399' : d.score >= 50 ? '#FBBF24' : '#F87171');
+  });
   setTimeout(() => {
     poly.setAttribute('points', pts.map(p => p.join(',')).join(' '));
     pts.forEach((d, i) => {
