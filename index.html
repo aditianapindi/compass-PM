@@ -1604,27 +1604,8 @@
             <h3 style="font-size:15px;font-weight:700">PM-Relevant Highlights</h3>
             <span style="font-size:11px;color:var(--faint);background:var(--elevated);padding:3px 10px;border-radius:6px;border:1px solid var(--border);white-space:nowrap">From LinkedIn + Resume</span>
           </div>
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
-              <p style="font-size:13px;color:var(--text);line-height:1.65">Led a cross-functional team of 7 to ship a real-time payment reconciliation feature. <span style="color:var(--emerald);font-weight:600">↑ Strong PM signal.</span></p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
-              <p style="font-size:13px;color:var(--text);line-height:1.65">Reduced API latency by 34% through query optimisation — cited by PM team in quarterly review. <span style="color:var(--emerald);font-weight:600">↑ Impact ownership.</span></p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:6px"></div>
-              <p style="font-size:13px;color:var(--text);line-height:1.65">4 years at Infosys — client-delivery context, not product context. <span style="color:var(--amber);font-weight:600">⚠ Reframe in your narrative.</span></p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>
-              <p style="font-size:13px;color:var(--text);line-height:1.65">No public writing or product teardowns detected. <span style="color:var(--accent);font-weight:600">→ Build proof of work.</span></p>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:6px;height:6px;border-radius:50%;background:var(--emerald);flex-shrink:0;margin-top:6px"></div>
-              <p style="font-size:13px;color:var(--text);line-height:1.65">Built 3 internal tools used by 200+ colleagues — shows product intuition beyond job description. <span style="color:var(--emerald);font-weight:600">↑ Use this in interviews.</span></p>
-            </div>
+          <div id="pm-highlights-content" style="display:flex;flex-direction:column;gap:14px">
+            <p style="font-size:13px;color:var(--faint)">Upload your resume to see PM-relevant signals from your background.</p>
           </div>
         </div>
 
@@ -1805,53 +1786,70 @@ async function processResumeFile(file) {
 }
 
 function updateProfileFromResume(parsed) {
-  const card = document.getElementById('resume-snapshot-card');
+  // ── Profile header ───────────────────────────────────────────────────────
+  const nameEl = document.getElementById('profile-name');
+  if (nameEl && parsed.name) nameEl.textContent = parsed.name;
+
+  const subEl = document.getElementById('profile-subtitle');
+  if (subEl) {
+    const parts = [];
+    if (parsed.currentRole)     parts.push(parsed.currentRole);
+    if (parsed.totalExperience) parts.push(parsed.totalExperience);
+    if (parts.length) subEl.textContent = parts.join(' · ');
+  }
+
+  // ── Resume snapshot card ─────────────────────────────────────────────────
   const content = document.getElementById('resume-snapshot-content');
-  if (!card || !content) return;
-
-  let html = '';
-
-  if (parsed.name || parsed.email || parsed.phone) {
-    html += `<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">`;
-    if (parsed.name)  html += `<p style="font-size:15px;font-weight:700;margin-bottom:4px">${parsed.name}</p>`;
-    if (parsed.email) html += `<p style="font-size:13px;color:var(--muted);margin-bottom:2px">✉ ${parsed.email}</p>`;
-    if (parsed.phone) html += `<p style="font-size:13px;color:var(--muted)">📞 ${parsed.phone}</p>`;
-    html += `</div>`;
+  if (content) {
+    let html = '';
+    if (parsed.name || parsed.email || parsed.phone) {
+      html += `<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">`;
+      if (parsed.name)  html += `<p style="font-size:15px;font-weight:700;margin-bottom:4px">${parsed.name}</p>`;
+      if (parsed.email) html += `<p style="font-size:13px;color:var(--muted);margin-bottom:2px">✉ ${parsed.email}</p>`;
+      if (parsed.phone) html += `<p style="font-size:13px;color:var(--muted)">📞 ${parsed.phone}</p>`;
+      html += `</div>`;
+    }
+    if (parsed.experience && parsed.experience.length) {
+      html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Experience</p>`;
+      parsed.experience.forEach(exp => {
+        html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>
+          <p style="font-size:13px;color:var(--text);line-height:1.5">${exp}</p>
+        </div>`;
+      });
+    }
+    if (parsed.awards && parsed.awards.length) {
+      html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-top:14px;margin-bottom:10px">Awards & Recognition</p>`;
+      parsed.awards.forEach(award => {
+        html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:6px"></div>
+          <p style="font-size:13px;color:var(--text);line-height:1.5">${award}</p>
+        </div>`;
+      });
+    }
+    if (!html) html = `<p style="font-size:13px;color:var(--faint)">File uploaded. Structured data could not be extracted — try a text-based PDF.</p>`;
+    content.innerHTML = html;
   }
 
-  if (parsed.experience.length) {
-    html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Experience</p>`;
-    parsed.experience.forEach(exp => {
-      html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
-        <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>
-        <p style="font-size:13px;color:var(--text);line-height:1.5">${exp}</p>
+  // ── PM Highlights ────────────────────────────────────────────────────────
+  const highlights = document.getElementById('pm-highlights-content');
+  if (highlights && parsed.pmHighlights && parsed.pmHighlights.length) {
+    const colorMap = { strength: 'var(--emerald)', warning: 'var(--amber)', action: 'var(--accent)' };
+    highlights.innerHTML = parsed.pmHighlights.map(h => {
+      const color = colorMap[h.type] || 'var(--accent)';
+      return `<div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;margin-top:6px"></div>
+        <p style="font-size:13px;color:var(--text);line-height:1.65">${h.text} <span style="color:${color};font-weight:600">${h.label}</span></p>
       </div>`;
-    });
+    }).join('');
   }
 
-  if (parsed.awards.length) {
-    html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-top:14px;margin-bottom:10px">Awards & Recognition</p>`;
-    parsed.awards.forEach(award => {
-      html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
-        <div style="width:5px;height:5px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:6px"></div>
-        <p style="font-size:13px;color:var(--text);line-height:1.5">${award}</p>
-      </div>`;
-    });
-  }
-
-  if (!html) {
-    html = `<p style="font-size:13px;color:var(--faint)">File uploaded. Structured data could not be extracted — try a text-based PDF.</p>`;
-  }
-
-  content.innerHTML = html;
-
-  // Update resume row in Connected Signal Sources
+  // ── Connected Signal Sources — resume row ────────────────────────────────
   const resumeRow = document.getElementById('resume-connected-row');
   if (resumeRow) {
-    resumeRow.querySelector('.resume-filename').textContent = parsed.fileName;
+    resumeRow.querySelector('.resume-filename').textContent = parsed.fileName || 'Resume uploaded';
     resumeRow.querySelector('.resume-status').textContent = '✓ Uploaded';
     resumeRow.querySelector('.resume-status').className = 'badge badge-emerald resume-status';
-    resumeRow.style.display = 'flex';
   }
 }
 
