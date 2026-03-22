@@ -358,7 +358,7 @@
           </div>
         </div>
         <div id="drop-zone" class="drag-zone" style="margin-top:16px" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event)">
-          <input type="file" id="file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFileSelect(event)"/>
+          <input type="file" id="file-input" accept=".pdf,.doc,.docx" style="display:none"/>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5" style="margin:0 auto 8px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <p id="drop-label" style="font-size:14px;color:var(--muted)">Drag your resume here or <span style="color:var(--accent)">browse</span></p>
           <p style="font-size:12px;color:var(--faint);margin-top:4px">PDF, DOC, DOCX · up to 5MB</p>
@@ -2344,6 +2344,15 @@ function northAutoPopup(screenId, message, delay) {
       showScreen('s-connect');
     }
   });
+
+  // Wire file input for resume upload
+  var fileInput = document.getElementById('file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) processResumeFile(file);
+    });
+  }
 
   // Wire Google button
   var googleBtn = document.getElementById('btn-google-signin');
