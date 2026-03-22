@@ -1612,25 +1612,16 @@
         <!-- Detected Skills -->
         <div class="card" style="padding:24px">
           <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Detected Skills</h3>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-            <span class="badge badge-emerald">Java · Python</span>
-            <span class="badge badge-emerald">SQL</span>
-            <span class="badge badge-emerald">REST APIs</span>
-            <span class="badge badge-accent">Agile / Scrum</span>
-            <span class="badge badge-accent">Cross-functional</span>
-            <span class="badge badge-accent">JIRA</span>
-            <span class="badge badge-amber">Product Sense</span>
-            <span class="badge badge-orange">Data Analysis</span>
-            <span class="badge badge-rose">AI Fluency ↑ needs work</span>
+          <div id="skills-container" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <span style="font-size:13px;color:var(--faint)">Upload your resume to see detected skills.</span>
           </div>
-          <p style="font-size:12px;color:var(--faint)">Extracted from your resume and LinkedIn. Skills feed directly into your dimension scores.</p>
+          <p style="font-size:12px;color:var(--faint)">Extracted from your resume. Skills feed directly into your dimension scores.</p>
         </div>
 
         <!-- Narrative improvement prompt -->
-        <div class="card" style="padding:24px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04)">
+        <div id="profile-fix-card" class="card" style="padding:24px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04);display:none">
           <p style="font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">One Thing to Fix in Your Profile</p>
-          <p style="font-size:14px;color:var(--text);line-height:1.65;margin-bottom:14px">Your LinkedIn headline says <em>"Senior Software Engineer at Infosys"</em>. Hiring managers scanning for PM candidates won't stop here. Change it to signal your transition: <em>"Engineer → PM | Growth & Fintech | Bengaluru"</em>.</p>
-          <button class="btn-secondary" style="font-size:13px;padding:9px 16px">See All Profile Fixes →</button>
+          <p id="profile-fix-text" style="font-size:14px;color:var(--text);line-height:1.65"></p>
         </div>
 
       </div>
@@ -1864,6 +1855,27 @@ function updateProfileFromResume(parsed) {
       }).filter(Boolean).join('');
     } else {
       console.warn('[Compass] pmHighlights missing or empty in parsed data');
+    }
+  }
+
+  // ── Detected Skills ───────────────────────────────────────────────────────
+  const skillsContainer = document.getElementById('skills-container');
+  if (skillsContainer && parsed.skills && parsed.skills.length) {
+    const colors = ['badge-emerald','badge-accent','badge-amber','badge-accent','badge-emerald'];
+    skillsContainer.innerHTML = parsed.skills.map((s, i) =>
+      `<span class="badge ${colors[i % colors.length]}">${s}</span>`
+    ).join('');
+  }
+
+  // ── One Thing to Fix ──────────────────────────────────────────────────────
+  const fixCard = document.getElementById('profile-fix-card');
+  const fixText = document.getElementById('profile-fix-text');
+  if (fixCard && fixText && parsed.pmHighlights) {
+    const fix = parsed.pmHighlights.find(h => h.type === 'warning') ||
+                parsed.pmHighlights.find(h => h.type === 'action');
+    if (fix) {
+      fixText.textContent = fix.text;
+      fixCard.style.display = 'block';
     }
   }
 
