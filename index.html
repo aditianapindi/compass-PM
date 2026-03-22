@@ -1672,6 +1672,46 @@
 <script>
 const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, name:null, firstName:null, profileConnected:false };
 
+// ── Supabase persistence helpers ──────────────────────────────────────
+var _sb = null; // set after Supabase init
+
+async function saveProfile() {
+  if (!_sb) return;
+  var { data: { session } } = await _sb.auth.getSession();
+  if (!session) return;
+  var row = {
+    id: session.user.id,
+    q1: userData.q1, q2: userData.q2, q3: userData.q3, q4: userData.q4, q5: userData.q5,
+    resume_data: userData.resumeData || null,
+    gate_score: userData.gateScore || null,
+    updated_at: new Date().toISOString()
+  };
+  await _sb.from('profiles').upsert(row, { onConflict: 'id' });
+}
+
+async function loadProfile() {
+  if (!_sb) return null;
+  var { data: { session } } = await _sb.auth.getSession();
+  if (!session) return null;
+  var { data } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!data) return null;
+  if (data.q1) userData.q1 = data.q1;
+  if (data.q2) userData.q2 = data.q2;
+  if (data.q3) userData.q3 = data.q3;
+  if (data.q4) userData.q4 = data.q4;
+  if (data.q5) userData.q5 = data.q5;
+  if (data.resume_data) { userData.resumeData = data.resume_data; userData.profileConnected = true; }
+  if (data.gate_score) userData.gateScore = data.gate_score;
+  return data;
+}
+
+function getReturningScreen(profile) {
+  if (profile.gate_score && profile.gate_score.score) return 's-dashboard';
+  if (profile.resume_data) return 's-gate';
+  if (profile.q1) return 's-connect';
+  return 's-connect';
+}
+
 // Q1 background → PM type, description, gap insight
 const pmTypeMap = {
   'Software / Data Engineer':       { type:'Growth PM',   desc:"Growth PMs run experiments, own acquisition and retention metrics, and drive revenue loops. Your engineering background gives you a technical edge — most growth PMs struggle to speak the language of engineering teams. You don't have that problem.", also:'Fintech PM · Consumer PM · Growth-stage B2B PM', gap:"Engineers transitioning to PM most commonly lead with solutions before diagnosing the problem — it's how they've been trained to think. Your gate task will tell us whether this pattern applies to you." },
@@ -1813,6 +1853,7 @@ async function processResumeFile(file) {
   userData.resumeData = parsed;
   applyName();
   updateProfileFromResume(parsed);
+  saveProfile();
 
   // Update drop zone
   if (zone)  zone.style.borderColor = 'var(--emerald)';
@@ -1961,7 +2002,7 @@ function selectOption(el, group) {
   const nextScreen = { q1:'s-q2', q2:'s-q3', q3:'s-q4', q4:'s-q5', q5:null };
   const dest = nextScreen[group];
   if (dest) setTimeout(() => showScreen(dest), 350);
-  else if (group === 'q5') setTimeout(() => startLoading(), 350);
+  else if (group === 'q5') { saveProfile(); setTimeout(() => startLoading(), 350); }
 }
 
 function startLoading() {
@@ -2077,6 +2118,7 @@ async function submitGate() {
     if (data.error || !data.score) { showScreen('s-readiness'); return; }
 
     userData.gateScore = data;
+    saveProfile();
 
     // Colour the ring by score
     const color = data.score >= 70 ? 'var(--emerald)' : data.score >= 50 ? 'var(--amber)' : 'var(--rose)';
@@ -2481,19 +2523,29 @@ function northAutoPopup(screenId, message, delay) {
   var sb = null;
   try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { console.warn('Supabase init failed', e); }
   if (!sb) return;
+  _sb = sb; // expose globally for saveProfile/loadProfile
 
   // After Google redirects back, pick up the session
-  sb.auth.onAuthStateChange(function (event, session) {
+  sb.auth.onAuthStateChange(async function (event, session) {
     if (!session) return;
     var user = session.user;
     var name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email;
     userData.name = name;
     userData.profileConnected = true;
     applyName();
-    // If we're still on signin or landing, send them to the connect screen
+
+    // Load saved profile for returning users
     var current = document.querySelector('.screen.active');
     if (!current || current.id === 's-signin' || current.id === 's-landing') {
-      showScreen('s-connect');
+      var profile = await loadProfile();
+      if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+        // Returning user — restore UI state
+        if (userData.resumeData) { applyName(); updateProfileFromResume(userData.resumeData); }
+        if (userData.q1) personalize();
+        showScreen(getReturningScreen(profile));
+      } else {
+        showScreen('s-connect');
+      }
     }
   });
 
@@ -2676,6 +2728,7 @@ async function processResumeFileFromModal(file) {
   userData.resumeData = parsed;
   applyName();
   updateProfileFromResume(parsed);
+  saveProfile();
   zone.style.borderColor = 'var(--emerald)';
   label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} updated</span>`;
   setTimeout(closeEditProfileModal, 1200);
