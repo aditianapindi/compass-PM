@@ -1754,6 +1754,7 @@ async function processResumeFile(file) {
       fullText += content.items.map(item => item.str).join(' ') + '\n';
     }
 
+    console.log('PDF raw text (first 500 chars):', fullText.slice(0, 500));
     const lines = fullText.split(/[\n|•]+/).map(l => l.trim()).filter(l => l.length > 2);
 
     // Name — first short line with 2–4 words, no digits or symbols
