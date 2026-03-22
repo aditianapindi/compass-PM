@@ -7,11 +7,15 @@ A Career Navigation Platform for Aspiring Product Managers, serving both India a
 **Compass** — "Like Google Maps, but for your PM career."
 
 ## Current Stage
-Prototype complete with working Supabase auth (Google OAuth + email/password sign-up). Monetisation paywall screen added. All files moved into `compass/` folder. Next step: push to GitHub, deploy to Netlify, validate with 5–10 real users.
+Prototype live on Vercel with working Supabase auth, PDF resume parsing, AI gate scoring, and AI North assistant. Deployed at `compass-pm.vercel.app`. GitHub repo: `aditianapindi/compass-PM`. Next step: validate with 5–10 real users, then pursue technical co-founder or pre-seed raise.
 
 ## Key Files
-- `compass_prototype.html` — Full interactive prototype (single HTML file). 12 screens, vanilla JS, Tailwind CDN, Supabase JS CDN, Google Fonts (Syne + DM Sans).
+- `index.html` — Full interactive prototype (single HTML file). 13 screens, vanilla JS, Tailwind CDN, Supabase JS CDN, PDF.js CDN, Google Fonts (Syne + DM Sans). Supabase keys inlined directly (anon key is safe to commit).
 - `config.js` — Supabase credentials (gitignored — never commit).
+- `api/parse-resume.js` — Vercel serverless function. Extracts PDF text via PDF.js on client, sends to Gemini 2.5 Flash, returns structured JSON (name, email, phone, currentRole, totalExperience, experience, awards, pmHighlights, skills).
+- `api/score-gate.js` — Vercel serverless function. Takes gate task text + user background, sends to Gemini 2.5 Flash, returns score (0–100), thinkingStyle, headline, strength, gap.
+- `api/north-chat.js` — Vercel serverless function. Takes user message + full user context string, sends to Gemini 2.5 Flash, returns North's reply (honest, specific, 2–4 sentences).
+- `api/list-models.js` — Diagnostic endpoint. Lists all Gemini models available for the API key.
 - `compass_session_notes.md` — Full session notes: all screens, design decisions, AI features, open threads.
 - `pm_market_research_report.md` — Market research report (780 lines, live-verified March 2026).
 - `pm_discovery_report.md` — Discovery report (938 lines): personas, journey maps, JTBD, TAM.
@@ -115,17 +119,17 @@ Side: Profile (s-profile), Interview Room (s-interview)
 |---|---|
 | `s-landing` | Hero, pain points, 7-step how-it-works, footer CTA |
 | `s-signin` | Sign in / create account (Google OAuth via Supabase, email/password) |
-| `s-connect` | Connect LinkedIn, Teal, resume upload, GitHub, writing samples |
+| `s-connect` | Connect LinkedIn, Teal, resume upload (PDF.js + Gemini), GitHub, writing samples |
 | `s-q1`–`s-q5` | 5 onboarding questions — auto-advance on selection, no Next button |
 | `s-loading` | Spinning compass, animated check items, auto-advances to verdict |
 | `s-verdict` | PM Type card, locked score ring (unlocks after LinkedIn + gate task), background pattern hypothesis |
-| `s-gate` | First action task — 300-char max product teardown, character countdown, submits to readiness |
+| `s-gate` | First action task — 1500-char max product teardown, character countdown, AI scoring, inline feedback card |
 | `s-readiness` | Radar chart (6 dimensions) + confidence indicator (measured vs estimated) + stat cards |
 | `s-paywall` | Monetisation screen — Monthly (₹999/mo) vs Annual (₹7,999/yr) pricing cards |
 | `s-path` | 3-phase 6-week navigation plan (Product Sense → Analytical → AI Fluency) |
 | `s-dashboard` | Streak, today's task, job fit matches, hiring trend signals |
 | `s-interview` | Interview Room — Riva AI avatar, round selector, live mock session |
-| `s-profile` | User profile — connected accounts, PM highlights, skills, dimension scores |
+| `s-profile` | User profile — connected accounts, PM highlights, skills, dimension scores. Edit Profile modal for resume re-upload. |
 
 ### Key Design Decisions
 - **Free flow:** Landing → Q1–Q5 → Fit Verdict (no login required)
@@ -133,13 +137,13 @@ Side: Profile (s-profile), Interview Room (s-interview)
 - **Paywall:** Between Readiness Score and the 6-week Path. Free = diagnosis. Paid = navigation.
 - **Pricing:** Monthly ₹999/mo · Annual ₹7,999/yr (save 33%). Inside validated WTP ceiling.
 - **Score locked on verdict:** Shows `?` ring until LinkedIn/resume + gate task completed. Then unlocks with confidence indicator.
-- **Gate task:** Max 300 chars (not min). Character countdown. Enabled after 20 chars typed.
+- **Gate task:** Max 1500 chars. Character countdown. Enabled after 20 chars typed. Submits to Gemini for real scoring.
 - **Personalization:** `pmTypeMap` + `companyMap` + `personalize()` — all post-verdict text reflects Q1 background + Q4 target company. Name comes from Google profile or LinkedIn, not a form field.
 - **Full navbar:** Visible on all screens from s-gate onward (Path, Jobs, Trends, Interview Room, Profile tabs + avatar).
 - **s-gaps screen cut** — content merged into s-readiness as dimension breakdown grid
 - **7-step How It Works** — includes "Build Your Portfolio" and "Create Connections" steps
 
-### The 6 PM Dimensions (Sample: Arjun, Engineer at Infosys)
+### The 6 PM Dimensions (Hardcoded sample scores — not yet driven by real AI)
 | Dimension | Score | Status |
 |---|---|---|
 | Product Sense | 58 | Developing 🟠 |
@@ -149,10 +153,100 @@ Side: Profile (s-profile), Interview Room (s-interview)
 | AI Fluency | 37 | Gap 🔴 |
 | Behavioural | 62 | Developing 🟠 |
 
-### AI Features Built
-**North** — Floating AI assistant (bottom-right compass bubble). Appears post-onboarding. Contextual nudges on verdict/gap/dashboard Day 1. 5 quick-reply chips + free-text input. Honest, non-cheerleader responses.
+---
 
-**Riva** — AI interview avatar. Lives in Interview Room tab. Animated SVG face with breathing rings. Round selector (Product Sense / Metrics / Behavioural), company selector (Razorpay, Meesho, Flipkart, Swiggy, CRED), pressure level toggle. Scores all 6 dimensions, feeds back into Readiness Score.
+## AI Features Built (All Live)
+
+### Resume Parsing (PDF.js + Gemini 2.5 Flash)
+- User uploads PDF on s-connect
+- PDF.js extracts text client-side (first 3 pages)
+- Text sent to `/api/parse-resume` → Gemini 2.5 Flash
+- Returns: `name`, `email`, `phone`, `currentRole`, `totalExperience`, `experience[]`, `awards[]`, `pmHighlights[]`, `skills[]`
+- `pmHighlights` schema: `{ text, type: "strength|warning|action", label: "↑/⚠/→ label" }`
+- Profile page updates automatically: header name + subtitle, resume snapshot card, PM highlights (colour-coded), detected skills, "One Thing to Fix" card
+- `updateProfileFromResume(parsed)` is called on upload AND when navigating to s-profile if `userData.resumeData` exists
+
+### Gate Task Scoring (Gemini 2.5 Flash)
+- User writes product teardown on s-gate (up to 1500 chars)
+- On submit → `/api/score-gate` with text + user background (Q1)
+- Returns: `score` (0–100), `thinkingStyle`, `headline`, `strength`, `gap`
+- Inline feedback card revealed on gate screen (no navigation away): score ring coloured green/amber/red, headline, green dot strength, amber dot gap
+- "See My Full Readiness Score →" button navigates to s-readiness
+- Result stored in `userData.gateScore`
+- Falls through silently to s-readiness if API fails
+
+### North AI Assistant (Gemini 2.5 Flash)
+- Floating compass bubble (bottom-right), visible on all post-onboarding screens
+- 5 quick-reply chips: "I'm feeling stuck", "How am I doing?", "Mock Interview", "What to do today?", "I got rejected"
+- Free-text input — all messages routed to `/api/north-chat`
+- Context sent with every message: name, Q1 background, Q4 target company, currentRole, totalExperience, readiness score, gate score + headline + strength + gap, resume pmHighlights (strengths and warnings)
+- North personality: honest, not a cheerleader, 2–4 sentences, specific to user data, no generic PM advice
+- Typing indicator (`···`) shown while waiting for Gemini
+- Auto-popup nudges on s-verdict, s-gaps, s-dashboard with screen-specific messages (shown once per screen per session)
+
+### Edit Profile Modal
+- "Edit Profile" button on s-profile opens a modal overlay
+- Modal has drag-and-drop + browse PDF upload zone
+- Runs full parse-resume flow inline — shows progress states (reading → AI parsing → done)
+- Closes automatically 1.2s after success and refreshes all profile data
+- Click outside or ✕ to close
+
+---
+
+## Technical Architecture
+
+### Infrastructure
+- **Hosting:** Vercel (auto-deploys on push to GitHub main branch)
+- **Repo:** `github.com/aditianapindi/compass-PM`
+- **Auth:** Supabase (Google OAuth + email/password)
+- **AI:** Gemini 2.5 Flash via `generativelanguage.googleapis.com/v1beta`
+- **API key:** `GEMINI_API_KEY` stored in Vercel environment variables (never in code)
+- **PDF parsing:** PDF.js via unpkg CDN (client-side, first 3 pages)
+
+### Serverless Functions (`api/` folder)
+| File | Purpose |
+|---|---|
+| `parse-resume.js` | Resume parsing — returns full structured JSON |
+| `score-gate.js` | Gate task scoring — returns score, headline, strength, gap |
+| `north-chat.js` | North AI chat — returns contextual reply |
+| `list-models.js` | Diagnostic — lists available Gemini models |
+
+### Key Global State (`userData` object)
+```javascript
+userData = {
+  name,           // from Google auth or resume parse
+  firstName,      // derived from name
+  q1,             // background (e.g. "Software / Data Engineer")
+  q4,             // target company
+  profileConnected,
+  resumeData: {   // from parse-resume API
+    name, email, phone, currentRole, totalExperience,
+    experience[], awards[], pmHighlights[], skills[], fileName
+  },
+  gateScore: {    // from score-gate API
+    score, thinkingStyle, headline, strength, gap
+  }
+}
+```
+
+### Key Functions
+- `processResumeFile(file)` — handles upload on s-connect, calls parse-resume API, updates userData and profile
+- `processResumeFileFromModal(file)` — same logic but uses modal UI elements, closes modal on success
+- `updateProfileFromResume(parsed)` — updates all profile elements from parsed resume data
+- `submitGate()` — async, calls score-gate API, reveals inline feedback card
+- `northAsk(message)` — async, calls north-chat API with full user context, handles typing indicator
+- `getNorthContext()` — assembles userData into context string for North API
+- `applyName()` — updates all avatar initials and profile name across all screens
+- `showScreen(id)` — handles screen transitions; triggers updateProfileFromResume when navigating to s-profile
+
+### Supabase Integration
+- CDN: `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2`
+- Keys inlined in index.html (anon key is safe to expose)
+- Auth providers: Google OAuth, Email/Password
+- Google redirect URI: `https://pcmddbdwajxmgftvycqw.supabase.co/auth/v1/callback`
+- Supabase Site URL set to live Vercel domain
+- On sign-in: name pulled from `user.user_metadata.full_name`, `applyName()` called, routed to `s-connect`
+- No custom tables yet — users stored in Supabase Auth built-in users table
 
 ### Design System
 | Token | Value |
@@ -163,29 +257,24 @@ Side: Profile (s-profile), Interview Room (s-interview)
 | Accent | `#818CF8` (indigo) |
 | Fonts | Syne (headings) + DM Sans (body) |
 
-### Supabase Integration
-- CDN: `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2`
-- Config: `config.js` (gitignored) — exports `SUPABASE_URL` and `SUPABASE_KEY`
-- Auth providers enabled: Google OAuth, Email/Password
-- Users stored in: Supabase Authentication → Users (built-in, no custom table needed yet)
-- Google redirect URI in Google Cloud Console: `https://pcmddbdwajxmgftvycqw.supabase.co/auth/v1/callback`
-- Supabase Site URL: `http://localhost:3000` (update when deployed)
-- On sign-in: name pulled from `user.user_metadata.full_name`, `applyName()` called, routed to `s-connect`
+---
 
-### Open Threads (Not Yet Built)
-1. Second gate question — metric drop diagnosis
-2. AI interview backend — currently hardcoded. Real version needs Claude API.
-3. Voice input for Riva — Web Speech API (text-first)
-4. North → Riva handoff for mock interview chip
-5. Cohort/peer group feature
-6. Domain check for "Compass"
-7. `profiles` table in Supabase — store Q1–Q5 answers, readiness score, subscription status
-8. Stripe/Razorpay integration for paywall
+## Open Threads (Not Yet Built)
+1. **Resume-to-verdict personalization** — s-verdict copy should reference actual resume data (currentRole, experience) not just Q1 answer
+2. **Readiness score from AI** — radar chart scores are hardcoded; should be estimated from resume + gate score
+3. **Second gate question** — metric drop diagnosis
+4. **Riva interview backend** — currently hardcoded responses. Real version needs Claude API or Gemini.
+5. **Voice input for Riva** — Web Speech API (text-first for now)
+6. **North → Riva handoff** — Mock Interview chip in North should open Interview Room
+7. **Cohort/peer group feature**
+8. **`profiles` table in Supabase** — persist Q1–Q5 answers, readiness score, subscription status across sessions
+9. **Stripe/Razorpay integration** for paywall
+10. **Domain** — check and acquire compass domain
 
-### Next Steps (Recommended Order)
-1. Push to GitHub → deploy to Netlify → update Supabase redirect URL to live domain
-2. Validate prototype with 5–10 real users (share Netlify URL)
-3. Connect Claude API for gate scoring, gap diagnosis, North responses
-4. Add `profiles` table in Supabase to persist user answers + score
-5. Add payment integration (Stripe for NA, Razorpay for India)
+## Next Steps (Recommended Order)
+1. Validate prototype with 5–10 real users (share `compass-pm.vercel.app`)
+2. Resume-to-verdict personalization (s-verdict copy uses real resume data)
+3. Readiness score dimensions driven by AI (resume + gate score as inputs)
+4. `profiles` table in Supabase to persist user data across sessions
+5. Payment integration (Stripe for NA, Razorpay for India)
 6. Technical co-founder or pre-seed raise using prototype as proof of concept
