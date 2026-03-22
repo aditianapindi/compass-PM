@@ -699,10 +699,10 @@
           <span style="color:var(--accent)">→</span> What would you change — and why?</p>
         </div>
 
-        <textarea id="gate-input" class="textarea-dark" rows="6" maxlength="300" placeholder="Start with the app name and the feature… e.g. 'I'm looking at Swiggy's reorder feature. It's designed for…'" oninput="validateGate()"></textarea>
+        <textarea id="gate-input" class="textarea-dark" rows="8" maxlength="1500" placeholder="Start with the app name and the feature… e.g. 'I'm looking at Swiggy's reorder feature. It's designed for…'" oninput="validateGate()"></textarea>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;margin-bottom:24px">
           <p style="font-size:12px;color:var(--faint)">This becomes the first entry in your proof-of-work portfolio.</p>
-          <p id="gate-counter" style="font-size:12px;color:var(--faint)">300 characters remaining</p>
+          <p id="gate-counter" style="font-size:12px;color:var(--faint)">1500 characters remaining</p>
         </div>
 
         <div style="text-align:center">
@@ -2111,11 +2111,11 @@ function validateGate() {
   const counter = document.getElementById('gate-counter');
   if (!ta || !btn || !counter) return;
   const len = ta.value.length;
-  const remaining = 300 - len;
-  counter.textContent = remaining === 300 ? '300 characters remaining'
+  const remaining = 1500 - len;
+  counter.textContent = remaining === 1500 ? '1500 characters remaining'
     : remaining === 0 ? 'Character limit reached'
     : `${remaining} character${remaining === 1 ? '' : 's'} remaining`;
-  counter.style.color = remaining <= 0 ? 'var(--rose)' : remaining <= 30 ? 'var(--amber)' : 'var(--faint)';
+  counter.style.color = remaining <= 0 ? 'var(--rose)' : remaining <= 100 ? 'var(--amber)' : 'var(--faint)';
   btn.disabled = len < 20;
 }
 
