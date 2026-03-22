@@ -1483,17 +1483,17 @@
               <span class="badge badge-emerald" style="font-size:11px">✓ Connected</span>
             </div>
 
-            <div style="display:flex;align-items:center;justify-content:space-between">
+            <div id="resume-connected-row" style="display:flex;align-items:center;justify-content:space-between">
               <div style="display:flex;align-items:center;gap:10px">
                 <div style="width:32px;height:32px;border-radius:8px;background:var(--elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 </div>
                 <div>
                   <p style="font-size:13px;font-weight:600">Resume</p>
-                  <p style="font-size:12px;color:var(--faint)">arjun_resume_2026.pdf</p>
+                  <p class="resume-filename" style="font-size:12px;color:var(--faint)">Not uploaded</p>
                 </div>
               </div>
-              <span class="badge badge-emerald" style="font-size:11px">✓ Uploaded</span>
+              <span class="resume-status badge" style="font-size:11px;color:var(--faint)">Upload →</span>
             </div>
 
             <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1579,6 +1579,15 @@
 
       <!-- RIGHT COLUMN -->
       <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Resume Snapshot — populated after PDF upload -->
+        <div id="resume-snapshot-card" class="card" style="padding:24px;display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h3 style="font-size:15px;font-weight:700">Resume Snapshot</h3>
+            <span style="font-size:11px;color:var(--faint);background:var(--elevated);padding:3px 10px;border-radius:6px;border:1px solid var(--border)">From PDF</span>
+          </div>
+          <div id="resume-snapshot-content"></div>
+        </div>
 
         <!-- PM-Relevant Highlights -->
         <div class="card" style="padding:24px">
@@ -1723,10 +1732,18 @@ function handleFileSelect(event) {
 }
 
 async function processResumeFile(file) {
+  const zone  = document.getElementById('drop-zone');
   const label = document.getElementById('drop-label');
-  if (label) label.textContent = 'Reading your resume…';
+
+  // Immediate feedback — synchronous, happens before any async work
+  if (zone)  zone.style.borderColor  = 'var(--accent)';
+  if (label) label.innerHTML = `<span style="color:var(--accent)">⏳ Reading ${file.name}…</span>`;
+
+  const parsed = { name: null, email: null, phone: null, experience: [], awards: [], fileName: file.name };
 
   try {
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js not loaded');
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -1737,31 +1754,107 @@ async function processResumeFile(file) {
       fullText += content.items.map(item => item.str).join(' ') + '\n';
     }
 
-    // Extract name — first non-empty line that looks like a name (2-4 words, no digits)
-    const lines = fullText.split(/[\n|]+/).map(l => l.trim()).filter(l => l.length > 1);
-    let extractedName = null;
-    for (const line of lines.slice(0, 6)) {
+    const lines = fullText.split(/[\n|•]+/).map(l => l.trim()).filter(l => l.length > 2);
+
+    // Name — first short line with 2–4 words, no digits or symbols
+    for (const line of lines.slice(0, 8)) {
       const words = line.split(/\s+/);
-      if (words.length >= 2 && words.length <= 4 && !/\d/.test(line) && !/[@|•|:\/]/.test(line)) {
-        extractedName = line;
-        break;
+      if (words.length >= 2 && words.length <= 4 && !/\d/.test(line) && !/[@:\/|]/.test(line)) {
+        parsed.name = line; break;
       }
     }
 
-    if (extractedName) {
-      userData.name = extractedName;
-    }
-    userData.profileConnected = true;
-    applyName();
+    // Email
+    const emailMatch = fullText.match(/[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch) parsed.email = emailMatch[0];
 
-    if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} parsed</span>${extractedName ? `<br/><span style="font-size:12px;color:var(--muted)">Name found: ${extractedName}</span>` : ''}`;
+    // Phone
+    const phoneMatch = fullText.match(/(\+?\d[\d\s\-().]{7,14}\d)/);
+    if (phoneMatch) parsed.phone = phoneMatch[0].trim();
+
+    // Experience — lines near role/company keywords
+    const expKeywords = /\b(engineer|manager|analyst|developer|designer|consultant|lead|senior|intern|associate|director|head of|co-founder|founder)\b/i;
+    for (const line of lines) {
+      if (expKeywords.test(line) && line.length > 15 && line.length < 120) {
+        parsed.experience.push(line);
+        if (parsed.experience.length >= 5) break;
+      }
+    }
+
+    // Awards
+    const awardKeywords = /\b(award|recognition|honour|honor|achievement|winner|certificate|scholarship|rank|top|best)\b/i;
+    for (const line of lines) {
+      if (awardKeywords.test(line) && line.length > 10 && line.length < 120) {
+        parsed.awards.push(line);
+        if (parsed.awards.length >= 3) break;
+      }
+    }
 
   } catch (e) {
-    console.warn('PDF parse error:', e);
-    // Still mark as connected even if parsing fails
-    userData.profileConnected = true;
-    applyName();
-    if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} uploaded</span>`;
+    console.warn('PDF parse:', e.message);
+  }
+
+  // Apply name if found
+  if (parsed.name) userData.name = parsed.name;
+  userData.profileConnected = true;
+  userData.resumeData = parsed;
+  applyName();
+  updateProfileFromResume(parsed);
+
+  // Update drop zone
+  if (zone)  zone.style.borderColor = 'var(--emerald)';
+  if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} uploaded</span>${parsed.name ? `<br/><span style="font-size:12px;color:var(--muted)">Name: ${parsed.name}</span>` : ''}`;
+}
+
+function updateProfileFromResume(parsed) {
+  const card = document.getElementById('resume-snapshot-card');
+  const content = document.getElementById('resume-snapshot-content');
+  if (!card || !content) return;
+
+  let html = '';
+
+  if (parsed.name || parsed.email || parsed.phone) {
+    html += `<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">`;
+    if (parsed.name)  html += `<p style="font-size:15px;font-weight:700;margin-bottom:4px">${parsed.name}</p>`;
+    if (parsed.email) html += `<p style="font-size:13px;color:var(--muted);margin-bottom:2px">✉ ${parsed.email}</p>`;
+    if (parsed.phone) html += `<p style="font-size:13px;color:var(--muted)">📞 ${parsed.phone}</p>`;
+    html += `</div>`;
+  }
+
+  if (parsed.experience.length) {
+    html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Experience</p>`;
+    parsed.experience.forEach(exp => {
+      html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+        <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>
+        <p style="font-size:13px;color:var(--text);line-height:1.5">${exp}</p>
+      </div>`;
+    });
+  }
+
+  if (parsed.awards.length) {
+    html += `<p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-top:14px;margin-bottom:10px">Awards & Recognition</p>`;
+    parsed.awards.forEach(award => {
+      html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+        <div style="width:5px;height:5px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:6px"></div>
+        <p style="font-size:13px;color:var(--text);line-height:1.5">${award}</p>
+      </div>`;
+    });
+  }
+
+  if (!html) {
+    html = `<p style="font-size:13px;color:var(--faint)">File uploaded. Structured data could not be extracted — try a text-based PDF.</p>`;
+  }
+
+  content.innerHTML = html;
+  card.style.display = 'block';
+
+  // Update resume row in Connected Signal Sources
+  const resumeRow = document.getElementById('resume-connected-row');
+  if (resumeRow) {
+    resumeRow.querySelector('.resume-filename').textContent = parsed.fileName;
+    resumeRow.querySelector('.resume-status').textContent = '✓ Uploaded';
+    resumeRow.querySelector('.resume-status').className = 'badge badge-emerald resume-status';
+    resumeRow.style.display = 'flex';
   }
 }
 
@@ -2220,8 +2313,8 @@ function northAutoPopup(screenId, message, delay) {
 </script>
 
 <!-- PDF.js -->
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
+<script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>if (typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
