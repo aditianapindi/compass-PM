@@ -1484,7 +1484,7 @@
                 </div>
                 <div>
                   <p style="font-size:13px;font-weight:600">LinkedIn</p>
-                  <p style="font-size:12px;color:var(--faint)">arjunsharma · 312 connections</p>
+                  <p id="linkedin-subtext" style="font-size:12px;color:var(--faint)">arjunsharma · 312 connections</p>
                 </div>
               </div>
               <span class="badge badge-emerald" style="font-size:11px">✓ Connected</span>
@@ -1697,6 +1697,8 @@ function applyName() {
   if (nameEl) nameEl.textContent = userData.name;
   const subEl = document.getElementById('profile-subtitle');
   if (subEl && userData.q1) subEl.textContent = `${userData.q1} · transitioning to PM`;
+  const liSub = document.getElementById('linkedin-subtext');
+  if (liSub && userData.firstName) liSub.textContent = `${userData.firstName.toLowerCase()} · Connected`;
 }
 
 // ── Connect screen handlers ──────────────────────────────────────────────────
