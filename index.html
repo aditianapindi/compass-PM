@@ -2529,8 +2529,8 @@ function northAutoPopup(screenId, message, delay) {
   sb.auth.onAuthStateChange(async function (event, session) {
     if (!session) return;
     var user = session.user;
-    var name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email;
-    userData.name = name;
+    var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
+    userData.name = authName || user.email;
     userData.profileConnected = true;
     applyName();
 
@@ -2538,9 +2538,14 @@ function northAutoPopup(screenId, message, delay) {
     var current = document.querySelector('.screen.active');
     if (!current || current.id === 's-signin' || current.id === 's-landing') {
       var profile = await loadProfile();
+      // Prefer resume name over auth email fallback
+      if (userData.resumeData && userData.resumeData.name) {
+        userData.name = userData.resumeData.name;
+        applyName();
+      }
       if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
         // Returning user — restore UI state
-        if (userData.resumeData) { applyName(); updateProfileFromResume(userData.resumeData); }
+        if (userData.resumeData) updateProfileFromResume(userData.resumeData);
         if (userData.q1) personalize();
         showScreen(getReturningScreen(profile));
       } else {
