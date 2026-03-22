@@ -8,13 +8,12 @@ export default async function handler(req, res) {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  const prompt = `Extract information from this resume. Return ONLY a JSON object, nothing else.
+  const prompt = `Extract information from this resume. Return ONLY a JSON object, nothing else. No markdown, no explanation.
 
-Required format:
-{"name":"string or null","email":"string or null","phone":"string or null","experience":["string"...],"awards":["string"...]}
+{"name":"full name","email":"email or null","phone":"phone or null","experience":["role at company (dates)"],"awards":["award name"]}
 
 Resume:
-${text.slice(0, 4000)}`;
+${text.slice(0, 3000)}`;
 
   try {
     const response = await fetch(
@@ -24,18 +23,29 @@ ${text.slice(0, 4000)}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.0,
-            responseMimeType: 'application/json'
-          }
+          generationConfig: { temperature: 0.0 }
         })
       }
     );
 
     const data = await response.json();
+
+    // Log full response for debugging
+    console.log('Gemini full response:', JSON.stringify(data).slice(0, 500));
+
+    // Check for API error
+    if (data.error) {
+      return res.status(200).json({ error: data.error.message });
+    }
+
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // Try direct parse first
+    if (!content) {
+      const reason = data.candidates?.[0]?.finishReason || 'unknown';
+      return res.status(200).json({ error: `Empty response from Gemini. Reason: ${reason}`, fullResponse: JSON.stringify(data).slice(0, 300) });
+    }
+
+    // Try direct parse
     try {
       return res.status(200).json(JSON.parse(content));
     } catch {
