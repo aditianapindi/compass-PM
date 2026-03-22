@@ -1786,6 +1786,8 @@ async function processResumeFile(file) {
 }
 
 function updateProfileFromResume(parsed) {
+  console.log('[Compass] Resume parsed data:', JSON.stringify(parsed, null, 2));
+
   // ── Profile header ───────────────────────────────────────────────────────
   const nameEl = document.getElementById('profile-name');
   if (nameEl && parsed.name) nameEl.textContent = parsed.name;
@@ -1793,7 +1795,12 @@ function updateProfileFromResume(parsed) {
   const subEl = document.getElementById('profile-subtitle');
   if (subEl) {
     const parts = [];
-    if (parsed.currentRole)     parts.push(parsed.currentRole);
+    // currentRole fallback: strip date from first experience entry
+    const role = parsed.currentRole ||
+      (parsed.experience && parsed.experience[0]
+        ? parsed.experience[0].replace(/\s*\(.*?\)\s*$/, '').trim()
+        : null);
+    if (role) parts.push(role);
     if (parsed.totalExperience) parts.push(parsed.totalExperience);
     if (parts.length) subEl.textContent = parts.join(' · ');
   }
