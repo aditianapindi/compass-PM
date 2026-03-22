@@ -1754,41 +1754,22 @@ async function processResumeFile(file) {
       fullText += content.items.map(item => item.str).join(' ') + '\n';
     }
 
-    console.log('PDF raw text (first 500 chars):', fullText.slice(0, 500));
-    const lines = fullText.split(/[\n|•]+/).map(l => l.trim()).filter(l => l.length > 2);
-
-    // Name — first short line with 2–4 words, no digits or symbols
-    for (const line of lines.slice(0, 8)) {
-      const words = line.split(/\s+/);
-      if (words.length >= 2 && words.length <= 4 && !/\d/.test(line) && !/[@:\/|]/.test(line)) {
-        parsed.name = line; break;
-      }
-    }
-
-    // Email
-    const emailMatch = fullText.match(/[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}/);
-    if (emailMatch) parsed.email = emailMatch[0];
-
-    // Phone
-    const phoneMatch = fullText.match(/(\+?\d[\d\s\-().]{7,14}\d)/);
-    if (phoneMatch) parsed.phone = phoneMatch[0].trim();
-
-    // Experience — lines near role/company keywords
-    const expKeywords = /\b(engineer|manager|analyst|developer|designer|consultant|lead|senior|intern|associate|director|head of|co-founder|founder)\b/i;
-    for (const line of lines) {
-      if (expKeywords.test(line) && line.length > 15 && line.length < 120) {
-        parsed.experience.push(line);
-        if (parsed.experience.length >= 5) break;
-      }
-    }
-
-    // Awards
-    const awardKeywords = /\b(award|recognition|honour|honor|achievement|winner|certificate|scholarship|rank|top|best)\b/i;
-    for (const line of lines) {
-      if (awardKeywords.test(line) && line.length > 10 && line.length < 120) {
-        parsed.awards.push(line);
-        if (parsed.awards.length >= 3) break;
-      }
+    // Send text to Gemini via Vercel function
+    if (label) label.innerHTML = `<span style="color:var(--accent)">🤖 Parsing with AI…</span>`;
+    try {
+      const aiRes = await fetch('/api/parse-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: fullText })
+      });
+      const aiData = await aiRes.json();
+      if (aiData.name)       parsed.name       = aiData.name;
+      if (aiData.email)      parsed.email      = aiData.email;
+      if (aiData.phone)      parsed.phone      = aiData.phone;
+      if (aiData.experience) parsed.experience = aiData.experience;
+      if (aiData.awards)     parsed.awards     = aiData.awards;
+    } catch (aiErr) {
+      console.warn('AI parse failed:', aiErr.message);
     }
 
   } catch (e) {
