@@ -65,6 +65,7 @@
   .progress-bar-outer { height: 3px; background: var(--elevated); border-radius: 99px; overflow: hidden; }
   .progress-bar-inner { height: 3px; background: linear-gradient(90deg, #6366F1, #8B5CF6); border-radius: 99px; transition: width 0.3s; }
   @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .spin { animation: spin-slow 2.5s linear infinite; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .fade-up { animation: fadeUp 0.5s ease forwards; }
@@ -1165,43 +1166,13 @@
     <div style="display:flex;flex-direction:column;gap:16px">
       <div>
         <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Job Fit Matches</h3>
-        <p style="font-size:12px;color:var(--faint)">Updated daily · 3 new matches this week</p>
+        <p style="font-size:12px;color:var(--faint)" id="job-matches-subtitle">Analyzing your profile against open roles…</p>
       </div>
-      <div class="job-card">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-          <div>
-            <h4 style="font-size:15px;font-weight:700">Growth PM</h4>
-            <p style="font-size:13px;color:var(--muted)">Slice · Series C · Fintech · Bengaluru</p>
-          </div>
-          <span class="badge badge-emerald">76% fit</span>
+      <div id="job-matches-list">
+        <div style="display:flex;align-items:center;justify-content:center;padding:40px 0">
+          <div style="width:24px;height:24px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+          <span style="margin-left:12px;font-size:13px;color:var(--muted)">Finding matches…</span>
         </div>
-        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">2 gaps before ready</p>
-        <button style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
-      </div>
-      <div class="job-card">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-          <div>
-            <h4 style="font-size:15px;font-weight:700">Technical PM</h4>
-            <p style="font-size:13px;color:var(--muted)">Darwinbox · Series D · B2B SaaS · Hyderabad</p>
-          </div>
-          <span class="badge badge-emerald">82% fit</span>
-        </div>
-        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">1 gap before ready</p>
-        <button style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
-      </div>
-      <div class="job-card" style="border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
-              <h4 style="font-size:15px;font-weight:700">Growth PM</h4>
-              <span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600">Your Target</span>
-            </div>
-            <p style="font-size:13px;color:var(--muted)">Razorpay · Unicorn · Fintech · Bengaluru</p>
-          </div>
-          <span class="badge badge-amber">68% fit</span>
-        </div>
-        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">~6 weeks away</p>
-        <button style="background:none;border:1px solid rgba(129,140,248,0.3);color:var(--accent);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">View Match →</button>
       </div>
     </div>
 
@@ -1997,7 +1968,7 @@ function showScreen(id) {
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
     if (id === 's-gaps') northAutoPopup('s-gaps', `${userData.firstName || 'Hey'}, two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?`, 3500);
-    if (id === 's-dashboard') northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000);
+    if (id === 's-dashboard') { fetchJobMatches(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
   }, 180);
 }
 
@@ -2095,6 +2066,62 @@ async function fetchReadinessScores() {
     console.warn('Readiness scoring failed:', e.message);
   }
   return null;
+}
+
+async function fetchJobMatches() {
+  const list = document.getElementById('job-matches-list');
+  const subtitle = document.getElementById('job-matches-subtitle');
+  try {
+    const res = await fetch('/api/job-matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        background: userData.q1,
+        targetCompany: userData.q4,
+        resumeData: userData.resumeData || null,
+        readinessScores: userData.readinessScores || null,
+        gateScore: userData.gateScore || null
+      })
+    });
+    const data = await res.json();
+    if (!data.jobs || !data.jobs.length) { if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">No matches found. Complete more steps to unlock job matching.</p>'; return; }
+    if (subtitle) subtitle.textContent = `${data.jobs.length} matches based on your profile`;
+    if (!list) return;
+    list.innerHTML = '';
+    data.jobs.forEach((job, i) => {
+      const fitBadge = job.fit >= 75 ? 'badge-emerald' : job.fit >= 55 ? 'badge-amber' : 'badge-rose';
+      const isTarget = job.isTarget;
+      const borderStyle = isTarget ? 'border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)' : '';
+      const btnStyle = isTarget
+        ? 'background:none;border:1px solid rgba(129,140,248,0.3);color:var(--accent);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:\'Plus Jakarta Sans\',sans-serif'
+        : 'background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:\'Plus Jakarta Sans\',sans-serif';
+      const targetTag = isTarget ? '<span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600">Your Target</span>' : '';
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      if (borderStyle) card.style.cssText = borderStyle;
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(8px)';
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:${isTarget ? '4' : '8'}px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <h4 style="font-size:15px;font-weight:700">${job.title}</h4>
+              ${targetTag}
+            </div>
+            <p style="font-size:13px;color:var(--muted)">${job.company} · ${job.stage} · ${job.vertical} · ${job.city}</p>
+          </div>
+          <span class="badge ${fitBadge}">${job.fit}% fit</span>
+        </div>
+        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">${job.gapNote}</p>
+        <button style="${btnStyle}">View Match →</button>`;
+      list.appendChild(card);
+      setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100 + i * 120);
+    });
+  } catch (e) {
+    console.warn('Job matches failed:', e.message);
+    if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">Could not load job matches. Try refreshing.</p>';
+  }
 }
 
 function buildAndAnimateGaps() {
