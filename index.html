@@ -312,7 +312,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -688,7 +688,7 @@
       </div>
       <div style="display:flex;gap:20px">
         <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
-        <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+        <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -792,7 +792,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-path')">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -937,7 +937,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -1036,7 +1036,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -1113,7 +1113,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -1193,6 +1193,50 @@
 </div>
 
 <!-- ============================================================ -->
+<!-- SCREEN: JOBS                                                   -->
+<!-- ============================================================ -->
+<div id="s-jobs" class="screen">
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
+      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
+    </div>
+    <div style="display:flex;gap:20px">
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
+    </div>
+    <div id="avatar-initial-jobs" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer" onclick="showScreen('s-profile')">A</div>
+  </nav>
+
+  <div style="max-width:1100px;margin:0 auto;padding:40px 24px 80px">
+    <!-- Header -->
+    <div style="margin-bottom:28px">
+      <h1 style="font-size:32px;font-weight:800;letter-spacing:-0.8px;margin-bottom:8px">PM Jobs For You</h1>
+      <p id="jobs-screen-subtitle" style="color:var(--muted);font-size:15px">Loading job listings...</p>
+    </div>
+
+    <!-- Filter tabs -->
+    <div id="jobs-filter-tabs" style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+      <button class="company-pill selected" data-filter="all" onclick="filterJobs('all',this)">All</button>
+      <button class="company-pill" data-filter="best-fit" onclick="filterJobs('best-fit',this)">Best Fit</button>
+      <button class="company-pill" data-filter="your-target" onclick="filterJobs('your-target',this)">Your Target</button>
+      <button class="company-pill" data-filter="switcher" onclick="filterJobs('switcher',this)">Switcher Friendly</button>
+    </div>
+
+    <!-- Job cards grid -->
+    <div id="jobs-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:60px 0">
+        <div style="width:24px;height:24px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+        <span style="margin-left:12px;font-size:13px;color:var(--muted)">Finding PM roles that match your profile...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
 <!-- SCREEN: INTERVIEW ROOM                                        -->
 <!-- ============================================================ -->
 <div id="s-interview" class="screen">
@@ -1203,7 +1247,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
@@ -1441,7 +1485,7 @@
     </div>
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-jobs')">Jobs</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Profile</span>
     </div>
@@ -1721,7 +1765,7 @@ function applyName() {
   if (!userData.name) return;
   userData.firstName = userData.name.split(' ')[0];
   const initial = userData.firstName[0].toUpperCase();
-  ['avatar-initial-dash','avatar-initial-interview','avatar-initial-profile-big','avatar-initial-profile-nav','avatar-initial-gate','avatar-initial-readiness','avatar-initial-path','avatar-initial-paywall','avatar-initial-connect'].forEach(id => {
+  ['avatar-initial-dash','avatar-initial-interview','avatar-initial-profile-big','avatar-initial-profile-nav','avatar-initial-gate','avatar-initial-readiness','avatar-initial-path','avatar-initial-paywall','avatar-initial-connect','avatar-initial-jobs'].forEach(id => {
     const el = document.getElementById(id); if (el) el.textContent = initial;
   });
   const nameEl = document.getElementById('profile-name');
@@ -1952,13 +1996,14 @@ function showScreen(id) {
     }
     if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
-    const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall'];
+    const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
     const bubble = document.getElementById('north-bubble');
     if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
     if (id === 's-gaps') northAutoPopup('s-gaps', `${userData.firstName || 'Hey'}, two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?`, 3500);
     if (id === 's-dashboard') { fetchJobMatches(); fetchTrendSignals(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
+    if (id === 's-jobs') { fetchJobListings(); }
   }, 180);
 }
 
@@ -2159,6 +2204,115 @@ async function fetchTrendSignals() {
   }
 }
 
+// ── Jobs Screen ─────────────────────────────────────────────────
+let jobListingsCache = null;
+
+async function fetchJobListings() {
+  const grid = document.getElementById('jobs-grid');
+  const subtitle = document.getElementById('jobs-screen-subtitle');
+  // If cached, just render
+  if (jobListingsCache) { renderJobCards(jobListingsCache, 'all'); return; }
+  try {
+    const res = await fetch('/api/job-listings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        readinessScores: userData.readinessScores || null
+      })
+    });
+    const data = await res.json();
+    if (!data.jobs || !data.jobs.length) {
+      if (grid) grid.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:var(--muted);padding:40px 0;text-align:center">No job listings found. Complete more steps to unlock job matching.</p>';
+      return;
+    }
+    jobListingsCache = data.jobs;
+    renderJobCards(data.jobs, 'all');
+  } catch (e) {
+    console.warn('Job listings failed:', e.message);
+    if (grid) grid.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:var(--muted);padding:40px 0;text-align:center">Could not load job listings. Try refreshing.</p>';
+  }
+}
+
+function renderJobCards(jobs, filter) {
+  const grid = document.getElementById('jobs-grid');
+  const subtitle = document.getElementById('jobs-screen-subtitle');
+  if (!grid) return;
+
+  // Apply filter
+  let filtered = jobs;
+  if (filter === 'best-fit') filtered = jobs.filter(j => j.fit >= 75);
+  else if (filter === 'your-target') filtered = jobs.filter(j => (userData.q4 || '').toLowerCase() === (j.company || '').toLowerCase());
+  else if (filter === 'switcher') filtered = jobs.filter(j => j.switcherFriendly);
+
+  if (subtitle) subtitle.textContent = `${filtered.length} role${filtered.length !== 1 ? 's' : ''} matched to your readiness profile`;
+
+  if (!filtered.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;font-size:14px;color:var(--muted);padding:40px 0;text-align:center">No roles match this filter. Try a different category.</p>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  filtered.forEach((job, i) => {
+    const fitBadge = job.fit >= 75 ? 'badge-emerald' : job.fit >= 55 ? 'badge-amber' : 'badge-rose';
+    const isTarget = (userData.q4 || '').toLowerCase() === (job.company || '').toLowerCase();
+    const borderStyle = isTarget ? 'border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)' : '';
+    const targetTag = isTarget ? '<span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap">Your Target</span>' : '';
+    const postedText = job.postedDaysAgo === 0 ? 'Today' : job.postedDaysAgo === 1 ? '1 day ago' : `${job.postedDaysAgo} days ago`;
+
+    // Dimension pills
+    const dimPills = (job.dimComparisons || []).map(d => {
+      const met = d.met;
+      const pillBg = met ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)';
+      const pillBorder = met ? 'rgba(52,211,153,0.25)' : 'rgba(248,113,113,0.25)';
+      const pillColor = met ? 'var(--emerald)' : 'var(--rose)';
+      const icon = met ? '&#10003;' : '&#9650;';
+      return `<span style="font-size:11px;background:${pillBg};color:${pillColor};border:1px solid ${pillBorder};border-radius:99px;padding:3px 10px;white-space:nowrap">${icon} ${d.name}: ${d.userScore}/${d.required}</span>`;
+    }).join('');
+
+    // Button text and style
+    const btnText = job.fit >= 75 ? 'You match &mdash; apply now &rarr;' : 'Apply when ready &rarr;';
+    const btnBg = job.fit >= 75 ? 'background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none' : 'background:none;border:1px solid var(--border);color:var(--text)';
+
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    if (borderStyle) card.style.cssText = borderStyle;
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(12px)';
+    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease, border-color 0.15s, background 0.15s';
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
+        <div style="flex:1;min-width:0">
+          <h4 style="font-size:15px;font-weight:700;margin-bottom:3px">${job.title}</h4>
+          <p style="font-size:13px;color:var(--muted)">${job.company} &middot; ${job.stage} &middot; ${job.vertical} &middot; ${job.city}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          ${targetTag}
+          <span class="badge ${fitBadge}" style="white-space:nowrap">${job.fit}% fit</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--faint);line-height:1.5;margin-bottom:10px">${job.description}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${dimPills}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="display:flex;gap:14px;align-items:center">
+          ${job.salary ? `<span style="font-size:11px;color:var(--muted)">${job.salary}</span>` : ''}
+          ${job.interviewRounds ? `<span style="font-size:11px;color:var(--muted)">${job.interviewRounds} rounds</span>` : ''}
+          <span style="font-size:11px;color:var(--faint)">${postedText}</span>
+        </div>
+        <button style="${btnBg};border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">${btnText}</button>
+      </div>`;
+    grid.appendChild(card);
+    setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 80 + i * 60);
+  });
+}
+
+function filterJobs(filter, el) {
+  // Update selected pill
+  document.querySelectorAll('#jobs-filter-tabs .company-pill').forEach(p => p.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  // Re-render with filter
+  if (jobListingsCache) renderJobCards(jobListingsCache, filter);
+}
+
 function buildAndAnimateGaps() {
   const list = document.getElementById('dim-list');
   if (!list || list.children.length > 0) return;
@@ -2349,7 +2503,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (landing) { landing.style.display = 'block'; landing.style.opacity = '1'; }
   // responsive: hide signin left panel on mobile
   const style = document.createElement('style');
-  style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}}`;
+  style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}#jobs-grid{grid-template-columns:1fr!important}}`;
   document.head.appendChild(style);
 });
 </script>
