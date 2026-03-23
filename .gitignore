@@ -1,5 +1,9 @@
-# Supabase credentials — never commit
+# Secrets — never commit
 config.js
+.env
+
+# Dependencies
+node_modules/
 
 # macOS
 .DS_Store

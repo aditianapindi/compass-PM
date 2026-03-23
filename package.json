@@ -1,0 +1,24 @@
+{
+  "name": "compass",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aditianapindi/compass-PM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/aditianapindi/compass-PM/issues"
+  },
+  "homepage": "https://github.com/aditianapindi/compass-PM#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1"
+  }
+}
