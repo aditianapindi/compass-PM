@@ -771,128 +771,108 @@
   </nav>
 
   <div style="max-width:920px;margin:0 auto;padding:48px 24px 80px">
-    <h1 style="font-size:32px;font-weight:800;margin-bottom:8px">You're 19 points from ready.</h1>
-    <p id="readiness-subtitle" style="color:var(--muted);font-size:15px;margin-bottom:40px">Application-ready for Growth PM roles at fintech companies means a Compass score of 75. You're at 56. Here's what your profile looks like across all 6 dimensions.</p>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start">
-      <!-- Left: Radar chart -->
-      <div>
-        <div class="card" style="padding:28px;text-align:center">
-          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px">Your PM Readiness Profile</p>
-          <!-- Spider/Radar Chart SVG -->
-          <svg viewBox="0 0 440 430" style="width:100%;max-width:380px;margin:0 auto;display:block" id="radar-svg">
-            <defs>
-              <linearGradient id="radarFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#6366F1" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.2"/>
-              </linearGradient>
-              <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#818CF8"/>
-                <stop offset="100%" stop-color="#A78BFA"/>
-              </linearGradient>
-            </defs>
-            <!-- Background grid hexagons -->
-            <polygon points="220,80 326,140 326,260 220,320 114,260 114,140" fill="none" stroke="#3F3F46" stroke-width="1"/>
-            <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="none" stroke="#27272A" stroke-width="0.75"/>
-            <polygon points="220,140 281,170 281,230 220,260 159,230 159,170" fill="none" stroke="#27272A" stroke-width="0.75"/>
-            <polygon points="220,170 258.5,185 258.5,215 220,230 181.5,215 181.5,185" fill="none" stroke="#27272A" stroke-width="0.5"/>
-            <!-- Axis lines -->
-            <line x1="220" y1="200" x2="220" y2="80" stroke="#27272A" stroke-width="1"/>
-            <line x1="220" y1="200" x2="326" y2="140" stroke="#27272A" stroke-width="1"/>
-            <line x1="220" y1="200" x2="326" y2="260" stroke="#27272A" stroke-width="1"/>
-            <line x1="220" y1="200" x2="220" y2="320" stroke="#27272A" stroke-width="1"/>
-            <line x1="220" y1="200" x2="114" y2="260" stroke="#27272A" stroke-width="1"/>
-            <line x1="220" y1="200" x2="114" y2="140" stroke="#27272A" stroke-width="1"/>
-            <!-- Target polygon (75) — dashed amber -->
-            <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="rgba(251,191,36,0.04)" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="5 3"/>
-            <!-- Score polygon — animated opacity -->
-            <polygon id="score-poly" points="220,200 220,200 220,200 220,200 220,200 220,200" fill="url(#radarFill)" stroke="url(#radarStroke)" stroke-width="2" stroke-linejoin="round" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <!-- Score dots -->
-            <circle id="dot0" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <circle id="dot1" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <circle id="dot2" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <circle id="dot3" cx="220" cy="200" r="5" fill="#34D399" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <circle id="dot4" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <circle id="dot5" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
-            <!-- Axis labels -->
-            <text x="220" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Product Sense</text>
-            <text x="220" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">58</text>
-            <text x="350" y="126" text-anchor="start" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Analytical</text>
-            <text x="350" y="138" text-anchor="start" font-size="11" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">44</text>
-            <text x="350" y="272" text-anchor="start" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Business</text>
-            <text x="350" y="284" text-anchor="start" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">53</text>
-            <text x="220" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Technical</text>
-            <text x="220" y="354" text-anchor="middle" font-size="11" font-weight="700" fill="#34D399" font-family="DM Sans, sans-serif">81</text>
-            <text x="90" y="272" text-anchor="end" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">AI Fluency</text>
-            <text x="90" y="284" text-anchor="end" font-size="11" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">37</text>
-            <text x="90" y="126" text-anchor="end" font-size="11" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Behavioural</text>
-            <text x="90" y="138" text-anchor="end" font-size="11" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">62</text>
-            <!-- Legend -->
-            <rect x="140" y="392" width="12" height="3" rx="1.5" fill="url(#radarStroke)"/>
-            <text x="158" y="397" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Your score</text>
-            <rect x="240" y="392" width="12" height="3" rx="1.5" fill="#FBBF24" stroke="#FBBF24"/>
-            <text x="258" y="397" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Target (75)</text>
-          </svg>
+    <!-- ===== SECTION 1: Hero Score ===== -->
+    <div style="text-align:center;margin-bottom:52px">
+      <!-- Animated score ring -->
+      <div style="position:relative;width:180px;height:180px;margin:0 auto 24px">
+        <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="#27272A" stroke-width="7"/>
+          <circle id="scoreRing" cx="60" cy="60" r="54" fill="none" stroke="url(#heroRingGrad)" stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="0 339.29" style="transition: stroke-dasharray 1.5s cubic-bezier(.4,0,.2,1)"/>
+          <defs>
+            <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#818CF8"/>
+              <stop offset="100%" stop-color="#A78BFA"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <span id="scoreNum" class="syne" style="font-size:52px;font-weight:800;color:var(--text);line-height:1">0</span>
+          <span style="font-size:13px;color:var(--faint);font-weight:600;margin-top:2px">/ 75</span>
         </div>
       </div>
+      <h1 id="readiness-headline" style="font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">You're 19 points from ready.</h1>
+      <p id="readiness-subtitle" style="color:var(--muted);font-size:14px;max-width:520px;margin:0 auto;line-height:1.6">Application-ready for Growth PM roles means a Compass score of 75. Here's how your profile stacks up across all 6 dimensions.</p>
+    </div>
 
-      <!-- Right: Stats + insights -->
-      <div style="display:flex;flex-direction:column;gap:14px">
+    <!-- ===== SECTION 2: Radar Chart (full-width, no card) ===== -->
+    <div style="text-align:center;margin-bottom:52px">
+      <svg viewBox="0 0 440 420" style="width:100%;max-width:520px;margin:0 auto;display:block" id="radar-svg">
+        <defs>
+          <linearGradient id="radarFill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366F1" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.2"/>
+          </linearGradient>
+          <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#818CF8"/>
+            <stop offset="100%" stop-color="#A78BFA"/>
+          </linearGradient>
+        </defs>
+        <!-- Background grid hexagons -->
+        <polygon points="220,80 326,140 326,260 220,320 114,260 114,140" fill="none" stroke="#3F3F46" stroke-width="1"/>
+        <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="none" stroke="#27272A" stroke-width="0.75"/>
+        <polygon points="220,140 281,170 281,230 220,260 159,230 159,170" fill="none" stroke="#27272A" stroke-width="0.75"/>
+        <polygon points="220,170 258.5,185 258.5,215 220,230 181.5,215 181.5,185" fill="none" stroke="#27272A" stroke-width="0.5"/>
+        <!-- Axis lines -->
+        <line x1="220" y1="200" x2="220" y2="80" stroke="#27272A" stroke-width="1"/>
+        <line x1="220" y1="200" x2="326" y2="140" stroke="#27272A" stroke-width="1"/>
+        <line x1="220" y1="200" x2="326" y2="260" stroke="#27272A" stroke-width="1"/>
+        <line x1="220" y1="200" x2="220" y2="320" stroke="#27272A" stroke-width="1"/>
+        <line x1="220" y1="200" x2="114" y2="260" stroke="#27272A" stroke-width="1"/>
+        <line x1="220" y1="200" x2="114" y2="140" stroke="#27272A" stroke-width="1"/>
+        <!-- Target polygon (75) — dashed amber -->
+        <polygon points="220,110 303.5,155 303.5,245 220,290 136.5,245 136.5,155" fill="rgba(251,191,36,0.04)" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <!-- Score polygon — animated -->
+        <polygon id="score-poly" points="220,200 220,200 220,200 220,200 220,200 220,200" fill="url(#radarFill)" stroke="url(#radarStroke)" stroke-width="2" stroke-linejoin="round" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <!-- Score dots -->
+        <circle id="dot0" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <circle id="dot1" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <circle id="dot2" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <circle id="dot3" cx="220" cy="200" r="5" fill="#34D399" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <circle id="dot4" cx="220" cy="200" r="5" fill="#F87171" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <circle id="dot5" cx="220" cy="200" r="5" fill="#FBBF24" stroke="#09090B" stroke-width="2" style="transition: all 1s cubic-bezier(.4,0,.2,1)"/>
+        <!-- Axis labels (updated dynamically by animateRadar) -->
+        <text id="radar-label-0" x="220" y="62" text-anchor="middle" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Product Sense</text>
+        <text id="radar-score-0" x="220" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">58</text>
+        <text id="radar-label-1" x="350" y="126" text-anchor="start" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Analytical</text>
+        <text id="radar-score-1" x="350" y="138" text-anchor="start" font-size="12" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">44</text>
+        <text id="radar-label-2" x="350" y="272" text-anchor="start" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Business</text>
+        <text id="radar-score-2" x="350" y="284" text-anchor="start" font-size="12" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">53</text>
+        <text id="radar-label-3" x="220" y="342" text-anchor="middle" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Technical</text>
+        <text id="radar-score-3" x="220" y="354" text-anchor="middle" font-size="12" font-weight="700" fill="#34D399" font-family="DM Sans, sans-serif">81</text>
+        <text id="radar-label-4" x="90" y="272" text-anchor="end" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">AI Fluency</text>
+        <text id="radar-score-4" x="90" y="284" text-anchor="end" font-size="12" font-weight="700" fill="#F87171" font-family="DM Sans, sans-serif">37</text>
+        <text id="radar-label-5" x="90" y="126" text-anchor="end" font-size="12" font-weight="700" fill="#A1A1AA" font-family="DM Sans, sans-serif">Behavioural</text>
+        <text id="radar-score-5" x="90" y="138" text-anchor="end" font-size="12" font-weight="700" fill="#FBBF24" font-family="DM Sans, sans-serif">62</text>
+        <!-- Legend -->
+        <rect x="140" y="386" width="12" height="3" rx="1.5" fill="url(#radarStroke)"/>
+        <text x="158" y="391" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Your score</text>
+        <rect x="240" y="386" width="12" height="3" rx="1.5" fill="#FBBF24" stroke="#FBBF24"/>
+        <text x="258" y="391" font-size="11" fill="#71717A" font-family="DM Sans, sans-serif">Target (75)</text>
+      </svg>
+    </div>
 
-        <!-- Confidence indicator -->
-        <div id="confidence-banner" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px">
-          <div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px"></div>
-          <div>
-            <p id="confidence-title" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">3 of 6 dimensions measured · 3 estimated</p>
-            <p id="confidence-detail" style="font-size:12px;color:var(--faint);line-height:1.55">Measured: Product Sense (gate task) · Technical Credibility · Business Framing (LinkedIn). Complete a Riva session to measure the remaining 3.</p>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-          <div class="card" style="padding:16px;text-align:center">
-            <div class="syne" style="font-size:28px;font-weight:800;color:var(--accent)">56</div>
-            <div style="font-size:11px;color:var(--faint);margin-top:2px">Your score</div>
-          </div>
-          <div class="card" style="padding:16px;text-align:center">
-            <div class="syne" style="font-size:28px;font-weight:800;color:var(--amber)">75</div>
-            <div style="font-size:11px;color:var(--faint);margin-top:2px">Ready threshold</div>
-          </div>
-          <div class="card" style="padding:16px;text-align:center">
-            <div class="syne" style="font-size:28px;font-weight:800;color:var(--emerald)">6w</div>
-            <div style="font-size:11px;color:var(--faint);margin-top:2px">Daily practice</div>
-          </div>
-        </div>
-
-        <div class="card" style="padding:20px;border-left:3px solid var(--rose);background:rgba(248,113,113,0.04)">
-          <p style="font-size:12px;color:var(--rose);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">2 Critical Gaps</p>
-          <p style="font-size:14px;color:var(--text);margin-bottom:4px"><strong>Analytical Depth (44)</strong> and <strong>AI Fluency (37)</strong> are your priority gaps. These two dimensions are explicitly tested in round 1 at Razorpay and Meesho.</p>
-        </div>
-
-        <div class="card" style="padding:20px;border-left:3px solid var(--emerald);background:rgba(52,211,153,0.04)">
-          <p style="font-size:12px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">Your Advantage</p>
-          <p style="font-size:14px;color:var(--text)"><strong>Technical Credibility (81)</strong> is your biggest edge. Most growth PMs at your target companies can't speak engineering fluently. You can. Don't undersell it.</p>
-        </div>
-
-        <div class="card" style="padding:20px">
-          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Competitive after 6 weeks</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px">
-            <span class="badge badge-emerald">Slice</span>
-            <span class="badge badge-emerald">Darwinbox</span>
-            <span class="badge badge-emerald">Jar</span>
-            <span class="badge badge-amber">Razorpay (8 weeks)</span>
-          </div>
-        </div>
-
-        <button class="btn-primary" style="font-size:15px;padding:14px 28px;width:100%" onclick="showScreen('s-paywall')">See Your 6-Week Path →</button>
+    <!-- ===== SECTION 3: Key Insights (2-col) ===== -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:52px">
+      <div id="gaps-card" class="card" style="padding:22px;border-left:3px solid var(--rose);background:rgba(248,113,113,0.04)">
+        <p style="font-size:11px;color:var(--rose);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:10px">Critical Gaps</p>
+        <p id="gaps-text" style="font-size:14px;color:var(--text);line-height:1.6"><strong>Analytical Depth (44)</strong> and <strong>AI Fluency (37)</strong> are your priority gaps. These are explicitly tested in round 1 at Razorpay and Meesho.</p>
+      </div>
+      <div id="advantage-card" class="card" style="padding:22px;border-left:3px solid var(--emerald);background:rgba(52,211,153,0.04)">
+        <p style="font-size:11px;color:var(--emerald);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:10px">Your Advantage</p>
+        <p id="advantage-text" style="font-size:14px;color:var(--text);line-height:1.6"><strong>Technical Credibility (81)</strong> is your biggest edge. Most growth PMs at your target companies can't speak engineering fluently. You can.</p>
       </div>
     </div>
 
-    <!-- Dimension breakdown -->
-    <div style="margin-top:40px;padding-top:36px;border-top:1px solid var(--border)">
+    <!-- ===== SECTION 4: Dimension Breakdown ===== -->
+    <div style="border-top:1px solid var(--border);padding-top:36px;margin-bottom:32px">
       <h3 style="font-size:16px;font-weight:700;margin-bottom:6px">All 6 Dimensions</h3>
       <p style="font-size:13px;color:var(--faint);margin-bottom:24px">What each score means for your specific target companies.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="dim-list"></div>
     </div>
+
+    <button class="btn-primary" style="font-size:15px;padding:14px 28px;width:100%" onclick="showScreen('s-paywall')">See Your 6-Week Path →</button>
   </div>
 </div>
 
@@ -924,7 +904,7 @@
       </div>
       <div>
         <p style="font-size:13px;font-weight:600;color:var(--emerald);margin-bottom:2px">Your readiness score is ready.</p>
-        <p style="font-size:13px;color:var(--muted)">Compass scored you at <strong style="color:var(--text)">56 / 75</strong> for <span id="paywall-pm-type">Growth PM</span> roles. Your 6-week path to close that gap is waiting.</p>
+        <p style="font-size:13px;color:var(--muted)">Compass scored you at <strong id="paywall-score" style="color:var(--text)">56 / 75</strong> for <span id="paywall-pm-type">Growth PM</span> roles. Your 6-week path to close that gap is waiting.</p>
       </div>
     </div>
 
@@ -1965,6 +1945,11 @@ function showScreen(id) {
         setTimeout(animateRadar, 400); setTimeout(() => { animateScoreRing(); buildAndAnimateGaps(); }, 600);
       }
     }
+    if (id === 's-paywall') {
+      const sc = (userData.readinessScores && userData.readinessScores.overall) || 56;
+      const el = document.getElementById('paywall-score');
+      if (el) el.textContent = sc + ' / 75';
+    }
     if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
     const northScreens = ['s-verdict','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
@@ -2017,8 +2002,20 @@ function animateScoreRing() {
   const numEl = document.getElementById('scoreNum');
   if (!ring) return;
   const target = (userData.readinessScores && userData.readinessScores.overall) || 56;
-  const circ = 351.86, duration = 1500;
+  const circ = 2 * Math.PI * 54; // ~339.29
+  const duration = 1500;
   const start = performance.now();
+  // Update headline text
+  const headlineEl = document.getElementById('readiness-headline');
+  if (headlineEl) {
+    const gap = 75 - target;
+    headlineEl.textContent = gap > 0 ? `You're ${gap} points from ready.` : `You're ready to apply.`;
+  }
+  // Update subtitle
+  const subtitleEl = document.getElementById('readiness-subtitle');
+  if (subtitleEl && userData.readinessScores && userData.readinessScores.headline) {
+    subtitleEl.textContent = userData.readinessScores.headline;
+  }
   function step(now) {
     const p = Math.min((now - start) / duration, 1);
     const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
@@ -2286,7 +2283,6 @@ function filterJobs(filter, el) {
 function buildAndAnimateGaps() {
   const list = document.getElementById('dim-list');
   if (!list || list.children.length > 0) return;
-  updateConfidenceBanner();
   getDims().forEach((d, i) => {
     const sourceBadge = d.measured
       ? `<span style="font-size:10px;background:rgba(52,211,153,0.1);color:var(--emerald);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:2px 8px;white-space:nowrap">✓ Measured · ${d.source}</span>`
@@ -2316,21 +2312,6 @@ function buildAndAnimateGaps() {
   });
 }
 
-function updateConfidenceBanner() {
-  const dims = getDims();
-  const measured = dims.filter(d => d.measured).length;
-  const total = dims.length;
-  const titleEl = document.getElementById('confidence-title');
-  const detailEl = document.getElementById('confidence-detail');
-  if (titleEl) titleEl.textContent = `${measured} of ${total} dimensions measured · ${total - measured} estimated`;
-  if (detailEl) {
-    const measuredNames = dims.filter(d => d.measured).map(d => `${d.name} (${d.source})`).join(' · ');
-    const unmeasuredNames = dims.filter(d => !d.measured).map(d => d.name).join(', ');
-    detailEl.textContent = measured > 0
-      ? `Measured: ${measuredNames}. Complete practice sessions to measure: ${unmeasuredNames}.`
-      : `All dimensions estimated from your background. Connect LinkedIn or upload your resume to start measuring.`;
-  }
-}
 
 async function submitGate() {
   const btn  = document.getElementById('gate-btn');
@@ -2391,11 +2372,26 @@ function animateRadar() {
   if (!poly) return;
   const dims = getDims();
   const pts = dims.map((d, i) => scoreToRadarPoint(i, d.score));
-  // Update dot colours based on actual status
+  // Update dot colours and radar score labels based on actual data
   dims.forEach((d, i) => {
+    const color = d.score >= 66 ? '#34D399' : d.score >= 50 ? '#FBBF24' : '#F87171';
     const dot = document.getElementById('dot' + i);
-    if (dot) dot.setAttribute('fill', d.score >= 66 ? '#34D399' : d.score >= 50 ? '#FBBF24' : '#F87171');
+    if (dot) dot.setAttribute('fill', color);
+    const scoreLabel = document.getElementById('radar-score-' + i);
+    if (scoreLabel) { scoreLabel.textContent = d.score; scoreLabel.setAttribute('fill', color); }
   });
+  // Update gaps and advantage cards
+  const gapDims = dims.filter(d => d.score < 50).sort((a, b) => a.score - b.score);
+  const strongDims = dims.filter(d => d.score >= 66).sort((a, b) => b.score - a.score);
+  const gapsText = document.getElementById('gaps-text');
+  if (gapsText && gapDims.length > 0) {
+    const gapNames = gapDims.map(d => `<strong>${d.name} (${d.score})</strong>`).join(' and ');
+    gapsText.innerHTML = `${gapNames} ${gapDims.length === 1 ? 'is your' : 'are your'} priority ${gapDims.length === 1 ? 'gap' : 'gaps'}. ${gapDims[0].note || 'Focus here first.'}`;
+  }
+  const advText = document.getElementById('advantage-text');
+  if (advText && strongDims.length > 0) {
+    advText.innerHTML = `<strong>${strongDims[0].name} (${strongDims[0].score})</strong> is your biggest edge. ${strongDims[0].note || 'Leverage this in interviews.'}`;
+  }
   setTimeout(() => {
     poly.setAttribute('points', pts.map(p => p.join(',')).join(' '));
     pts.forEach((d, i) => {
