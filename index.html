@@ -275,10 +275,10 @@
         Continue with Google
       </button>
 
-      <!-- LinkedIn -->
-      <button onclick="showScreen('s-connect')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#0A66C2;border:none;color:white;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:opacity 0.15s;margin-bottom:24px" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+      <!-- LinkedIn (coming soon) -->
+      <button disabled style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#0A66C2;border:none;color:white;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:not-allowed;opacity:0.5;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:24px">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="white"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.389 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711zM4.05 6.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm1.337 9.764H2.711v-8.59H5.39v8.59zM17.668 0H.33C.149 0 0 .145 0 .324v17.352C0 17.855.149 18 .33 18h17.338c.183 0 .332-.145.332-.324V.324C18 .145 17.851 0 17.668 0z"/></svg>
-        Continue with LinkedIn
+        Continue with LinkedIn · Coming Soon
       </button>
 
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
@@ -311,7 +311,7 @@
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
     <div style="display:flex;gap:20px">
-      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -687,7 +687,7 @@
         <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
       </div>
       <div style="display:flex;gap:20px">
-        <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+        <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -752,36 +752,6 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- SCREEN: GAP DIAGNOSIS                                         -->
-<!-- ============================================================ -->
-<div id="s-gaps" class="screen">
-  <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
-      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
-      <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
-    </div>
-    <span style="font-size:13px;color:var(--faint);background:var(--elevated);padding:5px 12px;border-radius:99px;border:1px solid var(--border)">Gap Breakdown</span>
-  </nav>
-
-  <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
-    <h1 style="font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.8px">Here's exactly what's in your way.</h1>
-    <p style="color:var(--muted);font-size:15px;margin-bottom:28px">Two gaps. One major advantage. All fixable.</p>
-
-    <div class="card" style="padding:20px;border-left:3px solid var(--amber);background:rgba(251,191,36,0.04);margin-bottom:32px">
-      <p style="font-size:14px;color:var(--text);line-height:1.6">Razorpay's published hiring framework explicitly tests on two of your six dimensions. <strong>Analytical Depth</strong> and <strong>AI Fluency</strong> — they eliminate 60% of candidates before the product sense round even begins.</p>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:0" id="dim-list">
-      <!-- rows inserted by JS -->
-    </div>
-
-    <div style="text-align:center;margin-top:36px">
-      <button class="btn-primary" style="font-size:15px;padding:14px 36px" onclick="showScreen('s-readiness')">See Your Readiness Score →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================ -->
 <!-- SCREEN: READINESS SCORE                                       -->
 <!-- ============================================================ -->
 <div id="s-readiness" class="screen">
@@ -791,7 +761,7 @@
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
     <div style="display:flex;gap:20px">
-      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-path')">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -936,7 +906,7 @@
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
     <div style="display:flex;gap:20px">
-      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -1035,7 +1005,7 @@
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
     <div style="display:flex;gap:20px">
-      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -1112,7 +1082,7 @@
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
     <div style="display:flex;gap:20px">
-      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Path</span>
+      <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
@@ -1204,7 +1174,7 @@
     <div style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Jobs</span>
-      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Trends</span>
+      <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="navTo('section-trends')">Trends</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px" onclick="showScreen('s-interview')"><span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Interview Room</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-profile')">Profile</span>
     </div>
@@ -1713,7 +1683,8 @@ async function loadProfile() {
 }
 
 function getReturningScreen(profile) {
-  if (profile.gate_score && profile.gate_score.score) return 's-dashboard';
+  if (profile.readiness_scores) return 's-dashboard';
+  if (profile.gate_score && profile.gate_score.score) return 's-readiness';
   if (profile.resume_data) return 's-gate';
   if (profile.q1) return 's-connect';
   return 's-connect';
@@ -1996,12 +1967,11 @@ function showScreen(id) {
     }
     if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
-    const northScreens = ['s-verdict','s-gaps','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
+    const northScreens = ['s-verdict','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
     const bubble = document.getElementById('north-bubble');
     if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
-    if (id === 's-gaps') northAutoPopup('s-gaps', `${userData.firstName || 'Hey'}, two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?`, 3500);
     if (id === 's-dashboard') { fetchJobMatches(); fetchTrendSignals(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
     if (id === 's-jobs') { fetchJobListings(); }
   }, 180);
