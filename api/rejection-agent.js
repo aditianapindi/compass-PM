@@ -28,19 +28,23 @@ export default async function handler(req, res) {
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
   // ─── STEP 1: IDENTIFY — extract company and round from message ───
-  const identifyPrompt = `Extract the company name and interview round from this message. If not mentioned, use the target company provided.
+  const identifyPrompt = `Extract the company name and interview round from this message. Only return a company if the user EXPLICITLY names one in their message. Do NOT assume or fill in a company they did not mention.
 
 User message: "${message || 'I got rejected'}"
-Target company (fallback): ${targetCompany || 'Not specified'}
 
 Return ONLY valid JSON, no markdown:
-{ "company": "<company name or 'unknown'>", "round": "<specific round like 'case study' or 'analytical' or 'unknown'>" }`;
+{ "company": "<company name ONLY if explicitly mentioned, otherwise 'unknown'>", "round": "<specific round like 'case study' or 'analytical' or 'unknown'>" }`;
 
-  let identified = { company: targetCompany || 'unknown', round: 'unknown' };
+  let identified = { company: 'unknown', round: 'unknown' };
   try {
     const idResp = await callGemini(GEMINI_API_KEY, identifyPrompt, 0.1, 200);
     if (idResp) identified = JSON.parse(idResp.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim());
   } catch (e) { /* use defaults */ }
+
+  // If no company identified, ask the user
+  if (!identified.company || identified.company === 'unknown') {
+    return res.status(200).json({ needsInfo: true, question: "Which company rejected you? And do you know which round — was it the case study, analytics, behavioural, or something else?" });
+  }
 
   // ─── STEP 2: RETRIEVE — get company data via vector search or keyword ───
   let companyData = null;

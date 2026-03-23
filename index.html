@@ -2674,6 +2674,8 @@ function getNorthContext() {
 }
 
 async function northAsk(message) {
+  // If rejection agent is waiting for follow-up info (company name), route there
+  if (_rejectionPending) return northRejectionAgent(message);
   // Detect rejection messages → route to rejection agent
   const isRejection = /\b(rejected|rejection|didn't get|didn't make it|failed|turned down)\b/i.test(message);
   if (isRejection) return northRejectionAgent(message);
@@ -2694,9 +2696,11 @@ async function northAsk(message) {
   }
 }
 
+var _rejectionPending = false;
+
 async function northRejectionAgent(message) {
+  _rejectionPending = true;
   const typingId = addNorthTyping();
-  addNorthMessage("Running full diagnosis...", 'bot');
   try {
     const res = await fetch('/api/rejection-agent', {
       method: 'POST',
@@ -2713,10 +2717,18 @@ async function northRejectionAgent(message) {
     });
     const data = await res.json();
     removeNorthTyping(typingId);
+    if (data.needsInfo) {
+      // Agent needs more info — ask the user, keep rejection mode active
+      addNorthMessage(data.question, 'bot');
+      return;
+    }
+    _rejectionPending = false;
     if (data.error) { addNorthMessage("I couldn't run the full diagnosis right now. " + (data.error || ''), 'bot'); return; }
+    addNorthMessage("Here's your full rejection diagnosis:", 'bot');
     renderRejectionCard(data);
   } catch(e) {
     removeNorthTyping(typingId);
+    _rejectionPending = false;
     addNorthMessage("Can't reach the server right now. Try again in a moment.", 'bot');
   }
 }
