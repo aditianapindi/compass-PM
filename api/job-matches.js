@@ -54,7 +54,7 @@ Return ONLY valid JSON, no markdown, no backticks:
   ]
 }
 
-Return exactly 4 jobs. Sort by fit score descending, but put the target company job 3rd (so it feels like a goal to work toward).`;
+Return exactly 4 jobs. Put the target company job FIRST (position 1). Sort the remaining 3 by fit score descending. Keep job titles short (max 4 words, e.g. "Growth PM", "Technical PM", "AI Product Manager", "Platform PM").`;
 
   try {
     const response = await fetch(
