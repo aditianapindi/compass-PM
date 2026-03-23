@@ -1180,23 +1180,13 @@
     <div id="section-trends" style="display:flex;flex-direction:column;gap:16px">
       <div>
         <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Hiring Trend Signals</h3>
-        <p style="font-size:12px;color:var(--faint)">Updated daily via Compass Market Intelligence</p>
+        <p style="font-size:12px;color:var(--faint)">Personalized via Compass Market Intelligence</p>
       </div>
-      <div class="signal-card">
-        <div class="dot" style="background:var(--emerald)"></div>
-        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Fintech PM postings on LinkedIn India up <strong>22%</strong> this month. 47 new roles added in the last 7 days.</p><p style="font-size:11px;color:var(--faint)">Updated 2 hours ago</p></div>
-      </div>
-      <div class="signal-card">
-        <div class="dot" style="background:var(--amber)"></div>
-        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">AI Fluency is now a <strong>first-round screen</strong> at 3 of your top 5 target companies. This is your most urgent gap to close.</p><p style="font-size:11px;color:var(--faint)">Updated today</p></div>
-      </div>
-      <div class="signal-card">
-        <div class="dot" style="background:var(--accent)"></div>
-        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Take-home assignments are now standard at <strong>Meesho and Darwinbox</strong>. Good news for analytical backgrounds.</p><p style="font-size:11px;color:var(--faint)">Updated yesterday</p></div>
-      </div>
-      <div class="signal-card">
-        <div class="dot" style="background:var(--rose)"></div>
-        <div><p style="font-size:13px;color:var(--text);line-height:1.55;margin-bottom:4px">Edtech PM roles down <strong>34%</strong> YoY. If Byju's or Unacademy are in your list, consider removing them.</p><p style="font-size:11px;color:var(--faint)">Updated 3 days ago</p></div>
+      <div id="trend-signals-list">
+        <div style="display:flex;align-items:center;justify-content:center;padding:30px 0">
+          <div style="width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+          <span style="margin-left:10px;font-size:13px;color:var(--muted)">Loading signals…</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1968,7 +1958,7 @@ function showScreen(id) {
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
     if (id === 's-gaps') northAutoPopup('s-gaps', `${userData.firstName || 'Hey'}, two gaps flagged. Want me to explain why Analytical Depth matters more than most prep content tells you?`, 3500);
-    if (id === 's-dashboard') { fetchJobMatches(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
+    if (id === 's-dashboard') { fetchJobMatches(); fetchTrendSignals(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
   }, 180);
 }
 
@@ -2121,7 +2111,11 @@ async function fetchJobMatches() {
             <span class="badge ${fitBadge}" style="white-space:nowrap">${job.fit}% fit</span>
           </div>
         </div>
-        <p style="font-size:12px;color:var(--faint);margin-bottom:12px">${job.gapNote}</p>
+        <p style="font-size:12px;color:var(--faint);margin-bottom:8px">${job.gapNote}</p>
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          ${job.salary ? `<span style="font-size:11px;color:var(--muted)">💰 ${job.salary}</span>` : ''}
+          ${job.interviewRounds ? `<span style="font-size:11px;color:var(--muted)">${job.interviewRounds} rounds</span>` : ''}
+        </div>
         <button style="${btnStyle}">View Match →</button>`;
       list.appendChild(card);
       setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100 + i * 120);
@@ -2129,6 +2123,39 @@ async function fetchJobMatches() {
   } catch (e) {
     console.warn('Job matches failed:', e.message);
     if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">Could not load job matches. Try refreshing.</p>';
+  }
+}
+
+async function fetchTrendSignals() {
+  const list = document.getElementById('trend-signals-list');
+  try {
+    const res = await fetch('/api/job-trends', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        background: userData.q1,
+        targetCompany: userData.q4,
+        readinessScores: userData.readinessScores || null
+      })
+    });
+    const data = await res.json();
+    if (!data.signals || !data.signals.length) { if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">No trend signals available.</p>'; return; }
+    if (!list) return;
+    list.innerHTML = '';
+    const dotColors = { positive: 'var(--emerald)', warning: 'var(--amber)', neutral: 'var(--accent)', negative: 'var(--rose)' };
+    data.signals.forEach((s, i) => {
+      const card = document.createElement('div');
+      card.className = 'signal-card';
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(6px)';
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.innerHTML = `<div class="dot" style="background:${dotColors[s.impact] || 'var(--accent)'}"></div><div><p style="font-size:13px;color:var(--text);line-height:1.55">${s.text}</p></div>`;
+      list.appendChild(card);
+      setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100 + i * 100);
+    });
+  } catch (e) {
+    console.warn('Trend signals failed:', e.message);
+    if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">Could not load trend signals.</p>';
   }
 }
 

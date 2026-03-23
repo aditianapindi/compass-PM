@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,6 +11,34 @@ export default async function handler(req, res) {
   const { message, context } = req.body;
   if (!message) return res.status(400).json({ error: 'No message provided' });
 
+  // Load market data for RAG context
+  let companyContext = '';
+  try {
+    const raw = readFileSync(join(process.cwd(), 'data', 'pm-market-data.json'), 'utf8');
+    const data = JSON.parse(raw);
+    // Extract target company from user context
+    const targetLine = (context || '').split('\n').find(l => l.startsWith('Target company:'));
+    const targetName = targetLine ? targetLine.replace('Target company:', '').trim() : '';
+    const match = (data.companies || []).find(c => c.name.toLowerCase() === targetName.toLowerCase());
+    if (match) {
+      companyContext = `\nTarget company intelligence (${match.name}):
+- Hiring bar: Product Sense ${match.hiringBar.productSense}, Analytical ${match.hiringBar.analyticalDepth}, Business ${match.hiringBar.businessFraming}, Technical ${match.hiringBar.technicalCredibility}, AI ${match.hiringBar.aiFluency}
+- Interview: ${match.interviewFormat.join(' → ')} (${match.interviewRounds} rounds)
+- Common rejections: ${match.commonRejectionReasons.join('; ')}
+- Recent signals: ${match.recentSignals.join('; ')}
+- Switcher note: ${match.switcherNote}
+- Salary: ${match.salaryRange}`;
+    }
+    // Add transition intelligence
+    const bgLine = (context || '').split('\n').find(l => l.startsWith('Background:'));
+    const bgName = bgLine ? bgLine.replace('Background:', '').trim() : '';
+    const transitions = data.transitionIntelligence?.successRateByBackground || [];
+    const bgMatch = transitions.find(t => bgName.toLowerCase().includes(t.background.toLowerCase()));
+    if (bgMatch) {
+      companyContext += `\nTransition intelligence for ${bgMatch.background}s: ${bgMatch.conversionRate} conversion rate, avg ${bgMatch.avgTimeToOffer} to offer. Best fit: ${bgMatch.bestFitCompanies.join(', ')}. ${bgMatch.note}`;
+    }
+  } catch (e) { /* silent — proceed without market data */ }
+
   const prompt = `You are North, an AI guide inside Compass — a PM career navigation platform.
 
 Your personality:
@@ -16,11 +47,12 @@ Your personality:
 - Concise: 2–4 sentences max per response
 - Give signal and next action, not motivation
 - Reference the user's actual background, score, and gaps when relevant
+- When discussing companies, interview prep, or job market — use the real data provided below, not generic advice
 - Address the user by their first name naturally (not every message, but regularly — it builds trust)
 - If you don't have enough context to be specific, ask a clarifying question
 
 User context:
-${context}
+${context}${companyContext}
 
 User message: "${message}"
 

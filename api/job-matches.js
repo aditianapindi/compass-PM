@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -7,16 +10,42 @@ export default async function handler(req, res) {
 
   const { background, targetCompany, resumeData, readinessScores, gateScore } = req.body;
 
+  // Load curated market data
+  let marketData = {};
+  try {
+    const raw = readFileSync(join(process.cwd(), 'data', 'pm-market-data.json'), 'utf8');
+    marketData = JSON.parse(raw);
+  } catch (e) {
+    console.warn('Could not load market data:', e.message);
+  }
+
+  // Retrieve relevant companies — target company + best matches for background
+  const companies = marketData.companies || [];
+  const targetMatch = companies.find(c => c.name.toLowerCase() === (targetCompany || '').toLowerCase());
+  const otherCompanies = companies.filter(c => c !== targetMatch).slice(0, 6);
+  const relevantCompanies = targetMatch ? [targetMatch, ...otherCompanies] : otherCompanies.slice(0, 7);
+
+  // Find transition intelligence for user's background
+  const transitions = marketData.transitionIntelligence?.successRateByBackground || [];
+  const bgMatch = transitions.find(t => (background || '').toLowerCase().includes(t.background.toLowerCase()));
+
   const prompt = `You are Compass's job matching engine for aspiring Product Managers in India.
 
-Given this user's profile, generate 4 realistic PM job matches at real Indian startups/companies. One MUST be at their target company (marked as target). The others should be real companies that match their background.
+Given this user's profile AND the real company hiring data below, generate 4 PM job matches. Base your fit scores and gap notes on the ACTUAL hiring bar data provided — do not invent numbers.
 
-## Indian PM Job Market Context
-- Top PM hiring companies in India: Razorpay, Flipkart, Meesho, Swiggy, PhonePe, CRED, Zerodha, Slice, Darwinbox, Jar, Groww, Lenskart, Ola, Zomato, upGrad, Freshworks, Chargebee, Zoho, Myntra, BigBasket, Dunzo, ShareChat
-- PM roles: Growth PM, Product Manager, Technical PM, Platform PM, 0→1 PM, Analytics PM, AI PM, Payments PM, Consumer PM, B2B PM
-- Typical stages: Series A, Series B, Series C, Series D, Unicorn, Public
-- Verticals: Fintech, E-commerce, SaaS, Consumer, EdTech, HealthTech, Logistics, Social, Gaming
-- Cities: Bengaluru, Mumbai, Delhi NCR, Hyderabad, Pune, Chennai, Gurgaon
+## Real Company Hiring Data (from Compass database)
+${relevantCompanies.map(c => `
+**${c.name}** (${c.stage} · ${c.vertical} · ${c.city})
+- Roles: ${c.topRoles.join(', ')}
+- Annual PM intake: ${c.annualJuniorPMIntake}
+- Hiring bar: Product Sense ${c.hiringBar.productSense}, Analytical ${c.hiringBar.analyticalDepth}, Business ${c.hiringBar.businessFraming}, Technical ${c.hiringBar.technicalCredibility}, AI ${c.hiringBar.aiFluency}, Behavioural ${c.hiringBar.behavioural}
+- Interview: ${c.interviewFormat.join(' → ')} (${c.interviewRounds} rounds)
+- Switcher-friendly: ${c.switcherFriendly ? 'Yes — ' + c.switcherNote : 'No — ' + c.switcherNote}
+- Common rejections: ${c.commonRejectionReasons.join('; ')}
+- Recent signals: ${c.recentSignals.join('; ')}
+- Salary: ${c.salaryRange}`).join('\n')}
+
+${bgMatch ? `\n## Transition Intelligence for ${bgMatch.background}s\n- Conversion rate: ${bgMatch.conversionRate}\n- Avg time to offer: ${bgMatch.avgTimeToOffer}\n- Best fit companies: ${bgMatch.bestFitCompanies.join(', ')}\n- Note: ${bgMatch.note}` : ''}
 
 ## User Profile
 Background: ${background || 'Not provided'}
@@ -31,30 +60,34 @@ ${readinessScores?.dimensions ? readinessScores.dimensions.map(d => `${d.name}: 
 Gate task:
 ${gateScore ? `Score: ${gateScore.score}/100 — ${gateScore.headline}` : 'Not completed'}
 
-## Fit Score Calculation
-- Base fit on how well the user's skills, experience, and dimension scores match typical requirements for that role at that company
-- Be honest: most aspiring PMs are 50–75% fit. Only give 80%+ if there's strong alignment
-- Include specific gaps: what dimensions they need to improve for THIS role
+## Fit Score Rules
+- Compare user's readiness scores against the company's hiring bar for each dimension
+- Fit % = how many dimensions meet or exceed the hiring bar, weighted by the company's priority dimensions
+- If user score is below company bar on 2+ priority dimensions → fit should be under 65%
+- Use the transition intelligence to adjust: if this background type converts well at this company, boost fit by 5–10%
+- Be specific in gapNote: reference actual dimensions and company-specific context
 
 ## Response Format
 Return ONLY valid JSON, no markdown, no backticks:
 {
   "jobs": [
     {
-      "title": "<PM role title>",
-      "company": "<real company name>",
-      "stage": "<funding stage>",
-      "vertical": "<industry vertical>",
+      "title": "<PM role title — max 4 words>",
+      "company": "<company name>",
+      "stage": "<stage>",
+      "vertical": "<vertical>",
       "city": "<city>",
       "fit": <number 0-100>,
-      "isTarget": <true if this is their target company, false otherwise>,
-      "gapCount": <number of dimensions below 60 relevant to this role>,
-      "gapNote": "<short specific note like '~4 weeks away' or '2 gaps to close' or 'Strong match'>"
+      "isTarget": <true/false>,
+      "gapCount": <number>,
+      "gapNote": "<specific note referencing dimensions and timeline>",
+      "salary": "<salary range>",
+      "interviewRounds": <number>
     }
   ]
 }
 
-Return exactly 4 jobs. Put the target company job FIRST (position 1). Sort the remaining 3 by fit score descending. Keep job titles short (max 4 words, e.g. "Growth PM", "Technical PM", "AI Product Manager", "Platform PM").`;
+Return exactly 4 jobs. Put the target company job FIRST. Sort remaining 3 by fit descending.`;
 
   try {
     const response = await fetch(
@@ -64,7 +97,7 @@ Return exactly 4 jobs. Put the target company job FIRST (position 1). Sort the r
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.6, maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.4, maxOutputTokens: 1000, thinkingConfig: { thinkingBudget: 0 } }
         })
       }
     );
