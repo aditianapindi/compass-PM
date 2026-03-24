@@ -48,7 +48,7 @@ Be ruthlessly specific to their actual words. Do not give generic PM feedback.`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2 }
+          generationConfig: { temperature: 0.2, maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } }
         })
       }
     );
