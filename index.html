@@ -1857,9 +1857,13 @@ async function saveProfile() {
   }
 }
 
-async function loadProfile() {
+async function loadProfile(existingSession) {
   if (!_sb) return null;
-  var { data: { session } } = await _sb.auth.getSession();
+  var session = existingSession;
+  if (!session) {
+    var result = await _sb.auth.getSession();
+    session = result.data.session;
+  }
   if (!session) return null;
   var { data } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
   if (!data) return null;
@@ -2261,10 +2265,10 @@ function showScreen(id) {
   if (!nxt) { console.warn('[Compass] showScreen: target not found:', id); return; }
   const cur = document.querySelector('.screen.active');
   if (cur === nxt) return;
+  // Always cancel pending transitions first to prevent timer conflicts
+  if (_showScreenTimer) { clearTimeout(_showScreenTimer); _showScreenTimer = null; }
   if (!cur) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return; }
   console.log('[Compass] showScreen:', cur.id, '→', id);
-  // Cancel any in-flight transition to prevent overlapping animations
-  if (_showScreenTimer) { clearTimeout(_showScreenTimer); _showScreenTimer = null; }
   // Immediately clean up ALL active screens
   document.querySelectorAll('.screen.active').forEach(function(s) {
     if (s !== nxt) { s.classList.remove('active'); s.style.display = 'none'; s.style.opacity = '0'; }
@@ -3758,37 +3762,19 @@ function northAutoPopup(screenId, message, delay) {
   if (!sb) return;
   _sb = sb; // expose globally for saveProfile/loadProfile
 
-  // Check for existing session BEFORE showing any screen (prevents landing flash)
-  sb.auth.getSession().then(async function(result) {
-    var session = result.data && result.data.session;
-    if (session) {
-      try {
-        var user = session.user;
-        userData.name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email;
-        userData.profileConnected = true;
-        applyName();
-        var profile = await loadProfile();
-        if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
-        if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
-          if (userData.resumeData) updateProfileFromResume(userData.resumeData);
-          if (userData.q1) personalize();
-          showScreen(getReturningScreen(profile));
-        } else {
-          showScreen('s-connect');
-        }
-      } catch (e) {
-        console.error('[Compass] Init session error:', e);
-        showScreen('s-landing');
-      }
-    } else {
-      showScreen('s-landing');
-    }
-  }).catch(function() { showScreen('s-landing'); });
-
-  // After Google redirects back, pick up the session
+  // Single auth handler — handles initial session check AND sign-in/sign-out events
+  var _authHandled = false;
   sb.auth.onAuthStateChange(async function (event, session) {
     console.log('[Compass] Auth event:', event, session ? 'session exists' : 'no session');
-    if (!session) return;
+    if (!session) {
+      _authHandled = false; // Reset so next sign-in is handled
+      var cur = document.querySelector('.screen.active');
+      if (!cur) showScreen('s-landing');
+      return;
+    }
+    // Prevent double navigation from INITIAL_SESSION + SIGNED_IN firing together
+    if (_authHandled) return;
+    _authHandled = true;
     try {
       var user = session.user;
       var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
@@ -3796,12 +3782,12 @@ function northAutoPopup(screenId, message, delay) {
       userData.profileConnected = true;
       applyName();
 
-      // Load saved profile for returning users
+      // Load saved profile — pass session directly to avoid getSession() race
       var current = document.querySelector('.screen.active');
       console.log('[Compass] onAuthStateChange current screen:', current ? current.id : 'none');
-      var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
+      var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-connect', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
       if (!current || preAuthScreens.includes(current.id)) {
-        var profile = await loadProfile();
+        var profile = await loadProfile(session);
         console.log('[Compass] onAuthStateChange profile loaded:', profile ? 'has data' : 'empty');
         // Prefer resume name over auth email fallback
         if (userData.resumeData && userData.resumeData.name) {
@@ -3822,9 +3808,10 @@ function northAutoPopup(screenId, message, delay) {
       }
     } catch (e) {
       console.error('[Compass] onAuthStateChange error:', e);
-      // Fallback: ensure user isn't stuck on auth screen
+      _authHandled = false; // Reset so retry is possible
+      // Fallback: ensure user isn't stuck — navigate even if no screen is active
       var cur = document.querySelector('.screen.active');
-      if (cur && ['s-signin', 's-landing', 's-verdict'].includes(cur.id)) {
+      if (!cur || ['s-signin', 's-landing', 's-verdict', 's-connect'].includes(cur.id)) {
         showScreen('s-connect');
       }
     }
@@ -3906,8 +3893,8 @@ function northAutoPopup(screenId, message, delay) {
           }
         }
 
+        // Account created — let onAuthStateChange handle navigation
         signupBtn.textContent = '✓ Account created';
-        showScreen('s-connect');
       } catch (e) {
         console.error('[Compass] Sign-up exception:', e);
         errorEl.textContent = e.message || 'Sign-up failed. Please try again.';
@@ -3948,22 +3935,18 @@ function northAutoPopup(screenId, message, delay) {
           return;
         }
 
-        // Sign-in succeeded — onAuthStateChange will also navigate for returning users
+        // Sign-in succeeded — let onAuthStateChange handle all navigation
         signupBtn.textContent = '✓ Signed in';
-        console.log('[Compass] Sign-in success, calling showScreen s-connect');
-        showScreen('s-connect');
+        console.log('[Compass] Sign-in success, onAuthStateChange will navigate');
 
-        // Fallback: if still on signin screen after 2s, force navigate
+        // Fallback: if still stuck after 3s, force navigate
         setTimeout(function() {
           var cur = document.querySelector('.screen.active');
-          if (cur && cur.id === 's-signin') {
-            console.warn('[Compass] Sign-in fallback: still on signin, forcing navigation');
-            cur.classList.remove('active');
-            cur.style.display = 'none';
-            var nxt = document.getElementById('s-connect');
-            if (nxt) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; }
+          if (!cur || cur.id === 's-signin' || cur.id === 's-landing') {
+            console.warn('[Compass] Sign-in fallback: forcing navigation to s-connect');
+            showScreen('s-connect');
           }
-        }, 2000);
+        }, 3000);
       } catch (e) {
         console.error('[Compass] Sign-in exception:', e);
         errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
