@@ -1066,7 +1066,7 @@
             <span id="streak-count" class="syne" style="font-size:56px;font-weight:800;line-height:1">0</span>
             <span style="font-size:14px;color:var(--muted);font-weight:500">days</span>
           </div>
-          <p style="font-size:13px;color:var(--faint);margin-bottom:20px">Your streak tracks doing, not watching.</p>
+          <p style="font-size:13px;color:var(--faint);margin-bottom:20px"><span id="streak-tasks-done">0</span> tasks completed</p>
         </div>
         <div id="streak-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
       </div>
@@ -1640,30 +1640,32 @@ const TASK_BANK = [
 
 function initTaskProgress() {
   if (!userData.taskProgress) {
-    userData.taskProgress = {
-      currentDay: 1,
-      streak: 0,
-      lastTaskDate: null,
-      completedTasks: [],
-      currentTask: null
-    };
+    // Try localStorage first
+    var local = loadLocal('task_progress');
+    if (local && local.completedTasks && local.completedTasks.length > 0) {
+      userData.taskProgress = local;
+    } else {
+      userData.taskProgress = {
+        currentDay: 1,
+        streak: 0,
+        lastTaskDate: null,
+        completedTasks: [],
+        currentTask: null
+      };
+    }
   }
 }
 
 function selectDailyTask() {
   initTaskProgress();
+  ensureReadinessScores();
   const tp = userData.taskProgress;
   const completedIds = tp.completedTasks.map(t => t.id);
   const co = companyMap[userData.q4] || companyMap['Fintech and payments'];
 
-  // Get weakest dimensions
-  var dims = [];
-  if (userData.readinessScores && userData.readinessScores.dimensions) {
-    dims = userData.readinessScores.dimensions.slice().sort((a, b) => a.score - b.score);
-  }
-  var weakestNames = dims.length > 0
-    ? dims.slice(0, 3).map(d => d.name)
-    : ['Product Sense', 'Analytical Depth', 'AI Fluency'];
+  // Get weakest dimensions from actual scores
+  var dims = userData.readinessScores.dimensions.slice().sort((a, b) => a.score - b.score);
+  var weakestNames = dims.slice(0, 3).map(d => d.name);
 
   // Filter to tasks targeting weak dimensions, not yet completed
   var available = TASK_BANK.filter(t => !completedIds.includes(t.id) && weakestNames.includes(t.dimension));
@@ -1686,7 +1688,7 @@ function selectDailyTask() {
 }
 
 function getCurrentDimScore(dimensionName) {
-  if (!userData.readinessScores || !userData.readinessScores.dimensions) return 50;
+  ensureReadinessScores();
   var dim = userData.readinessScores.dimensions.find(d => d.name === dimensionName);
   return dim ? dim.score : 50;
 }
@@ -1707,8 +1709,27 @@ function updateStreak() {
   tp.lastTaskDate = today;
 }
 
+function ensureReadinessScores() {
+  if (userData.readinessScores && userData.readinessScores.dimensions) return;
+  // Try localStorage
+  var local = loadLocal('readiness_scores');
+  if (local && local.dimensions) { userData.readinessScores = local; return; }
+  // Use hardcoded defaults so task system can track improvements
+  userData.readinessScores = {
+    overall: 56,
+    dimensions: [
+      { name: 'Product Sense', score: 58, status: 'Developing', note: '' },
+      { name: 'Analytical Depth', score: 44, status: 'Gap', note: '' },
+      { name: 'Business Framing', score: 53, status: 'Developing', note: '' },
+      { name: 'Technical Credibility', score: 81, status: 'Strong', note: '' },
+      { name: 'AI Fluency', score: 37, status: 'Gap', note: '' },
+      { name: 'Behavioural', score: 62, status: 'Developing', note: '' }
+    ]
+  };
+}
+
 function applyDimensionDelta(dimensionName, delta) {
-  if (!userData.readinessScores || !userData.readinessScores.dimensions) return;
+  ensureReadinessScores();
   var dim = userData.readinessScores.dimensions.find(d => d.name === dimensionName);
   if (dim) {
     dim.score = Math.min(100, dim.score + delta);
@@ -1721,10 +1742,25 @@ function applyDimensionDelta(dimensionName, delta) {
   userData.readinessScores.overall = Math.round(total);
 }
 
+// ── Local persistence helpers (localStorage backup) ──────────────────
+function saveLocal(key, value) {
+  try { localStorage.setItem('compass_' + key, JSON.stringify(value)); } catch(e) {}
+}
+function loadLocal(key) {
+  try { var s = localStorage.getItem('compass_' + key); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+}
+function saveProgressLocal() {
+  saveLocal('task_progress', userData.taskProgress);
+  saveLocal('readiness_scores', userData.readinessScores);
+}
+
 // ── Supabase persistence helpers ──────────────────────────────────────
 var _sb = null; // set after Supabase init
 
 async function saveProfile() {
+  // Always save task progress + scores to localStorage as backup
+  saveProgressLocal();
+
   if (!_sb) return;
   var { data: { session } } = await _sb.auth.getSession();
   if (!session) return;
@@ -1737,7 +1773,13 @@ async function saveProfile() {
     task_progress: userData.taskProgress || null,
     updated_at: new Date().toISOString()
   };
-  await _sb.from('profiles').upsert(row, { onConflict: 'id' });
+  var { error } = await _sb.from('profiles').upsert(row, { onConflict: 'id' });
+  // If save fails (e.g. task_progress column doesn't exist yet), retry without it
+  if (error) {
+    console.warn('Profile save failed, retrying without task_progress:', error.message);
+    delete row.task_progress;
+    await _sb.from('profiles').upsert(row, { onConflict: 'id' });
+  }
 }
 
 async function loadProfile() {
@@ -1755,6 +1797,15 @@ async function loadProfile() {
   if (data.gate_score) userData.gateScore = data.gate_score;
   if (data.readiness_scores) userData.readinessScores = data.readiness_scores;
   if (data.task_progress) userData.taskProgress = data.task_progress;
+  // Fallback: load from localStorage if Supabase doesn't have task data
+  if (!userData.taskProgress) {
+    var local = loadLocal('task_progress');
+    if (local) userData.taskProgress = local;
+  }
+  if (!userData.readinessScores) {
+    var localScores = loadLocal('readiness_scores');
+    if (localScores) userData.readinessScores = localScores;
+  }
   return data;
 }
 
@@ -2501,6 +2552,8 @@ async function submitDailyTask() {
 
     // Select next task
     selectDailyTask();
+    // Save immediately to localStorage (sync) then async to Supabase
+    saveProgressLocal();
     saveProfile();
 
   } catch(e) {
@@ -2564,6 +2617,8 @@ function renderStreak() {
   var tp = userData.taskProgress;
   var el = document.getElementById('streak-count');
   if (el) el.textContent = tp.streak || 0;
+  var doneEl = document.getElementById('streak-tasks-done');
+  if (doneEl) doneEl.textContent = (tp.completedTasks || []).length;
 
   var grid = document.getElementById('streak-grid');
   if (!grid) return;
@@ -2659,8 +2714,9 @@ function renderPathProgress() {
   var pctBar = document.getElementById('path-progress-bar');
   if (pctBar) setTimeout(function() { pctBar.style.width = Math.round((totalCompleted / totalTasks) * 100) + '%'; }, 100);
 
+  ensureReadinessScores();
   var scoreEl = document.getElementById('path-overall-score');
-  if (scoreEl && userData.readinessScores) scoreEl.textContent = userData.readinessScores.overall || 56;
+  if (scoreEl) scoreEl.textContent = userData.readinessScores.overall || 56;
 }
 
 async function submitGate() {
