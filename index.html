@@ -427,18 +427,16 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- SCREENS: Q1–Q5 (Onboarding Questions)                        -->
+<!-- SCREENS: Q1–Q8 (Onboarding Questions — enriched v2)           -->
 <!-- ============================================================ -->
 
-<!-- Q1 -->
+<!-- Q1: Background (same as original) -->
 <div id="s-q1" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
       <button onclick="showScreen('s-landing')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
-      <div style="flex:1;max-width:240px;margin:0 auto">
-        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:20%"></div></div>
-      </div>
-      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">1 / 5</span>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:12.5%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">1 / 8</span>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:560px;width:100%">
@@ -458,59 +456,110 @@
   </div>
 </div>
 
-<!-- Q2 -->
+<!-- Q2: Years of Experience (NEW — inspired by PM Navigator) -->
 <div id="s-q2" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
       <button onclick="showScreen('s-q1')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
-      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:40%"></div></div></div>
-      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">2 / 5</span>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:25%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">2 / 8</span>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:560px;width:100%">
-        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Journey</p>
-        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">How long have you been thinking about PM?</h2>
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Experience</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">How many years of work experience do you have?</h2>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
-          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Just started</div><div style="font-size:13px;color:var(--muted)">I'm in the curiosity phase, still researching.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">1–3 months</div><div style="font-size:13px;color:var(--muted)">I've read about it but haven't done much.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">3–6 months</div><div style="font-size:13px;color:var(--muted)">I've been consuming content. A lot of it.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">6+ months</div><div style="font-size:13px;color:var(--muted)">I've been at this for a while. Still stuck.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Less than 2 years</div><div style="font-size:13px;color:var(--muted)">Early career — building foundational skills.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">2–4 years</div><div style="font-size:13px;color:var(--muted)">The sweet spot for PM transitions.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">5–8 years</div><div style="font-size:13px;color:var(--muted)">Strong domain expertise to bring into PM.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q2')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">8+ years</div><div style="font-size:13px;color:var(--muted)">Senior professional — may target senior PM or Group PM roles.</div></button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Q3 -->
+<!-- Q3: Experience Signals (NEW — 5 yes/no toggles from PM Navigator) -->
 <div id="s-q3" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
       <button onclick="showScreen('s-q2')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
-      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:60%"></div></div></div>
-      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">3 / 5</span>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:37.5%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">3 / 8</span>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:560px;width:100%">
-        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Blocker</p>
-        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">What's actually stopping you?</h2>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
-          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know if PM is right for me</div><div style="font-size:13px;color:var(--muted)">The role seems exciting but I can't tell if my background fits.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know where to specifically start</div><div style="font-size:13px;color:var(--muted)">Too much content. No clear first step for someone like me.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I can't stop consuming and start doing</div><div style="font-size:13px;color:var(--muted)">Reading and watching, but haven't actually practiced anything.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q3')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I applied and got rejected</div><div style="font-size:13px;color:var(--muted)">Tried. No feedback. Don't know what went wrong.</div></button>
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Experience Signals</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:8px;line-height:1.2;letter-spacing:-0.5px">What have you actually done?</h2>
+        <p style="font-size:14px;color:var(--faint);margin-bottom:28px">Be honest — better calibration means better guidance. Select all that apply.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+          <button class="option-card" id="exp-built" onclick="toggleExp(this,'hasBuiltProducts')" style="display:flex;align-items:center;gap:14px">
+            <div id="exp-built-check" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border-bright);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s"></div>
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:3px">Built a product or feature end-to-end</div><div style="font-size:13px;color:var(--muted)">Shipped something from idea to launch, even a side project.</div></div>
+          </button>
+          <button class="option-card" id="exp-stakeholders" onclick="toggleExp(this,'hasManagedStakeholders')" style="display:flex;align-items:center;gap:14px">
+            <div id="exp-stakeholders-check" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border-bright);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s"></div>
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:3px">Managed cross-functional stakeholders</div><div style="font-size:13px;color:var(--muted)">Coordinated across teams — eng, design, business, or ops.</div></div>
+          </button>
+          <button class="option-card" id="exp-data" onclick="toggleExp(this,'hasUsedDataForDecisions')" style="display:flex;align-items:center;gap:14px">
+            <div id="exp-data-check" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border-bright);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s"></div>
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:3px">Used data to drive decisions</div><div style="font-size:13px;color:var(--muted)">Ran analyses, A/B tests, or used metrics to justify a call.</div></div>
+          </button>
+          <button class="option-card" id="exp-ai" onclick="toggleExp(this,'hasAIExperience')" style="display:flex;align-items:center;gap:14px">
+            <div id="exp-ai-check" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border-bright);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s"></div>
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:3px">Experience with AI/ML tools or products</div><div style="font-size:13px;color:var(--muted)">Built, used, or managed AI-powered features or workflows.</div></div>
+          </button>
+          <button class="option-card" id="exp-side" onclick="toggleExp(this,'hasSideProjects')" style="display:flex;align-items:center;gap:14px">
+            <div id="exp-side-check" style="width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border-bright);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s"></div>
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:3px">Completed PM side projects or case studies</div><div style="font-size:13px;color:var(--muted)">Product teardowns, mock PRDs, case competitions, or a PM portfolio.</div></div>
+          </button>
         </div>
+        <button class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="submitExpSignals()">Continue →</button>
+        <button style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;width:100%;text-align:center" onclick="submitExpSignals()">None of these — skip</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Q4 -->
+<!-- Q4: Skills Multi-Select (NEW — from PM Navigator) -->
 <div id="s-q4" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
       <button onclick="showScreen('s-q3')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
-      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:80%"></div></div></div>
-      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">4 / 5</span>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:50%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">4 / 8</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Skills</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:8px;line-height:1.2;letter-spacing:-0.5px">What are your strongest skills?</h2>
+        <p style="font-size:14px;color:var(--faint);margin-bottom:28px">Pick all that genuinely apply. No aspirational picks.</p>
+        <div id="skills-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
+          <button class="company-pill" onclick="toggleSkill(this)">SQL / Data Analysis</button>
+          <button class="company-pill" onclick="toggleSkill(this)">User Research</button>
+          <button class="company-pill" onclick="toggleSkill(this)">A/B Testing</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Product Strategy</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Wireframing / Design</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Technical Architecture</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Stakeholder Management</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Market Analysis</button>
+          <button class="company-pill" onclick="toggleSkill(this)">Agile / Scrum</button>
+          <button class="company-pill" onclick="toggleSkill(this)">AI / ML Concepts</button>
+        </div>
+        <button class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="submitSkills()">Continue →</button>
+        <button style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;width:100%;text-align:center" onclick="submitSkills()">Skip</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q5: Target Company (was Q4 in original — kept q4 data key for backward compat) -->
+<div id="s-q5" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q4')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:62.5%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">5 / 8</span>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:560px;width:100%">
@@ -528,24 +577,70 @@
   </div>
 </div>
 
-<!-- Q5 -->
-<div id="s-q5" class="screen">
+<!-- Q6: Networking Level (NEW — from PM Navigator) -->
+<div id="s-q6" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
-      <button onclick="showScreen('s-q4')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
-      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div></div>
-      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">5 / 5</span>
+      <button onclick="showScreen('s-q5')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:75%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">6 / 8</span>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:560px;width:100%">
-        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Be honest</p>
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Network</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">Where are you with PM networking?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q6')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Haven't started</div><div style="font-size:13px;color:var(--muted)">Haven't reached out to anyone in PM yet.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q6')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Passive — consuming content</div><div style="font-size:13px;color:var(--muted)">Following PMs on LinkedIn, reading newsletters, in communities.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q6')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Active outreach</div><div style="font-size:13px;color:var(--muted)">Sending cold messages, doing coffee chats, attending events.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q6')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Strategic with referrals</div><div style="font-size:13px;color:var(--muted)">Building real relationships. Have or can get referrals.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q7: Preparation / Practice Level (expanded from original Q5) -->
+<div id="s-q7" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q6')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:87.5%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">7 / 8</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Be Honest</p>
         <h2 style="font-size:28px;font-weight:800;margin-bottom:8px;line-height:1.2;letter-spacing:-0.5px">How much have you actually practiced?</h2>
         <p style="font-size:14px;color:var(--faint);margin-bottom:28px">Not watched or read — practiced. Teardowns written, mocks done, cases answered.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
-          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Zero</div><div style="font-size:13px;color:var(--muted)">No teardowns. No mocks. Nothing produced yet.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Minimal</div><div style="font-size:13px;color:var(--muted)">Maybe 1–2 things. Nothing consistent.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Some</div><div style="font-size:13px;color:var(--muted)">A few teardowns or case questions.</div></button>
-          <button class="option-card" onclick="selectOption(this,'q5')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Regular</div><div style="font-size:13px;color:var(--muted)">Weekly practice but no signal on whether I'm improving.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q7')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Zero</div><div style="font-size:13px;color:var(--muted)">No teardowns. No mocks. Nothing produced yet.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q7')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Minimal (1–2 mocks or teardowns)</div><div style="font-size:13px;color:var(--muted)">Tried a couple things. Nothing consistent.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q7')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Moderate (5–10 practice sessions)</div><div style="font-size:13px;color:var(--muted)">Some teardowns, case questions, or mock interviews.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q7')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">Regular (10+ sessions)</div><div style="font-size:13px;color:var(--muted)">Weekly practice — but no signal on whether I'm improving.</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q8: Blocker (moved from original Q3 — still useful for personalization) -->
+<div id="s-q8" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <button onclick="showScreen('s-q7')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div></div>
+      <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">8 / 8</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="max-width:560px;width:100%">
+        <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Your Blocker</p>
+        <h2 style="font-size:28px;font-weight:800;margin-bottom:32px;line-height:1.2;letter-spacing:-0.5px">What's actually stopping you?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+          <button class="option-card" onclick="selectOption(this,'q8')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know if PM is right for me</div><div style="font-size:13px;color:var(--muted)">The role seems exciting but I can't tell if my background fits.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q8')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I don't know where to specifically start</div><div style="font-size:13px;color:var(--muted)">Too much content. No clear first step for someone like me.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q8')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I can't stop consuming and start doing</div><div style="font-size:13px;color:var(--muted)">Reading and watching, but haven't actually practiced anything.</div></button>
+          <button class="option-card" onclick="selectOption(this,'q8')"><div style="font-weight:700;font-size:15px;margin-bottom:3px">I applied and got rejected</div><div style="font-size:13px;color:var(--muted)">Tried. No feedback. Don't know what went wrong.</div></button>
         </div>
       </div>
     </div>
@@ -1596,7 +1691,7 @@
 <!-- JAVASCRIPT                                                    -->
 <!-- ============================================================ -->
 <script>
-const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, name:null, firstName:null, profileConnected:false };
+const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, q6:null, q7:null, q8:null, expSignals:{ hasBuiltProducts:false, hasManagedStakeholders:false, hasUsedDataForDecisions:false, hasAIExperience:false, hasSideProjects:false }, skills:[], name:null, firstName:null, profileConnected:false };
 
 // ── Daily Task System ─────────────────────────────────────────────────
 var currentTaskMode = 'gate'; // 'gate' for onboarding, 'daily' for path tasks
@@ -1745,6 +1840,7 @@ function loadLocal(key) {
 function saveProgressLocal() {
   saveLocal('task_progress', userData.taskProgress);
   saveLocal('readiness_scores', userData.readinessScores);
+  saveLocal('v2_enriched', { q2:userData.q2, q6:userData.q6, q7:userData.q7, q8:userData.q8, expSignals:userData.expSignals, skills:userData.skills });
 }
 
 // ── Supabase persistence helpers ──────────────────────────────────────
@@ -1759,7 +1855,7 @@ async function saveProfile() {
   if (!session) return;
   var row = {
     id: session.user.id,
-    q1: userData.q1, q2: userData.q2, q3: userData.q3, q4: userData.q4, q5: userData.q5,
+    q1: userData.q1, q2: userData.q2, q3: userData.q3, q4: userData.q4, q5: userData.q5, q6: userData.q6, q7: userData.q7, q8: userData.q8, exp_signals: userData.expSignals, skills: userData.skills,
     resume_data: userData.resumeData || null,
     gate_score: userData.gateScore || null,
     readiness_scores: userData.readinessScores || null,
@@ -1767,10 +1863,15 @@ async function saveProfile() {
     updated_at: new Date().toISOString()
   };
   var { error } = await _sb.from('profiles').upsert(row, { onConflict: 'id' });
-  // If save fails (e.g. task_progress column doesn't exist yet), retry without it
+  // If save fails (e.g. new columns don't exist yet), retry with only original fields
   if (error) {
-    console.warn('Profile save failed, retrying without task_progress:', error.message);
+    console.warn('Profile save failed, retrying with core fields only:', error.message);
     delete row.task_progress;
+    delete row.q6;
+    delete row.q7;
+    delete row.q8;
+    delete row.exp_signals;
+    delete row.skills;
     await _sb.from('profiles').upsert(row, { onConflict: 'id' });
   }
 }
@@ -1786,6 +1887,11 @@ async function loadProfile() {
   if (data.q3) userData.q3 = data.q3;
   if (data.q4) userData.q4 = data.q4;
   if (data.q5) userData.q5 = data.q5;
+  if (data.q6) userData.q6 = data.q6;
+  if (data.q7) userData.q7 = data.q7;
+  if (data.q8) userData.q8 = data.q8;
+  if (data.exp_signals) userData.expSignals = data.exp_signals;
+  if (data.skills) userData.skills = data.skills;
   if (data.resume_data) { userData.resumeData = data.resume_data; userData.profileConnected = true; }
   if (data.gate_score) userData.gateScore = data.gate_score;
   if (data.readiness_scores) userData.readinessScores = data.readiness_scores;
@@ -1798,6 +1904,18 @@ async function loadProfile() {
   if (!userData.readinessScores) {
     var localScores = loadLocal('readiness_scores');
     if (localScores) userData.readinessScores = localScores;
+  }
+  // Fallback: load enriched v2 data from localStorage if Supabase doesn't have it
+  if (!userData.q6 && !userData.expSignals.hasBuiltProducts) {
+    var v2Local = loadLocal('v2_enriched');
+    if (v2Local) {
+      if (v2Local.q2) userData.q2 = v2Local.q2;
+      if (v2Local.q6) userData.q6 = v2Local.q6;
+      if (v2Local.q7) userData.q7 = v2Local.q7;
+      if (v2Local.q8) userData.q8 = v2Local.q8;
+      if (v2Local.expSignals) userData.expSignals = v2Local.expSignals;
+      if (v2Local.skills) userData.skills = v2Local.skills;
+    }
   }
   return data;
 }
@@ -2137,10 +2255,46 @@ function selectOption(el, group) {
   const label = el.querySelector('div');
   if (label) userData[group] = label.textContent.trim();
   // Auto-advance to next screen after a brief pause so selection is visible
-  const nextScreen = { q1:'s-q2', q2:'s-q3', q3:'s-q4', q4:'s-q5', q5:null };
+  // Q3 (expSignals) and Q4 (skills) use custom handlers, not selectOption
+  // q4 data key = target company (screen Q5), q6 = networking (screen Q6), q7 = practice (screen Q7), q8 = blocker (screen Q8)
+  const nextScreen = { q1:'s-q2', q2:'s-q3', q4:'s-q6', q6:'s-q7', q7:'s-q8', q8:null };
   const dest = nextScreen[group];
   if (dest) setTimeout(() => showScreen(dest), 350);
-  else if (group === 'q5') { saveProfile(); setTimeout(() => startLoading(), 350); }
+  else if (group === 'q8') { saveProfile(); setTimeout(() => startLoading(), 350); }
+}
+
+// ── Experience Signals toggle (Q3 screen) ──────────────────────────────────
+function toggleExp(el, key) {
+  userData.expSignals[key] = !userData.expSignals[key];
+  el.classList.toggle('selected', userData.expSignals[key]);
+  const check = el.querySelector('div[id$="-check"]');
+  if (check) {
+    if (userData.expSignals[key]) {
+      check.style.background = 'var(--accent)';
+      check.style.borderColor = 'var(--accent)';
+      check.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+      check.style.background = 'transparent';
+      check.style.borderColor = 'var(--border-bright)';
+      check.innerHTML = '';
+    }
+  }
+}
+function submitExpSignals() {
+  showScreen('s-q4');
+}
+
+// ── Skills multi-select toggle (Q4 screen) ─────────────────────────────────
+function toggleSkill(el) {
+  el.classList.toggle('selected');
+  // Rebuild skills array from selected pills
+  userData.skills = [];
+  document.querySelectorAll('#skills-grid .company-pill.selected').forEach(function(s) {
+    userData.skills.push(s.textContent.trim());
+  });
+}
+function submitSkills() {
+  showScreen('s-q5');
 }
 
 function startLoading() {
@@ -2222,6 +2376,11 @@ async function fetchReadinessScores() {
       body: JSON.stringify({
         background: userData.q1,
         targetCompany: userData.q4,
+        yearsExperience: userData.q2 || null,
+        expSignals: userData.expSignals || null,
+        skills: userData.skills || null,
+        networkingLevel: userData.q6 || null,
+        practiceLevel: userData.q7 || null,
         resumeData: userData.resumeData || null,
         gateScore: userData.gateScore || null
       })
@@ -2249,6 +2408,9 @@ async function fetchJobMatches() {
       body: JSON.stringify({
         background: userData.q1,
         targetCompany: userData.q4,
+        yearsExperience: userData.q2 || null,
+        expSignals: userData.expSignals || null,
+        skills: userData.skills || null,
         resumeData: userData.resumeData || null,
         readinessScores: userData.readinessScores || null,
         gateScore: userData.gateScore || null
@@ -2819,7 +2981,7 @@ async function submitGate() {
     const res  = await fetch('/api/score-gate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, background: userData.q1 || '' })
+      body: JSON.stringify({ text, background: userData.q1 || '', yearsExperience: userData.q2 || null, expSignals: userData.expSignals || null, skills: userData.skills || null })
     });
     const data = await res.json();
 
@@ -3151,14 +3313,29 @@ function toggleNorth() {
 function getNorthContext() {
   const r = userData.resumeData || {};
   const g = userData.gateScore  || {};
+  const exp = userData.expSignals || {};
   const lines = [
     `Name: ${userData.name || 'Unknown'}`,
     `Background: ${userData.q1 || 'Not provided'}`,
+    `Years of experience: ${userData.q2 || 'Not provided'}`,
     `Target company: ${userData.q4 || 'Not specified'}`,
     `Current role: ${r.currentRole || 'Not provided'}`,
-    `Total experience: ${r.totalExperience || 'Not provided'}`,
+    `Total experience: ${r.totalExperience || userData.q2 || 'Not provided'}`,
+    `Networking level: ${userData.q6 || 'Not provided'}`,
+    `Practice level: ${userData.q7 || 'Not provided'}`,
+    `Blocker: ${userData.q8 || 'Not specified'}`,
     `Readiness score: ${userData.readinessScores ? userData.readinessScores.overall + '/100' : 'not yet scored'}`,
   ];
+  // Experience signals
+  const expLabels = [];
+  if (exp.hasBuiltProducts) expLabels.push('Has built products end-to-end');
+  if (exp.hasManagedStakeholders) expLabels.push('Has managed cross-functional stakeholders');
+  if (exp.hasUsedDataForDecisions) expLabels.push('Has used data for decisions');
+  if (exp.hasAIExperience) expLabels.push('Has AI/ML experience');
+  if (exp.hasSideProjects) expLabels.push('Has completed PM side projects');
+  if (expLabels.length) lines.push(`Experience signals: ${expLabels.join('; ')}`);
+  // Skills
+  if (userData.skills && userData.skills.length) lines.push(`Skills: ${userData.skills.join(', ')}`);
   if (g.score) {
     lines.push(`Gate task score: ${g.score}/100 — "${g.headline || ''}"`);
     if (g.strength) lines.push(`Gate strength: ${g.strength}`);
