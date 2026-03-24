@@ -814,6 +814,9 @@
 
         <div style="text-align:center">
           <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="handleGateSubmit()">Submit and See My Path →</button>
+          <div id="gate-back-link" style="display:none;margin-top:12px">
+            <button style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="showScreen('s-dashboard')">← Back to Dashboard</button>
+          </div>
         </div>
 
         <!-- Scoring motivation — shown while AI scores -->
@@ -2792,6 +2795,8 @@ function populateGateScreen(task) {
   if (fb) fb.style.display = 'none';
   var impact = document.getElementById('gate-dim-impact');
   if (impact) impact.style.display = 'none';
+  var backLink = document.getElementById('gate-back-link');
+  if (backLink) backLink.style.display = 'block';
   validateGate();
 }
 
@@ -2809,6 +2814,8 @@ function resetGateToOnboarding() {
   if (cta) { cta.textContent = 'See My Full Readiness Score →'; cta.onclick = function() { showScreen('s-readiness'); }; }
   var impact = document.getElementById('gate-dim-impact');
   if (impact) impact.style.display = 'none';
+  var backLink = document.getElementById('gate-back-link');
+  if (backLink) backLink.style.display = 'none';
 }
 
 async function submitDailyTask() {
@@ -2840,7 +2847,18 @@ async function submitDailyTask() {
     });
     var data = await res.json();
     stopScoringQuotes();
-    if (data.error || !data.score) { addNorthMessage('Scoring failed — try again.', 'bot'); btn.textContent = 'Submit Response →'; btn.disabled = false; btn.style.opacity = '1'; return; }
+    if (data.error || !data.score) {
+      console.warn('[Compass] Task scoring failed:', data.error || 'no score returned', data);
+      btn.textContent = 'Submit Response →';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      var errFb = document.getElementById('gate-feedback');
+      if (errFb) {
+        errFb.style.display = 'block';
+        errFb.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+      }
+      return;
+    }
 
     // Show feedback
     showTaskFeedback(data, task);
@@ -2865,9 +2883,15 @@ async function submitDailyTask() {
 
   } catch(e) {
     stopScoringQuotes();
+    console.warn('[Compass] Task scoring error:', e.message);
     btn.textContent = 'Submit Response →';
     btn.disabled = false;
     btn.style.opacity = '1';
+    var errFb = document.getElementById('gate-feedback');
+    if (errFb) {
+      errFb.style.display = 'block';
+      errFb.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+    }
   }
 }
 
