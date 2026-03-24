@@ -1188,8 +1188,11 @@
     <div style="height:6px;background:var(--elevated);border-radius:3px;margin-bottom:10px;overflow:hidden">
       <div id="dash-progress-bar" style="height:100%;background:linear-gradient(90deg,#6366F1,#8B5CF6);border-radius:3px;transition:width 0.8s ease;width:0%"></div>
     </div>
-    <div id="streak-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:32px;max-width:280px"></div>
+    <div id="streak-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:24px;max-width:280px"></div>
     <span id="streak-tasks-done" style="display:none">0</span>
+
+    <!-- ===== Today's task card ===== -->
+    <div id="dash-today-card" style="margin-bottom:32px"></div>
 
     <!-- ===== Phase-grouped task list ===== -->
     <div id="dash-task-list" style="display:flex;flex-direction:column;gap:20px;margin-bottom:48px"></div>
@@ -2662,12 +2665,24 @@ async function fetchReadinessScores() {
 }
 
 async function fetchJobMatches() {
-  const list = document.getElementById('job-matches-list');
-  const subtitle = document.getElementById('job-matches-subtitle');
+  var list = document.getElementById('job-matches-list');
+  var subtitle = document.getElementById('job-matches-subtitle');
+
+  // Skip API call if no user data — show static fallback
+  if (!userData.q1 && !userData.resumeData) {
+    renderStaticJobMatches(list, subtitle);
+    return;
+  }
+
+  // Race the API call against a timeout
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function() { controller.abort(); }, 12000);
+
   try {
-    const res = await fetch('/api/job-matches', {
+    var res = await fetch('/api/job-matches', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         background: userData.q1,
         targetCompany: userData.q4,
@@ -2679,42 +2694,80 @@ async function fetchJobMatches() {
         gateScore: userData.gateScore || null
       })
     });
-    const data = await res.json();
-    if (!data.jobs || !data.jobs.length) { if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">No matches found. Complete more steps to unlock job matching.</p>'; return; }
-    if (subtitle) subtitle.textContent = `${data.jobs.length} matches based on your profile`;
+    clearTimeout(timeoutId);
+    var data = await res.json();
+    if (!data.jobs || !data.jobs.length) {
+      renderStaticJobMatches(list, subtitle);
+      return;
+    }
+    if (subtitle) subtitle.textContent = data.jobs.length + ' matches based on your profile';
     if (!list) return;
     list.innerHTML = '';
-    data.jobs.forEach((job, i) => {
-      const fitBadge = job.fit >= 75 ? 'badge-emerald' : job.fit >= 55 ? 'badge-amber' : 'badge-rose';
-      const isTarget = job.isTarget;
-      const borderStyle = isTarget ? 'border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)' : '';
-      const targetTag = isTarget ? '<span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap">Your Target</span>' : '';
-      const card = document.createElement('div');
+    data.jobs.forEach(function(job, i) {
+      var fitBadge = job.fit >= 75 ? 'badge-emerald' : job.fit >= 55 ? 'badge-amber' : 'badge-rose';
+      var isTarget = job.isTarget;
+      var borderStyle = isTarget ? 'border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)' : '';
+      var targetTag = isTarget ? '<span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap">Your Target</span>' : '';
+      var card = document.createElement('div');
       card.className = 'job-card';
       if (borderStyle) card.style.cssText = borderStyle;
       card.style.opacity = '0';
       card.style.transform = 'translateY(8px)';
       card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">
-          <h4 style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${job.title}</h4>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            ${targetTag}
-            <span class="badge ${fitBadge}" style="white-space:nowrap;font-size:11px">${job.fit}% fit</span>
-          </div>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:6px">${job.company} · ${job.vertical} · ${job.city}</p>
-        <div style="display:flex;gap:12px">
-          ${job.salary ? `<span style="font-size:11px;color:var(--faint)">💰 ${job.salary}</span>` : ''}
-          ${job.interviewRounds ? `<span style="font-size:11px;color:var(--faint)">${job.interviewRounds} rounds</span>` : ''}
-        </div>`;
+      card.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
+          '<h4 style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + job.title + '</h4>' +
+          '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+            targetTag +
+            '<span class="badge ' + fitBadge + '" style="white-space:nowrap;font-size:11px">' + job.fit + '% fit</span>' +
+          '</div>' +
+        '</div>' +
+        '<p style="font-size:12px;color:var(--muted);margin-bottom:6px">' + job.company + ' · ' + job.vertical + ' · ' + job.city + '</p>' +
+        '<div style="display:flex;gap:12px">' +
+          (job.salary ? '<span style="font-size:11px;color:var(--faint)">' + job.salary + '</span>' : '') +
+          (job.interviewRounds ? '<span style="font-size:11px;color:var(--faint)">' + job.interviewRounds + ' rounds</span>' : '') +
+        '</div>';
       list.appendChild(card);
-      setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100 + i * 120);
+      setTimeout(function() { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100 + i * 120);
     });
   } catch (e) {
+    clearTimeout(timeoutId);
     console.warn('Job matches failed:', e.message);
-    if (list) list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:20px 0">Could not load job matches. Try refreshing.</p>';
+    renderStaticJobMatches(list, subtitle);
   }
+}
+
+function renderStaticJobMatches(list, subtitle) {
+  var co = companyMap[userData.q4] || companyMap['Fintech and payments'];
+  var staticJobs = [
+    { title:'Associate PM', company:co.company, vertical:co.sector, city:'Bangalore', fit:68, isTarget:true, salary:'12–18 LPA', rounds:4 },
+    { title:'Growth PM', company:'Meesho', vertical:'consumer', city:'Bangalore', fit:62, salary:'14–20 LPA', rounds:3 },
+    { title:'Product Analyst → PM', company:'Razorpay', vertical:'fintech', city:'Bangalore', fit:58, salary:'15–22 LPA', rounds:4 },
+    { title:'Junior PM', company:'Swiggy', vertical:'consumer', city:'Bangalore', fit:55, salary:'12–16 LPA', rounds:3 }
+  ];
+  if (subtitle) subtitle.textContent = 'Sample matches — complete more tasks to personalize';
+  if (!list) return;
+  list.innerHTML = '';
+  staticJobs.forEach(function(job, i) {
+    var fitBadge = job.fit >= 75 ? 'badge-emerald' : job.fit >= 55 ? 'badge-amber' : 'badge-rose';
+    var targetTag = job.isTarget ? '<span style="font-size:10px;background:rgba(129,140,248,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap">Your Target</span>' : '';
+    var card = document.createElement('div');
+    card.className = 'job-card';
+    if (job.isTarget) card.style.cssText = 'border-color:rgba(129,140,248,0.3);background:rgba(129,140,248,0.04)';
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
+        '<h4 style="font-size:14px;font-weight:700">' + job.title + '</h4>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' + targetTag +
+          '<span class="badge ' + fitBadge + '" style="font-size:11px">' + job.fit + '% fit</span>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:12px;color:var(--muted);margin-bottom:6px">' + job.company + ' · ' + job.vertical + ' · ' + job.city + '</p>' +
+      '<div style="display:flex;gap:12px">' +
+        '<span style="font-size:11px;color:var(--faint)">' + job.salary + '</span>' +
+        '<span style="font-size:11px;color:var(--faint)">' + job.rounds + ' rounds</span>' +
+      '</div>';
+    list.appendChild(card);
+  });
 }
 
 async function fetchTrendSignals() {
@@ -3080,6 +3133,25 @@ function showTaskFeedback(data, task) {
 function renderDashboardTask() {
   initTaskProgress();
   if (!userData.taskProgress.currentTask) selectDailyTask();
+  var card = document.getElementById('dash-today-card');
+  if (!card) return;
+  var task = userData.taskProgress.currentTask;
+  if (!task) { card.innerHTML = ''; return; }
+  var co = companyMap[userData.q4] || companyMap['Fintech and payments'];
+  var title = task.title.replace(/\{company\}/g, co.company);
+  var dimColors = { 'Product Sense':'var(--accent)', 'Analytical Depth':'var(--rose)', 'Business Framing':'var(--amber)', 'AI Fluency':'var(--violet)', 'Technical Credibility':'var(--emerald)', 'Behavioural':'var(--sky, #38BDF8)' };
+  var color = dimColors[task.dimension] || 'var(--accent)';
+  card.innerHTML =
+    '<div class="card" style="padding:24px;border:1.5px solid rgba(99,102,241,0.3);background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(139,92,246,0.04))">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">' +
+        '<div style="width:10px;height:10px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite"></div>' +
+        '<span style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px">Today\'s Task</span>' +
+        '<span style="font-size:11px;color:' + color + ';padding:2px 8px;border-radius:99px;font-weight:600;margin-left:auto;background:var(--elevated);border:1px solid var(--border)">' + task.dimension + '</span>' +
+      '</div>' +
+      '<h3 style="font-size:16px;font-weight:700;margin-bottom:6px">' + title + '</h3>' +
+      '<p style="font-size:13px;color:var(--muted);margin-bottom:14px">~' + task.minutes + ' min · Improves your ' + task.dimension + ' score</p>' +
+      '<button class="btn-primary" style="font-size:14px;padding:12px;width:100%" onclick="startSpecificTask(\'' + task.id + '\')">Start Task →</button>' +
+    '</div>';
 }
 
 function renderStreak() {
