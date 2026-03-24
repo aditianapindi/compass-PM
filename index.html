@@ -2306,7 +2306,7 @@ function showScreen(id) {
     if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
-    if (id === 's-dashboard') { renderDashboardTask(); renderStreak(); renderTaskList(); fetchJobMatches(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day ${(userData.taskProgress && userData.taskProgress.currentDay) || 1}. Want me to walk you through today's task?`, 5000); }
+    if (id === 's-dashboard') { renderDashboardTask(); renderStreak(); renderTaskList(); fetchJobMatches(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, I'm North — your PM career companion. Ask me anything.`, 2000); }
     if (id === 's-gate' && currentTaskMode === 'gate') { resetGateToOnboarding(); }
     if (id === 's-jobs') { fetchJobListings(); fetchTrendSignals(); }
   }, 180);
@@ -3717,10 +3717,25 @@ function northAutoPopup(screenId, message, delay) {
   northAutoShown[screenId] = true;
   setTimeout(() => {
     if (northOpen) return;
-    const badge = document.getElementById('north-badge');
-    const greeting = document.getElementById('north-greeting');
+    var badge = document.getElementById('north-badge');
+    var tooltip = document.getElementById('north-tooltip');
+    var greeting = document.getElementById('north-greeting');
     if (badge) badge.style.display = 'block';
     if (greeting) greeting.textContent = message;
+    // Show tooltip with intro message
+    if (tooltip) {
+      tooltip.textContent = message;
+      tooltip.style.display = 'block';
+      tooltip.style.opacity = '0';
+      tooltip.style.transition = 'opacity 0.4s ease';
+      tooltip.style.whiteSpace = 'normal';
+      tooltip.style.maxWidth = '220px';
+      requestAnimationFrame(function() { tooltip.style.opacity = '1'; });
+      setTimeout(function() {
+        tooltip.style.opacity = '0';
+        setTimeout(function() { tooltip.style.display = 'none'; }, 400);
+      }, 5000);
+    }
   }, delay);
 }
 </script>
