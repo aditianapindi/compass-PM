@@ -2304,8 +2304,10 @@ function showScreen(id) {
   cur.style.opacity = '0';
   _showScreenTimer = setTimeout(() => {
     _showScreenTimer = null;
-    cur.classList.remove('active');
-    cur.style.display = 'none';
+    // Hide ALL screens except the target to prevent bleed-through
+    document.querySelectorAll('.screen').forEach(function(s) {
+      if (s !== nxt) { s.classList.remove('active'); s.style.display = 'none'; s.style.opacity = '0'; }
+    });
     nxt.style.display = 'block';
     nxt.classList.add('active');
     nxt.style.opacity = '0';
@@ -2856,7 +2858,7 @@ async function submitDailyTask() {
     });
     var data = await res.json();
     stopScoringQuotes();
-    if (data.error || !data.score) {
+    if (data.error || (data.score == null)) {
       console.warn('[Compass] Task scoring failed:', data.error || 'no score returned', data);
       btn.textContent = 'Submit Response →';
       btn.disabled = false;
@@ -3154,7 +3156,7 @@ async function submitGate() {
     const data = await res.json();
 
     stopScoringQuotes();
-    if (data.error || !data.score) { showScreen('s-readiness'); return; }
+    if (data.error || (data.score == null)) { showScreen('s-readiness'); return; }
 
     userData.gateScore = data;
     saveProfile();
