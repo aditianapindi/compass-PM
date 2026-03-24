@@ -117,7 +117,7 @@ Reply as North. Plain conversational English. No bullet points. No markdown. No 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
         })
       }
     );

@@ -71,7 +71,7 @@ Return exactly 4 signals.`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.5, maxOutputTokens: 600 }
         })
       }
     );

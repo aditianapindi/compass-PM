@@ -97,7 +97,7 @@ Return exactly 4 jobs. Put the target company job FIRST. Sort remaining 3 by fit
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 1000, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.4, maxOutputTokens: 1000 }
         })
       }
     );
