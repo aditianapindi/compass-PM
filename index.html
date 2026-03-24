@@ -766,7 +766,7 @@
 <!-- ============================================================ -->
 <div id="s-readiness" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-dashboard')">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -804,6 +804,7 @@
       </div>
       <h1 id="readiness-headline" style="font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">You're 19 points from ready.</h1>
       <p id="readiness-subtitle" style="color:var(--muted);font-size:14px;max-width:520px;margin:0 auto;line-height:1.6">Application-ready for Growth PM roles means a Compass score of 75. Here's how your profile stacks up across all 6 dimensions.</p>
+      <div id="readiness-estimated-banner" style="display:none;margin-top:16px"><span class="badge badge-amber" style="font-size:12px">Estimated scores — complete gate task + upload resume for AI-calibrated scoring</span></div>
     </div>
 
     <!-- ===== SECTION 2: Radar Chart (full-width, no card) ===== -->
@@ -1186,7 +1187,7 @@
 <!-- ============================================================ -->
 <div id="s-interview" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-dashboard')">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1377,9 +1378,14 @@
         </div>
 
         <!-- Start CTA -->
-        <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px" onclick="startInterview()">
-          Start Interview with Riva →
-        </button>
+        <div style="position:relative">
+          <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px;opacity:0.5;cursor:not-allowed" disabled>
+            Start Interview with Riva →
+          </button>
+          <div style="text-align:center;margin-top:10px">
+            <span class="badge badge-amber" style="font-size:12px">Coming in next release — AI interview scoring in development</span>
+          </div>
+        </div>
 
         <!-- Live session panel (hidden until started) -->
         <div id="riva-live" style="display:none">
@@ -1529,40 +1535,10 @@
           <p id="profile-pm-also" style="font-size:12px;color:var(--faint)">Also suited: <span style="color:var(--text)">Fintech PM · Consumer PM</span></p>
         </div>
 
-        <!-- Dimension scores -->
+        <!-- Dimension scores (dynamically rendered by updateProfileDimensions()) -->
         <div class="card" style="padding:24px">
           <h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Readiness by Dimension</h3>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">Product Sense</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:58%;background:var(--orange)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">58</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">Analytical Depth</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:44%;background:var(--rose)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--rose);min-width:26px;text-align:right">44</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">Business Framing</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:53%;background:var(--orange)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">53</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">Technical Cred.</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:81%;background:var(--emerald)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--emerald);min-width:26px;text-align:right">81</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">AI Fluency</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:37%;background:var(--rose)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--rose);min-width:26px;text-align:right">37</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--muted);min-width:120px">Behavioural</span>
-              <div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:62%;background:var(--orange)"></div></div>
-              <span style="font-size:12px;font-weight:700;color:var(--orange);min-width:26px;text-align:right">62</span>
-            </div>
+          <div id="profile-dim-bars" style="display:flex;flex-direction:column;gap:10px">
           </div>
           <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
             <button class="btn-primary" style="width:100%;font-size:13px;padding:11px" onclick="showScreen('s-readiness')">View Full Radar Chart →</button>
@@ -1712,12 +1688,13 @@ function getCurrentDimScore(dimensionName) {
 function updateStreak() {
   initTaskProgress();
   var tp = userData.taskProgress;
-  var today = new Date().toISOString().split('T')[0];
+  var now = new Date();
+  var today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
   if (!tp.lastTaskDate) { tp.streak = 1; }
   else {
     var last = new Date(tp.lastTaskDate);
-    var now = new Date(today);
-    var diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+    var todayDate = new Date(today);
+    var diff = Math.floor((todayDate - last) / (1000 * 60 * 60 * 24));
     if (diff === 0) { /* same day, no change */ }
     else if (diff === 1) { tp.streak = (tp.streak || 0) + 1; }
     else { tp.streak = 1; }
@@ -1981,6 +1958,19 @@ async function processResumeFile(file) {
   if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} uploaded</span>${parsed.name ? `<br/><span style="font-size:12px;color:var(--muted)">Name: ${parsed.name}</span>` : ''}`;
 }
 
+function updateProfileDimensions() {
+  var container = document.getElementById('profile-dim-bars');
+  if (!container) return;
+  ensureReadinessScores();
+  var dims = userData.readinessScores.dimensions;
+  container.innerHTML = '';
+  dims.forEach(function(d) {
+    var color = d.score >= 75 ? 'var(--emerald)' : d.score >= 50 ? 'var(--orange)' : 'var(--rose)';
+    var shortName = d.name === 'Technical Credibility' ? 'Technical Cred.' : d.name;
+    container.innerHTML += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);min-width:120px">' + shortName + '</span><div class="dim-bar-bg" style="flex:1"><div class="dim-bar-fill" style="width:' + d.score + '%;background:' + color + '"></div></div><span style="font-size:12px;font-weight:700;color:' + color + ';min-width:26px;text-align:right">' + d.score + '</span></div>';
+  });
+}
+
 function updateProfileFromResume(parsed) {
   console.log('[Compass] Resume parsed data:', JSON.stringify(parsed, null, 2));
 
@@ -2102,10 +2092,15 @@ function showScreen(id) {
     window.scrollTo(0,0);
     if (id === 's-readiness') {
       // Fetch AI readiness scores if not already loaded, then animate
+      var estBanner = document.getElementById('readiness-estimated-banner');
       if (!userData.readinessScores) {
-        fetchReadinessScores().then(() => { animateRadar(); animateScoreRing(); buildAndAnimateGaps(); });
+        fetchReadinessScores().then(() => {
+          animateRadar(); animateScoreRing(); buildAndAnimateGaps();
+          if (estBanner) estBanner.style.display = userData.readinessScores && userData.readinessScores._source === 'api' ? 'none' : 'block';
+        });
       } else {
         setTimeout(animateRadar, 400); setTimeout(() => { animateScoreRing(); buildAndAnimateGaps(); }, 600);
+        if (estBanner) estBanner.style.display = userData.readinessScores._source === 'api' ? 'none' : 'block';
       }
     }
     if (id === 's-paywall') {
@@ -2113,7 +2108,7 @@ function showScreen(id) {
       const el = document.getElementById('paywall-score');
       if (el) el.textContent = sc + ' / 75';
     }
-    if (id === 's-profile' && userData.resumeData) { updateProfileFromResume(userData.resumeData); }
+    if (id === 's-profile') { updateProfileDimensions(); if (userData.resumeData) updateProfileFromResume(userData.resumeData); }
     // North bubble: show on post-onboarding screens
     const northScreens = ['s-verdict','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
     const bubble = document.getElementById('north-bubble');
@@ -2233,6 +2228,7 @@ async function fetchReadinessScores() {
     });
     const data = await res.json();
     if (data.dimensions && data.dimensions.length === 6) {
+      data._source = 'api';
       userData.readinessScores = data;
       saveProfile();
       return data;
@@ -2852,7 +2848,14 @@ async function submitGate() {
     btn.style.display = 'none';
 
   } catch (e) {
-    showScreen('s-readiness');
+    btn.textContent = 'Submit Response →';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    const errEl = document.getElementById('gate-feedback');
+    if (errEl) {
+      errEl.style.display = 'block';
+      errEl.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+    }
   }
 }
 
@@ -2923,7 +2926,7 @@ function handleConnect(service) {
   if (service === 'li') {
     // Simulate LinkedIn OAuth name extraction (production: read from LinkedIn API response)
     btn.textContent = '✓ Connected';
-    if (!userData.name) { userData.name = 'Alex Kumar'; applyName(); }
+    if (!userData.name) { userData.name = 'Connected User'; applyName(); }
     userData.profileConnected = true;
   } else {
     btn.textContent = '✓ Connected';
@@ -3154,7 +3157,7 @@ function getNorthContext() {
     `Target company: ${userData.q4 || 'Not specified'}`,
     `Current role: ${r.currentRole || 'Not provided'}`,
     `Total experience: ${r.totalExperience || 'Not provided'}`,
-    `Readiness score: 56/100 (estimated)`,
+    `Readiness score: ${userData.readinessScores ? userData.readinessScores.overall + '/100' : 'not yet scored'}`,
   ];
   if (g.score) {
     lines.push(`Gate task score: ${g.score}/100 — "${g.headline || ''}"`);
