@@ -1709,6 +1709,14 @@ const TASK_BANK = [
   // Behavioural
   { id:'bh-1', type:'stakeholder-conflict', dimension:'Behavioural', phase:3, title:'Stakeholder Conflict: {company}', prompt:'You\'re a PM at {company}. Your engineering lead says the feature you prioritized will take 3x longer than estimated and wants to cut scope significantly. The design lead disagrees and says the full scope is essential. Write your response to both in a group thread.', minutes:15, charLimit:1500 },
   { id:'bh-2', type:'stakeholder-conflict', dimension:'Behavioural', phase:3, title:'Priority Defense: {company}', prompt:'Your VP asks why you deprioritized a feature that a key customer requested. You believe the data shows it would only benefit 2% of users. Write your 5-sentence response defending your decision while keeping the relationship strong.', minutes:15, charLimit:1500 },
+
+  // Phase 4: Interview Ready — Networking & Portfolio
+  { id:'nw-1', type:'networking', dimension:'Behavioural', phase:4, title:'Cold Outreach: PM at {company}', prompt:'Write a personalized LinkedIn connection request to a PM at {company}. Research what {company} is working on. Your message should: (1) reference something specific about their work, (2) show genuine product curiosity, (3) include a clear ask that\'s easy to say yes to. Keep it under 300 characters — that\'s the LinkedIn limit.', minutes:10, charLimit:500 },
+  { id:'nw-2', type:'networking', dimension:'Behavioural', phase:4, title:'Referral Strategy: Map Your Network', prompt:'Identify 3 real people in your network (current colleagues, alumni, LinkedIn connections) who could connect you to PM teams. For each person: (1) who they are and how you know them, (2) what you\'d specifically ask, (3) why they\'d be willing to help. Be specific — names or roles, not "a friend at a startup."', minutes:15, charLimit:1500 },
+  { id:'nw-3', type:'networking', dimension:'Product Sense', phase:4, title:'Coffee Chat Prep: {company} PM', prompt:'You landed a 20-minute coffee chat with a PM at {company}. Write 5 questions that demonstrate product thinking — not generic career advice questions like "how did you get into PM?" Your questions should show you\'ve researched the company, understand their product challenges, and can think at the PM level.', minutes:10, charLimit:1500 },
+  { id:'pf-1', type:'portfolio', dimension:'Product Sense', phase:4, title:'Portfolio: Feature Redesign Case Study', prompt:'Write a 1-page case study of a feature you\'d redesign at {company}. Structure: (1) The Problem — what users struggle with today, (2) Your Hypothesis — why it happens, (3) Proposed Solution — what you\'d change and why, (4) Success Metrics — how you\'d measure if it worked. This should be portfolio-ready — specific, structured, and evidence-based.', minutes:25, charLimit:2000 },
+  { id:'pf-2', type:'portfolio', dimension:'Business Framing', phase:4, title:'Portfolio: Side Project Product Brief', prompt:'Draft a product brief for a side project that demonstrates PM skills. Include: (1) Problem — who has this problem and how painful is it, (2) Target User — be specific, (3) MVP Scope — what\'s in v1 and what\'s explicitly NOT, (4) 3 Success Metrics, (5) Why this project — what PM skill does building this prove? This brief should convince a hiring manager you think like a PM.', minutes:20, charLimit:2000 },
+  { id:'pf-3', type:'portfolio', dimension:'Behavioural', phase:4, title:'Portfolio: Impact Narrative', prompt:'Write a 5-sentence narrative from your current or most recent role, framed as PM-style impact: (1) Context — what was the situation, (2) Your Role — what did you specifically do, (3) The Metric — what moved, (4) The Result — quantify the outcome, (5) The Insight — what you learned that applies to PM. This is your interview story — make every sentence count.', minutes:15, charLimit:1500 },
 ];
 
 function initTaskProgress() {
@@ -3068,7 +3076,7 @@ function renderTaskList() {
   var doneCount = (userData.taskProgress.completedTasks || []).length;
   var interviewCard = document.createElement('div');
   interviewCard.className = 'card';
-  var isReady = doneCount >= 8;
+  var isReady = doneCount >= 12;
   if (isReady) {
     interviewCard.style.cssText = 'padding:24px;border:1px solid rgba(129,140,248,0.35);background:linear-gradient(160deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06))';
     interviewCard.innerHTML =
@@ -3092,7 +3100,7 @@ function renderTaskList() {
         '</div>' +
         '<div>' +
           '<div style="font-size:16px;font-weight:700;color:var(--muted)">Mock Interview with Riva</div>' +
-          '<div style="font-size:12px;color:var(--faint)">Unlocks after ' + (8 - doneCount) + ' more task' + (8 - doneCount === 1 ? '' : 's') + '</div>' +
+          '<div style="font-size:12px;color:var(--faint)">Unlocks after ' + (12 - doneCount) + ' more task' + (12 - doneCount === 1 ? '' : 's') + '</div>' +
         '</div>' +
       '</div>' +
       '<p style="font-size:13px;color:var(--faint);line-height:1.6">Complete more tasks to build your signal. Riva will be ready when you are.</p>';
@@ -3127,7 +3135,8 @@ function renderPathProgress() {
   var phases = [
     { num:1, title:'Product Sense + Business Framing', color:'var(--accent)', badge:'badge-accent', weeks:'Weeks 1–2' },
     { num:2, title:'Analytical Depth + Business Case', color:'var(--rose)', badge:'badge-rose', weeks:'Weeks 3–4' },
-    { num:3, title:'AI Fluency + Technical + Behavioural', color:'var(--violet)', badge:'', weeks:'Weeks 5–6' }
+    { num:3, title:'AI Fluency + Technical + Behavioural', color:'var(--violet)', badge:'', weeks:'Weeks 5–6' },
+    { num:4, title:'Networking + Portfolio', color:'var(--emerald)', badge:'badge-emerald', weeks:'Interview Ready' }
   ];
 
   phases.forEach(function(phase) {

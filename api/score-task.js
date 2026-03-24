@@ -50,7 +50,19 @@ export default async function handler(req, res) {
 80-100: Acknowledges the other perspective, provides data-backed reasoning, proposes a resolution path, and maintains relationship. PM-level influence without authority.
 60-79: Good reasoning but either dismisses the other perspective or agrees too easily without defending their position.
 40-59: Defends their position but doesn't acknowledge the other side. Comes across as confrontational or passive.
-0-39: No conflict resolution skill shown. Either caves immediately or escalates unnecessarily.`
+0-39: No conflict resolution skill shown. Either caves immediately or escalates unnecessarily.`,
+
+    'networking': `Score this networking/outreach piece:
+80-100: Personalized to the specific person and company, references real product work or challenges, shows genuine product curiosity, has a clear and easy-to-accept ask. Would actually get a response.
+60-79: Good structure and intent but either too generic or the ask is unclear. Shows effort but not enough specificity.
+40-59: Template-sounding. Could be sent to anyone at any company. No evidence of research or genuine interest.
+0-39: Unprofessional, overly self-focused, or completely generic. No one would respond to this.`,
+
+    'portfolio': `Score this portfolio piece:
+80-100: Clear problem framing grounded in user evidence, structured reasoning, specific metrics, and polished narrative. Demonstrates PM thinking — not just description of what happened.
+60-79: Good structure but missing one of: clear metrics, user grounding, specific evidence, or actionable insight.
+40-59: Describes what happened but doesn't frame it as PM impact. Tells instead of shows. No measurable outcomes.
+0-39: Too vague to demonstrate PM skills. No metrics, no structure, no evidence of analytical thinking.`
   };
 
   const rubric = rubrics[taskType] || rubrics['product-teardown'];
