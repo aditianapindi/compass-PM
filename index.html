@@ -2272,7 +2272,13 @@ function showScreen(id) {
   if (cur === nxt) return;
   // Always cancel pending transitions first to prevent timer conflicts
   if (_showScreenTimer) { clearTimeout(_showScreenTimer); _showScreenTimer = null; }
-  if (!cur) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return; }
+  if (!cur) {
+    // Hide all screens (e.g. s-landing made visible by DOMContentLoaded without .active class)
+    document.querySelectorAll('.screen').forEach(function(s) {
+      if (s !== nxt) { s.style.display = 'none'; s.style.opacity = '0'; }
+    });
+    nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return;
+  }
   console.log('[Compass] showScreen:', cur.id, '→', id);
   // Immediately clean up ALL active screens
   document.querySelectorAll('.screen.active').forEach(function(s) {
@@ -3855,7 +3861,7 @@ function northAutoPopup(screenId, message, delay) {
     googleBtn.addEventListener('click', function () {
       sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href }
+        options: { redirectTo: window.location.origin + window.location.pathname }
       });
     });
   }
