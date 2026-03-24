@@ -685,7 +685,7 @@
         <div style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
         </div>
-        Comparing against 40+ company hiring rubrics…
+        Comparing against company hiring rubrics…
       </div>
       <div id="load-3" class="check-appear" style="display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)">
         <div style="width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -694,6 +694,8 @@
         Calculating your PM fit score…
       </div>
     </div>
+    <p id="loading-quote" style="margin-top:48px;font-size:15px;color:var(--muted);font-style:italic;max-width:400px;line-height:1.6"></p>
+    <p id="loading-quote-author" style="font-size:13px;color:var(--faint);margin-top:6px"></p>
   </div>
 </div>
 
@@ -2033,6 +2035,10 @@ const PM_PARSING_QUOTES = [
   { text: "Product sense isn't innate — it's pattern-matched from hundreds of teardowns.", author: "Jackie Bavaro" },
   { text: "The gap between 'I want to be a PM' and 'I am ready' is 12–18 months of low-feedback cycles. Until now.", author: "Compass" },
   { text: "14,000+ AI PM roles are open globally. The market is creating a new category — and you're early.", author: "LinkedIn Data, 2025" },
+  { text: "Fall in love with the problem, not the solution.", author: "Uri Levine, co-founder of Waze" },
+  { text: "The hard part isn't getting a seat at the table — it's knowing what to say when you're there.", author: "Lenny Rachitsky" },
+  { text: "Every great product you use was once a terrible first version someone had the courage to ship.", author: "Reid Hoffman" },
+  { text: "Execution is a daily practice, not a quarterly plan.", author: "Marty Cagan" },
 ];
 var _parsingQuoteTimer = null;
 
@@ -2444,6 +2450,12 @@ function submitSkills() {
 
 function startLoading() {
   personalize();
+  // Pick a random quote for the loading screen
+  var q = PM_PARSING_QUOTES[Math.floor(Math.random() * PM_PARSING_QUOTES.length)];
+  var qEl = document.getElementById('loading-quote');
+  var aEl = document.getElementById('loading-quote-author');
+  if (qEl) qEl.textContent = '"' + q.text + '"';
+  if (aEl) aEl.textContent = '— ' + q.author;
   showScreen('s-loading');
   const items = ['load-1','load-2','load-3'];
   const delays = [900, 2200, 3600];
