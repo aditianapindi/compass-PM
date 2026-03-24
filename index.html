@@ -108,7 +108,7 @@
 <!-- ============================================================ -->
 <!-- SCREEN: LANDING                                               -->
 <!-- ============================================================ -->
-<div id="s-landing" class="screen active dot-grid">
+<div id="s-landing" class="screen dot-grid">
   <nav class="navbar">
     <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -3742,6 +3742,33 @@ function northAutoPopup(screenId, message, delay) {
   try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { console.warn('Supabase init failed', e); }
   if (!sb) return;
   _sb = sb; // expose globally for saveProfile/loadProfile
+
+  // Check for existing session BEFORE showing any screen (prevents landing flash)
+  sb.auth.getSession().then(async function(result) {
+    var session = result.data && result.data.session;
+    if (session) {
+      try {
+        var user = session.user;
+        userData.name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email;
+        userData.profileConnected = true;
+        applyName();
+        var profile = await loadProfile();
+        if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
+        if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+          if (userData.resumeData) updateProfileFromResume(userData.resumeData);
+          if (userData.q1) personalize();
+          showScreen(getReturningScreen(profile));
+        } else {
+          showScreen('s-connect');
+        }
+      } catch (e) {
+        console.error('[Compass] Init session error:', e);
+        showScreen('s-landing');
+      }
+    } else {
+      showScreen('s-landing');
+    }
+  }).catch(function() { showScreen('s-landing'); });
 
   // After Google redirects back, pick up the session
   sb.auth.onAuthStateChange(async function (event, session) {
