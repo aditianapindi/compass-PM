@@ -697,13 +697,13 @@
     </nav>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px">
       <div style="max-width:640px;width:100%">
-        <span class="badge badge-accent" style="margin-bottom:20px">Step 1 of your path</span>
-        <h1 style="font-size:30px;font-weight:800;margin-bottom:14px;letter-spacing:-0.6px">Before you see your path,<br/>one step.</h1>
-        <p style="font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:28px">This isn't gatekeeping. A path built from how you actually think is more accurate than one based on your stated background alone. This 10-minute task tells Compass whether your instinct is to diagnose or to build.</p>
+        <span id="gate-step-badge" class="badge badge-accent" style="margin-bottom:20px">Step 1 of your path</span>
+        <h1 id="gate-heading" style="font-size:30px;font-weight:800;margin-bottom:14px;letter-spacing:-0.6px">Before you see your path,<br/>one step.</h1>
+        <p id="gate-subtext" style="font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:28px">This isn't gatekeeping. A path built from how you actually think is more accurate than one based on your stated background alone. This 10-minute task tells Compass whether your instinct is to diagnose or to build.</p>
 
         <div class="card" style="padding:24px;border-left:3px solid var(--accent);margin-bottom:24px">
-          <p style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Your First Task</p>
-          <p style="font-size:15px;color:var(--text);line-height:1.7">Open any app you used in the last 24 hours. Pick one feature. In 5 sentences:<br/><br/>
+          <p id="gate-task-label" style="font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Your First Task</p>
+          <p id="gate-task-prompt" style="font-size:15px;color:var(--text);line-height:1.7">Open any app you used in the last 24 hours. Pick one feature. In 5 sentences:<br/><br/>
           <span style="color:var(--accent)">→</span> Who is this feature for?<br/>
           <span style="color:var(--accent)">→</span> What problem does it solve?<br/>
           <span style="color:var(--accent)">→</span> How would you know if it's working?<br/>
@@ -712,12 +712,12 @@
 
         <textarea id="gate-input" class="textarea-dark" rows="8" maxlength="1500" placeholder="Start with the app name and the feature… e.g. 'I'm looking at Swiggy's reorder feature. It's designed for…'" oninput="validateGate()"></textarea>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;margin-bottom:24px">
-          <p style="font-size:12px;color:var(--faint)">This becomes the first entry in your proof-of-work portfolio.</p>
+          <p id="gate-helper-text" style="font-size:12px;color:var(--faint)">This becomes the first entry in your proof-of-work portfolio.</p>
           <p id="gate-counter" style="font-size:12px;color:var(--faint)">1500 characters remaining</p>
         </div>
 
         <div style="text-align:center">
-          <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="submitGate()">Submit and See My Path →</button>
+          <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="handleGateSubmit()">Submit and See My Path →</button>
         </div>
 
         <!-- Gate feedback — revealed after scoring -->
@@ -728,8 +728,18 @@
                 <span id="gate-score-number" style="font-size:24px;font-weight:800;color:var(--accent)">—</span>
               </div>
               <div>
-                <p style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:5px">PM Thinking Score</p>
+                <p id="gate-score-label" style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:5px">PM Thinking Score</p>
                 <p id="gate-headline" style="font-size:15px;font-weight:700;line-height:1.4;color:var(--text)"></p>
+              </div>
+            </div>
+            <!-- Dimension impact (daily tasks only) -->
+            <div id="gate-dim-impact" style="display:none;margin-bottom:16px;background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:10px;padding:12px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span id="gate-dim-name" style="font-size:13px;color:var(--text);font-weight:600"></span>
+                <span id="gate-dim-delta" style="font-size:14px;font-weight:800;color:var(--emerald)"></span>
+              </div>
+              <div style="height:4px;background:var(--surface);border-radius:2px;margin-top:8px;overflow:hidden">
+                <div id="gate-dim-bar" style="height:100%;background:var(--accent);border-radius:2px;transition:width 1s ease"></div>
               </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:22px">
@@ -742,7 +752,7 @@
                 <p id="gate-gap" style="font-size:13px;color:var(--text);line-height:1.65"></p>
               </div>
             </div>
-            <button class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="showScreen('s-readiness')">See My Full Readiness Score →</button>
+            <button id="gate-cta" class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="showScreen('s-readiness')">See My Full Readiness Score →</button>
           </div>
         </div>
 
@@ -995,59 +1005,30 @@
   </nav>
 
   <div style="max-width:720px;margin:0 auto;padding:52px 24px 80px">
-    <h1 style="font-size:32px;font-weight:800;margin-bottom:8px;letter-spacing:-0.8px">Your Route to 75.</h1>
-    <p id="path-subtitle" style="color:var(--muted);font-size:15px;margin-bottom:36px">Calibrated to Growth PM roles at fintech companies. Not a generic 12-week plan.</p>
-
-    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px">
-      <!-- Phase 1 -->
-      <div class="card" style="padding:28px;border-left:3px solid var(--accent)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span class="badge badge-accent">Phase 1 · Weeks 1–2</span>
-          <span style="font-size:12px;color:var(--accent);font-weight:600">Product Sense: 58 → 68</span>
-        </div>
-        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">User Empathy Foundation</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Observe 3 user flows in any Razorpay product. Write what the user is actually trying to accomplish — not what the feature does.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Rewrite 2 feature announcements from a user problem perspective. Submit for Compass scoring.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">First scored case question: <em>"How would you improve Razorpay's merchant onboarding?"</em></p></div>
-        </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h1 style="font-size:32px;font-weight:800;letter-spacing:-0.8px">Your Route to 75.</h1>
+      <div style="text-align:right">
+        <span id="path-overall-score" class="syne" style="font-size:28px;font-weight:800;color:var(--accent)">56</span>
+        <span style="font-size:14px;color:var(--faint)"> / 75</span>
       </div>
+    </div>
+    <p id="path-subtitle" style="color:var(--muted);font-size:15px;margin-bottom:12px">Calibrated to Growth PM roles at fintech companies. Not a generic 12-week plan.</p>
 
-      <!-- Phase 2 -->
-      <div class="card" style="padding:28px;border-left:3px solid var(--rose)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span class="badge badge-rose">Phase 2 · Weeks 3–4</span>
-          <span style="font-size:12px;color:var(--rose);font-weight:600">Analytical Depth: 44 → 60</span>
-        </div>
-        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">Analytical Depth</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Apply the North Star metric framework to Meesho. 200 words. Scored against Meesho's actual growth priorities.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Diagnose a metric drop. Compass gives you a real case from a fintech company.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Build a mock metrics dashboard for a growth feature. Explain your choices in plain language.</p></div>
-        </div>
-      </div>
+    <!-- Overall progress bar -->
+    <div style="height:6px;background:var(--elevated);border-radius:3px;margin-bottom:36px;overflow:hidden">
+      <div id="path-progress-bar" style="height:100%;background:linear-gradient(90deg,#6366F1,#8B5CF6);border-radius:3px;transition:width 1s ease;width:0%"></div>
+    </div>
 
-      <!-- Phase 3 -->
-      <div class="card" style="padding:28px;border-left:3px solid var(--violet)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span class="badge" style="background:rgba(167,139,250,0.12);color:var(--violet);border:1px solid rgba(167,139,250,0.25)">Phase 3 · Weeks 5–6</span>
-          <span style="font-size:12px;color:var(--violet);font-weight:600">AI Fluency: 37 → 55</span>
-        </div>
-        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">AI Fluency + Mock Interviews</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 1</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Design an AI-native feature for an Indian fintech product. Not an AI wrapper — a genuinely new capability.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 3</span><p style="font-size:14px;color:var(--muted);line-height:1.5">First full live mock interview. Scored across all 6 dimensions in real time.</p></div>
-          <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--faint);min-width:36px;padding-top:1px">Day 5</span><p style="font-size:14px;color:var(--muted);line-height:1.5">Second mock + Compass re-assessment. If you've crossed 75, you'll see your application list.</p></div>
-        </div>
-      </div>
+    <div id="path-phases-container" style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px">
+      <!-- Dynamically rendered by renderPathProgress() -->
     </div>
 
     <div class="card" style="padding:20px;border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.04);margin-bottom:32px">
-      <p style="font-size:14px;color:var(--text);line-height:1.65">After Week 6, Compass re-scores you. If you hit 75, you'll receive a specific list of companies to apply to — with names of PMs to reach out to for referrals.</p>
+      <p style="font-size:14px;color:var(--text);line-height:1.65">After completing all phases, Compass re-scores you. If you hit 75, you'll receive a specific list of companies to apply to — with names of PMs to reach out to for referrals.</p>
     </div>
 
     <div style="text-align:center">
-      <button class="btn-primary" style="font-size:15px;padding:14px 36px" onclick="showScreen('s-dashboard')">Start Day 1 →</button>
+      <button class="btn-primary" style="font-size:15px;padding:14px 36px" onclick="showScreen('s-dashboard')">Go to Dashboard →</button>
     </div>
   </div>
 </div>
@@ -1082,37 +1063,28 @@
           <p style="font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:16px">Your Streak</p>
           <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px">
             <span style="font-size:56px;font-weight:800;line-height:1">🔥</span>
-            <span class="syne" style="font-size:56px;font-weight:800;line-height:1">1</span>
-            <span style="font-size:14px;color:var(--muted);font-weight:500">day</span>
+            <span id="streak-count" class="syne" style="font-size:56px;font-weight:800;line-height:1">0</span>
+            <span style="font-size:14px;color:var(--muted);font-weight:500">days</span>
           </div>
           <p style="font-size:13px;color:var(--faint);margin-bottom:20px">Your streak tracks doing, not watching.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
-          <div style="height:32px;border-radius:8px;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">M</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">T</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">W</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">T</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">F</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">S</div>
-          <div style="height:32px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--faint)">S</div>
-        </div>
+        <div id="streak-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
       </div>
 
       <!-- Today's task card -->
       <div class="card" style="padding:28px;border-left:3px solid var(--accent);display:flex;flex-direction:column;justify-content:space-between">
         <div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <span class="badge badge-accent" style="font-size:11px">Phase 1 · Day 1</span>
-            <span style="font-size:12px;color:var(--faint)">~15 min</span>
+            <span id="dash-task-phase" class="badge badge-accent" style="font-size:11px">Phase 1 · Day 1</span>
+            <span id="dash-task-time" style="font-size:12px;color:var(--faint)">~15 min</span>
           </div>
-          <h4 style="font-size:17px;font-weight:700;margin-bottom:10px">User Empathy: Razorpay Observation</h4>
-          <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:18px">Observe 3 user flows in Razorpay's merchant dashboard. For each, write what the user is actually trying to accomplish — not what the feature does.</p>
+          <h4 id="dash-task-title" style="font-size:17px;font-weight:700;margin-bottom:10px">Loading task...</h4>
+          <p id="dash-task-desc" style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:18px"></p>
           <div style="display:flex;gap:8px;margin-bottom:20px">
-            <span style="font-size:11px;background:var(--elevated);color:var(--faint);padding:5px 10px;border-radius:6px;border:1px solid var(--border)">Medium</span>
-            <span style="font-size:11px;background:var(--elevated);color:var(--faint);padding:5px 10px;border-radius:6px;border:1px solid var(--border)">Product Sense +4</span>
+            <span id="dash-task-dim" style="font-size:11px;background:var(--elevated);color:var(--faint);padding:5px 10px;border-radius:6px;border:1px solid var(--border)"></span>
           </div>
         </div>
-        <button class="btn-primary" style="width:100%;font-size:13px;padding:12px" onclick="showScreen('s-gate')">Submit Response →</button>
+        <button class="btn-primary" style="width:100%;font-size:13px;padding:12px" onclick="startDailyTask()">Start Task →</button>
       </div>
     </div>
 
@@ -1634,6 +1606,121 @@
 <script>
 const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, name:null, firstName:null, profileConnected:false };
 
+// ── Daily Task System ─────────────────────────────────────────────────
+var currentTaskMode = 'gate'; // 'gate' for onboarding, 'daily' for path tasks
+
+const TASK_BANK = [
+  // Phase 1: Product Sense (weeks 1-2)
+  { id:'ps-1', type:'product-teardown', dimension:'Product Sense', phase:1, title:'User Empathy: {company} Observation', prompt:'Open {company}\'s app or website. Pick one feature. In 5 sentences: Who is this feature for? What problem does it solve? How would you know if it\'s working? What would you change — and why?', minutes:15, charLimit:1500 },
+  { id:'ps-2', type:'product-teardown', dimension:'Product Sense', phase:1, title:'Feature Rewrite: {company}', prompt:'Find a feature announcement from {company} (blog, changelog, or app update). Rewrite it from the user\'s perspective: What was the user struggling with before? How does this change their experience? What metric would prove it worked?', minutes:15, charLimit:1500 },
+  { id:'ps-3', type:'product-teardown', dimension:'Product Sense', phase:1, title:'Competitor Teardown: {company}', prompt:'{company}\'s biggest competitor just launched a new feature. Pick a real competitor. What user need does their feature serve? Does {company} need to respond — or is it a distraction? Justify in 5 sentences.', minutes:20, charLimit:1500 },
+  { id:'ps-4', type:'product-teardown', dimension:'Product Sense', phase:1, title:'User Journey Map: {company}', prompt:'Pick one core user flow in {company}\'s product. Map the journey: entry point → key steps → completion. Where does the user hesitate? Where might they drop off? What would you fix first and why?', minutes:20, charLimit:1500 },
+
+  // Phase 2: Analytical Depth (weeks 3-4)
+  { id:'ad-1', type:'metric-diagnosis', dimension:'Analytical Depth', phase:2, title:'Metric Drop: {company} Weekly Review', prompt:'{company}\'s daily active users dropped 12% this week. Walk through your diagnosis: What data would you look at first? What are the top 3 hypotheses? How would you prioritize investigating them?', minutes:15, charLimit:1500 },
+  { id:'ad-2', type:'metric-diagnosis', dimension:'Analytical Depth', phase:2, title:'North Star Metric: {company}', prompt:'Define the North Star metric for {company}. Why this metric and not another? Break it into 3 input metrics that the product team can directly influence. How would you set a quarterly target?', minutes:15, charLimit:1500 },
+  { id:'ad-3', type:'metric-diagnosis', dimension:'Analytical Depth', phase:2, title:'A/B Test Design: {company}', prompt:'{company} wants to test a new onboarding flow. Design the experiment: What is the hypothesis? What are the control and variant? What metric decides success? How long should it run and how many users do you need?', minutes:20, charLimit:1500 },
+  { id:'ad-4', type:'metric-diagnosis', dimension:'Analytical Depth', phase:2, title:'Funnel Analysis: {company}', prompt:'{company}\'s sign-up to first-purchase conversion is 8%. The industry benchmark is 15%. Break down the funnel into stages. Which stage likely has the biggest drop-off? What data would you pull to confirm? What would you try first?', minutes:20, charLimit:1500 },
+
+  // Phase 3: Business Framing
+  { id:'bf-1', type:'business-case', dimension:'Business Framing', phase:2, title:'Market Entry: {company}', prompt:'Should {company} expand into a new adjacent market? Pick a specific market. In 5 sentences: What is the opportunity size? Who are the existing players? What advantage does {company} have? What\'s the risk? Go or no-go?', minutes:15, charLimit:1500 },
+  { id:'bf-2', type:'business-case', dimension:'Business Framing', phase:2, title:'Pricing Strategy: {company}', prompt:'{company} is considering adding a premium tier. Design it: Who is the target customer? What features justify the premium? At what price point? How would you test willingness to pay before building?', minutes:20, charLimit:1500 },
+
+  // Phase 3: AI Fluency (weeks 5-6)
+  { id:'ai-1', type:'ai-feature-design', dimension:'AI Fluency', phase:3, title:'AI Feature Design: {company}', prompt:'Design an AI-native feature for {company}. Not an AI wrapper — a genuinely new capability that wasn\'t possible before. What data powers it? What happens when the AI is wrong? How does the user experience it?', minutes:20, charLimit:1500 },
+  { id:'ai-2', type:'ai-feature-design', dimension:'AI Fluency', phase:3, title:'AI Tradeoffs: {company}', prompt:'{company} wants to add AI-generated recommendations to their product. What are the tradeoffs between showing AI-generated content vs human-curated content? When would AI be worse? How would you measure if the AI version is better?', minutes:15, charLimit:1500 },
+
+  // Technical Credibility
+  { id:'tc-1', type:'technical-tradeoff', dimension:'Technical Credibility', phase:3, title:'Technical Tradeoff: {company}', prompt:'{company} needs to decide between building a feature in-house vs integrating a third-party API. Pick a specific feature. Explain the tradeoff: speed, cost, control, maintenance. What would you recommend and why?', minutes:15, charLimit:1500 },
+
+  // Behavioural
+  { id:'bh-1', type:'stakeholder-conflict', dimension:'Behavioural', phase:3, title:'Stakeholder Conflict: {company}', prompt:'You\'re a PM at {company}. Your engineering lead says the feature you prioritized will take 3x longer than estimated and wants to cut scope significantly. The design lead disagrees and says the full scope is essential. Write your response to both in a group thread.', minutes:15, charLimit:1500 },
+  { id:'bh-2', type:'stakeholder-conflict', dimension:'Behavioural', phase:3, title:'Priority Defense: {company}', prompt:'Your VP asks why you deprioritized a feature that a key customer requested. You believe the data shows it would only benefit 2% of users. Write your 5-sentence response defending your decision while keeping the relationship strong.', minutes:15, charLimit:1500 },
+];
+
+function initTaskProgress() {
+  if (!userData.taskProgress) {
+    userData.taskProgress = {
+      currentDay: 1,
+      streak: 0,
+      lastTaskDate: null,
+      completedTasks: [],
+      currentTask: null
+    };
+  }
+}
+
+function selectDailyTask() {
+  initTaskProgress();
+  const tp = userData.taskProgress;
+  const completedIds = tp.completedTasks.map(t => t.id);
+  const co = companyMap[userData.q4] || companyMap['Fintech and payments'];
+
+  // Get weakest dimensions
+  var dims = [];
+  if (userData.readinessScores && userData.readinessScores.dimensions) {
+    dims = userData.readinessScores.dimensions.slice().sort((a, b) => a.score - b.score);
+  }
+  var weakestNames = dims.length > 0
+    ? dims.slice(0, 3).map(d => d.name)
+    : ['Product Sense', 'Analytical Depth', 'AI Fluency'];
+
+  // Filter to tasks targeting weak dimensions, not yet completed
+  var available = TASK_BANK.filter(t => !completedIds.includes(t.id) && weakestNames.includes(t.dimension));
+  // If all weak-dimension tasks done, open to any remaining
+  if (available.length === 0) available = TASK_BANK.filter(t => !completedIds.includes(t.id));
+  // If ALL tasks done, restart from beginning
+  if (available.length === 0) available = TASK_BANK.slice();
+
+  // Sort by phase to keep progression natural
+  available.sort((a, b) => a.phase - b.phase);
+  var task = available[0];
+
+  // Resolve {company} placeholder
+  var resolved = Object.assign({}, task);
+  resolved.title = task.title.replace(/\{company\}/g, co.company);
+  resolved.prompt = task.prompt.replace(/\{company\}/g, co.company);
+
+  tp.currentTask = resolved;
+  return resolved;
+}
+
+function getCurrentDimScore(dimensionName) {
+  if (!userData.readinessScores || !userData.readinessScores.dimensions) return 50;
+  var dim = userData.readinessScores.dimensions.find(d => d.name === dimensionName);
+  return dim ? dim.score : 50;
+}
+
+function updateStreak() {
+  initTaskProgress();
+  var tp = userData.taskProgress;
+  var today = new Date().toISOString().split('T')[0];
+  if (!tp.lastTaskDate) { tp.streak = 1; }
+  else {
+    var last = new Date(tp.lastTaskDate);
+    var now = new Date(today);
+    var diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+    if (diff === 0) { /* same day, no change */ }
+    else if (diff === 1) { tp.streak = (tp.streak || 0) + 1; }
+    else { tp.streak = 1; }
+  }
+  tp.lastTaskDate = today;
+}
+
+function applyDimensionDelta(dimensionName, delta) {
+  if (!userData.readinessScores || !userData.readinessScores.dimensions) return;
+  var dim = userData.readinessScores.dimensions.find(d => d.name === dimensionName);
+  if (dim) {
+    dim.score = Math.min(100, dim.score + delta);
+    dim.status = dim.score >= 81 ? 'Strong' : dim.score >= 66 ? 'Solid' : dim.score >= 51 ? 'Developing' : 'Gap';
+  }
+  // Recalculate overall with weights
+  var weights = { 'Product Sense': 0.25, 'Analytical Depth': 0.20, 'Business Framing': 0.15, 'Technical Credibility': 0.15, 'AI Fluency': 0.10, 'Behavioural': 0.15 };
+  var total = 0;
+  userData.readinessScores.dimensions.forEach(d => { total += d.score * (weights[d.name] || 0.15); });
+  userData.readinessScores.overall = Math.round(total);
+}
+
 // ── Supabase persistence helpers ──────────────────────────────────────
 var _sb = null; // set after Supabase init
 
@@ -1647,6 +1734,7 @@ async function saveProfile() {
     resume_data: userData.resumeData || null,
     gate_score: userData.gateScore || null,
     readiness_scores: userData.readinessScores || null,
+    task_progress: userData.taskProgress || null,
     updated_at: new Date().toISOString()
   };
   await _sb.from('profiles').upsert(row, { onConflict: 'id' });
@@ -1666,6 +1754,7 @@ async function loadProfile() {
   if (data.resume_data) { userData.resumeData = data.resume_data; userData.profileConnected = true; }
   if (data.gate_score) userData.gateScore = data.gate_score;
   if (data.readiness_scores) userData.readinessScores = data.readiness_scores;
+  if (data.task_progress) userData.taskProgress = data.task_progress;
   return data;
 }
 
@@ -1964,7 +2053,9 @@ function showScreen(id) {
     if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
     // North auto-popup triggers
     if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
-    if (id === 's-dashboard') { fetchJobMatches(); fetchTrendSignals(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day 1. The streak starts now. Want me to walk you through today's task?`, 5000); }
+    if (id === 's-dashboard') { renderDashboardTask(); renderStreak(); fetchJobMatches(); fetchTrendSignals(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, day ${(userData.taskProgress && userData.taskProgress.currentDay) || 1}. Want me to walk you through today's task?`, 5000); }
+    if (id === 's-path') { renderPathProgress(); }
+    if (id === 's-gate' && currentTaskMode === 'gate') { resetGateToOnboarding(); }
     if (id === 's-jobs') { fetchJobListings(); }
   }, 180);
 }
@@ -2312,6 +2403,265 @@ function buildAndAnimateGaps() {
   });
 }
 
+
+function handleGateSubmit() {
+  if (currentTaskMode === 'daily') submitDailyTask();
+  else submitGate();
+}
+
+function startDailyTask() {
+  currentTaskMode = 'daily';
+  initTaskProgress();
+  var task = userData.taskProgress.currentTask || selectDailyTask();
+  populateGateScreen(task);
+  showScreen('s-gate');
+}
+
+function populateGateScreen(task) {
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  var setHTML = function(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; };
+  set('gate-step-badge', 'Phase ' + task.phase + ' · Day ' + (userData.taskProgress.currentDay || 1));
+  set('gate-heading', task.title);
+  set('gate-subtext', 'Complete this task to improve your ' + task.dimension + ' score. Your response will be scored by AI.');
+  set('gate-task-label', task.dimension + ' · ~' + task.minutes + ' min');
+  setHTML('gate-task-prompt', task.prompt);
+  set('gate-helper-text', 'This response gets scored and moves your ' + task.dimension + ' score.');
+  set('gate-btn', 'Submit Response →');
+  // Reset UI
+  var input = document.getElementById('gate-input');
+  if (input) { input.value = ''; input.maxLength = task.charLimit || 1500; }
+  var btn = document.getElementById('gate-btn');
+  if (btn) { btn.disabled = true; btn.style.display = ''; btn.style.opacity = '1'; btn.textContent = 'Submit Response →'; }
+  var fb = document.getElementById('gate-feedback');
+  if (fb) fb.style.display = 'none';
+  var impact = document.getElementById('gate-dim-impact');
+  if (impact) impact.style.display = 'none';
+  validateGate();
+}
+
+function resetGateToOnboarding() {
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  var setHTML = function(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; };
+  set('gate-step-badge', 'Step 1 of your path');
+  setHTML('gate-heading', 'Before you see your path,<br/>one step.');
+  set('gate-subtext', "This isn't gatekeeping. A path built from how you actually think is more accurate than one based on your stated background alone. This 10-minute task tells Compass whether your instinct is to diagnose or to build.");
+  set('gate-task-label', 'Your First Task');
+  setHTML('gate-task-prompt', 'Open any app you used in the last 24 hours. Pick one feature. In 5 sentences:<br/><br/><span style="color:var(--accent)">→</span> Who is this feature for?<br/><span style="color:var(--accent)">→</span> What problem does it solve?<br/><span style="color:var(--accent)">→</span> How would you know if it\'s working?<br/><span style="color:var(--accent)">→</span> What would you change — and why?');
+  set('gate-helper-text', 'This becomes the first entry in your proof-of-work portfolio.');
+  set('gate-btn', 'Submit and See My Path →');
+  var cta = document.getElementById('gate-cta');
+  if (cta) { cta.textContent = 'See My Full Readiness Score →'; cta.onclick = function() { showScreen('s-readiness'); }; }
+  var impact = document.getElementById('gate-dim-impact');
+  if (impact) impact.style.display = 'none';
+}
+
+async function submitDailyTask() {
+  var btn  = document.getElementById('gate-btn');
+  var text = (document.getElementById('gate-input').value || '').trim();
+  if (!text || text.length < 20) return;
+
+  var task = userData.taskProgress.currentTask;
+  if (!task) return;
+
+  btn.textContent = 'Scoring your thinking…';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  try {
+    var res = await fetch('/api/score-task', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: text,
+        taskType: task.type,
+        taskPrompt: task.prompt,
+        dimension: task.dimension,
+        background: userData.q1 || '',
+        targetCompany: userData.q4 || '',
+        currentDimScore: getCurrentDimScore(task.dimension)
+      })
+    });
+    var data = await res.json();
+    if (data.error || !data.score) { addNorthMessage('Scoring failed — try again.', 'bot'); btn.textContent = 'Submit Response →'; btn.disabled = false; btn.style.opacity = '1'; return; }
+
+    // Show feedback
+    showTaskFeedback(data, task);
+
+    // Record completion
+    initTaskProgress();
+    var tp = userData.taskProgress;
+    tp.completedTasks.push({ id: task.id, type: task.type, dimension: task.dimension, score: data.score, delta: data.dimensionImpact?.delta || 0, date: new Date().toISOString().split('T')[0] });
+    tp.currentDay = tp.completedTasks.length + 1;
+    updateStreak();
+
+    // Apply score improvement
+    if (data.dimensionImpact && data.dimensionImpact.delta > 0) {
+      applyDimensionDelta(task.dimension, data.dimensionImpact.delta);
+    }
+
+    // Select next task
+    selectDailyTask();
+    saveProfile();
+
+  } catch(e) {
+    btn.textContent = 'Submit Response →';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+function showTaskFeedback(data, task) {
+  var color = data.score >= 70 ? 'var(--emerald)' : data.score >= 50 ? 'var(--amber)' : 'var(--rose)';
+  var ring = document.getElementById('gate-score-ring');
+  var num = document.getElementById('gate-score-number');
+  if (ring) ring.style.borderColor = color;
+  if (num) { num.textContent = data.score; num.style.color = color; }
+
+  var scoreLabel = document.getElementById('gate-score-label');
+  if (scoreLabel) scoreLabel.textContent = task.dimension + ' Score';
+
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || ''; };
+  set('gate-headline', data.headline);
+  set('gate-strength', data.strength);
+  set('gate-gap', data.gap);
+
+  // Show dimension impact
+  var impact = document.getElementById('gate-dim-impact');
+  if (impact && data.dimensionImpact && data.dimensionImpact.delta > 0) {
+    impact.style.display = 'block';
+    set('gate-dim-name', data.dimensionImpact.name);
+    set('gate-dim-delta', '+' + data.dimensionImpact.delta + ' points');
+    var bar = document.getElementById('gate-dim-bar');
+    if (bar) setTimeout(function() { bar.style.width = Math.min(data.dimensionImpact.newEstimate, 100) + '%'; }, 100);
+  }
+
+  // Update CTA
+  var cta = document.getElementById('gate-cta');
+  if (cta) { cta.textContent = 'Back to Dashboard →'; cta.onclick = function() { currentTaskMode = 'gate'; showScreen('s-dashboard'); }; }
+
+  var feedback = document.getElementById('gate-feedback');
+  if (feedback) {
+    feedback.style.display = 'block';
+    feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  var btn = document.getElementById('gate-btn');
+  if (btn) btn.style.display = 'none';
+}
+
+function renderDashboardTask() {
+  initTaskProgress();
+  var task = userData.taskProgress.currentTask || selectDailyTask();
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  set('dash-task-phase', 'Phase ' + task.phase + ' · Day ' + (userData.taskProgress.currentDay || 1));
+  set('dash-task-time', '~' + task.minutes + ' min');
+  set('dash-task-title', task.title);
+  set('dash-task-desc', task.prompt.length > 160 ? task.prompt.substring(0, 157) + '…' : task.prompt);
+  set('dash-task-dim', task.dimension);
+}
+
+function renderStreak() {
+  initTaskProgress();
+  var tp = userData.taskProgress;
+  var el = document.getElementById('streak-count');
+  if (el) el.textContent = tp.streak || 0;
+
+  var grid = document.getElementById('streak-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  var days = ['M','T','W','T','F','S','S'];
+  var today = new Date().getDay(); // 0=Sun
+  var todayIdx = today === 0 ? 6 : today - 1; // convert to Mon=0
+
+  // Build set of completed dates
+  var completedDates = new Set((tp.completedTasks || []).map(function(t) { return t.date; }));
+  var todayStr = new Date().toISOString().split('T')[0];
+
+  days.forEach(function(d, i) {
+    var div = document.createElement('div');
+    div.style.cssText = 'height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700';
+    // Calculate date for this weekday
+    var dayOffset = i - todayIdx;
+    var date = new Date();
+    date.setDate(date.getDate() + dayOffset);
+    var dateStr = date.toISOString().split('T')[0];
+
+    if (completedDates.has(dateStr)) {
+      div.style.background = 'linear-gradient(135deg,#6366F1,#8B5CF6)';
+      div.style.color = '#fff';
+    } else if (i === todayIdx) {
+      div.style.background = 'var(--elevated)';
+      div.style.border = '1px solid var(--accent)';
+      div.style.color = 'var(--accent)';
+    } else {
+      div.style.background = 'var(--elevated)';
+      div.style.color = 'var(--faint)';
+    }
+    div.textContent = d;
+    grid.appendChild(div);
+  });
+}
+
+function renderPathProgress() {
+  var container = document.getElementById('path-phases-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  initTaskProgress();
+  var completedIds = new Set((userData.taskProgress.completedTasks || []).map(function(t) { return t.id; }));
+  var co = companyMap[userData.q4] || companyMap['Fintech and payments'];
+
+  var phases = [
+    { num:1, title:'Product Sense + Business Framing', color:'var(--accent)', badge:'badge-accent', weeks:'Weeks 1–2' },
+    { num:2, title:'Analytical Depth + Business Case', color:'var(--rose)', badge:'badge-rose', weeks:'Weeks 3–4' },
+    { num:3, title:'AI Fluency + Technical + Behavioural', color:'var(--violet)', badge:'', weeks:'Weeks 5–6' }
+  ];
+
+  phases.forEach(function(phase) {
+    var phaseTasks = TASK_BANK.filter(function(t) { return t.phase === phase.num; });
+    var completedInPhase = phaseTasks.filter(function(t) { return completedIds.has(t.id); }).length;
+    var pct = phaseTasks.length > 0 ? Math.round((completedInPhase / phaseTasks.length) * 100) : 0;
+
+    var badgeStyle = phase.num === 3 ? 'style="background:rgba(167,139,250,0.12);color:var(--violet);border:1px solid rgba(167,139,250,0.25)"' : '';
+    var badgeClass = phase.badge ? 'class="badge ' + phase.badge + '"' : 'class="badge"';
+
+    var tasksHtml = phaseTasks.map(function(t) {
+      var done = completedIds.has(t.id);
+      var completed = (userData.taskProgress.completedTasks || []).find(function(c) { return c.id === t.id; });
+      var title = t.title.replace(/\{company\}/g, co.company);
+      var icon = done
+        ? '<span style="color:var(--emerald);font-weight:700;min-width:24px">✓</span>'
+        : '<span style="color:var(--faint);min-width:24px">○</span>';
+      var scoreTag = done && completed
+        ? '<span style="font-size:11px;color:var(--emerald);margin-left:auto;white-space:nowrap">' + completed.score + '/100 · +' + (completed.delta || 0) + '</span>'
+        : '';
+      return '<div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">' + icon + '<span style="font-size:13px;color:' + (done ? 'var(--text)' : 'var(--muted)') + '">' + title + '</span>' + scoreTag + '</div>';
+    }).join('');
+
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = 'padding:28px;border-left:3px solid ' + phase.color;
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
+        '<span ' + badgeClass + ' ' + badgeStyle + '>' + 'Phase ' + phase.num + ' · ' + phase.weeks + '</span>' +
+        '<span style="font-size:12px;color:' + phase.color + ';font-weight:600">' + completedInPhase + '/' + phaseTasks.length + ' completed</span>' +
+      '</div>' +
+      '<h3 style="font-size:18px;font-weight:700;margin-bottom:8px">' + phase.title + '</h3>' +
+      '<div style="height:4px;background:var(--elevated);border-radius:2px;margin-bottom:16px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + phase.color + ';border-radius:2px;transition:width 0.8s ease"></div>' +
+      '</div>' +
+      '<div>' + tasksHtml + '</div>';
+    container.appendChild(card);
+  });
+
+  // Update overall progress
+  var totalCompleted = userData.taskProgress.completedTasks ? userData.taskProgress.completedTasks.length : 0;
+  var totalTasks = TASK_BANK.length;
+  var pctBar = document.getElementById('path-progress-bar');
+  if (pctBar) setTimeout(function() { pctBar.style.width = Math.round((totalCompleted / totalTasks) * 100) + '%'; }, 100);
+
+  var scoreEl = document.getElementById('path-overall-score');
+  if (scoreEl && userData.readinessScores) scoreEl.textContent = userData.readinessScores.overall || 56;
+}
 
 async function submitGate() {
   const btn  = document.getElementById('gate-btn');
