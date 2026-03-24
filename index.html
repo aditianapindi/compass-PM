@@ -71,7 +71,7 @@
   .verdict-score-dashes { animation: rotate-slow 12s linear infinite; transform-origin: 65px 65px; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .fade-up { animation: fadeUp 0.5s ease forwards; }
-  #parsing-quote { transition: opacity 0.3s ease; }
+  #parsing-quote, #parsing-quote-author { transition: opacity 0.5s ease; }
   .drag-zone { border: 1.5px dashed var(--border-bright); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.15s; }
   .drag-zone:hover, .drag-zone.dragging { border-color: var(--accent); background: rgba(129,140,248,0.05); }
   .connect-card { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
@@ -350,9 +350,11 @@
           <p style="font-size:12px;color:var(--faint);margin-top:4px;text-align:center">PDF, DOC, DOCX · up to 5MB</p>
         </div>
         <!-- Parsing motivation — shown during AI parsing -->
-        <div id="resume-parsing-motivation" style="display:none;text-align:center;padding:16px 0 4px">
-          <p id="parsing-quote" style="font-size:14px;color:var(--muted);font-style:italic;line-height:1.5;margin-bottom:6px"></p>
-          <p id="parsing-quote-author" style="font-size:12px;color:var(--faint)"></p>
+        <div id="resume-parsing-motivation" style="display:none;text-align:center;padding:20px 24px 8px">
+          <div style="max-width:420px;margin:0 auto">
+            <p id="parsing-quote" style="font-size:15px;color:var(--text);font-style:italic;line-height:1.6;margin-bottom:8px"></p>
+            <p id="parsing-quote-author" style="font-size:12px;color:var(--faint);font-weight:600"></p>
+          </div>
         </div>
       </div>
 
@@ -2035,12 +2037,14 @@ function startParsingQuotes() {
   _parsingQuoteTimer = setInterval(function() {
     idx = (idx + 1) % PM_PARSING_QUOTES.length;
     quoteEl.style.opacity = '0';
+    if (authorEl) authorEl.style.opacity = '0';
     setTimeout(function() {
       quoteEl.textContent = '"' + PM_PARSING_QUOTES[idx].text + '"';
       if (authorEl) authorEl.textContent = '— ' + PM_PARSING_QUOTES[idx].author;
       quoteEl.style.opacity = '1';
-    }, 300);
-  }, 3500);
+      if (authorEl) authorEl.style.opacity = '1';
+    }, 500);
+  }, 6000);
 }
 
 function stopParsingQuotes() {
@@ -2243,6 +2247,8 @@ function showScreen(id) {
   const cur = document.querySelector('.screen.active');
   const nxt = document.getElementById(id);
   if (!nxt || cur === nxt) return;
+  if (!cur) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return; }
+  console.log('[Compass] showScreen:', cur.id, '→', id);
   cur.style.opacity = '0';
   setTimeout(() => {
     cur.classList.remove('active');
@@ -3652,6 +3658,7 @@ function northAutoPopup(screenId, message, delay) {
 
   // After Google redirects back, pick up the session
   sb.auth.onAuthStateChange(async function (event, session) {
+    console.log('[Compass] Auth event:', event, session ? 'session exists' : 'no session');
     if (!session) return;
     var user = session.user;
     var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
@@ -3661,6 +3668,7 @@ function northAutoPopup(screenId, message, delay) {
 
     // Load saved profile for returning users
     var current = document.querySelector('.screen.active');
+    console.log('[Compass] Current screen:', current ? current.id : 'none');
     var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
     if (!current || preAuthScreens.includes(current.id)) {
       var profile = await loadProfile();
