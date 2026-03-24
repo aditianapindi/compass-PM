@@ -3614,7 +3614,8 @@ function northAutoPopup(screenId, message, delay) {
 
     // Load saved profile for returning users
     var current = document.querySelector('.screen.active');
-    if (!current || current.id === 's-signin' || current.id === 's-landing') {
+    var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
+    if (!current || preAuthScreens.includes(current.id)) {
       var profile = await loadProfile();
       // Prefer resume name over auth email fallback
       if (userData.resumeData && userData.resumeData.name) {
@@ -3695,14 +3696,18 @@ function northAutoPopup(screenId, message, delay) {
         return;
       }
 
-      // If email confirmation is required, tell the user
+      // If no session (email confirmation required), try auto-sign-in
       if (!data.session) {
-        signupBtn.textContent = '✓ Check your email to confirm';
-        signupBtn.style.background = 'var(--emerald)';
-        return;
+        var { error: signInErr } = await sb.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          // Truly needs email confirmation — tell the user
+          signupBtn.textContent = '✓ Check your email to confirm';
+          signupBtn.style.background = 'var(--emerald)';
+          return;
+        }
+        // Auto-sign-in worked — proceed
       }
 
-      // Signed in immediately (email confirmation off) — proceed
       showScreen('s-connect');
     });
   }
