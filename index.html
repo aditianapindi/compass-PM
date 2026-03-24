@@ -434,7 +434,7 @@
 <div id="s-q1" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
-      <button onclick="showScreen('s-landing')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
+      <button onclick="_retakeMode ? cancelRetake() : showScreen('s-landing')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:4px">←</button>
       <div style="flex:1;max-width:240px;margin:0 auto"><div class="progress-bar-outer"><div class="progress-bar-inner" style="width:12.5%"></div></div></div>
       <span style="font-size:13px;color:var(--faint);min-width:40px;text-align:right">1 / 8</span>
     </div>
@@ -1552,7 +1552,10 @@
           <span class="badge badge-emerald">🔥 Day 1 Streak</span>
         </div>
       </div>
-      <button class="btn-secondary" onclick="openEditProfileModal()" style="font-size:13px;padding:9px 18px;white-space:nowrap;flex-shrink:0">Edit Profile</button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn-secondary" onclick="startRetakeAssessment()" style="font-size:13px;padding:9px 18px;white-space:nowrap">Retake Assessment</button>
+        <button class="btn-secondary" onclick="openEditProfileModal()" style="font-size:13px;padding:9px 18px;white-space:nowrap">Edit Profile</button>
+      </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="profile-grid">
@@ -1692,6 +1695,9 @@
 <!-- ============================================================ -->
 <script>
 const userData = { q1:null, q2:null, q3:null, q4:null, q5:null, q6:null, q7:null, q8:null, expSignals:{ hasBuiltProducts:false, hasManagedStakeholders:false, hasUsedDataForDecisions:false, hasAIExperience:false, hasSideProjects:false }, skills:[], name:null, firstName:null, profileConnected:false };
+
+// ── Retake Assessment Mode ────────────────────────────────────────────
+var _retakeMode = false; // true when user retakes assessment from profile
 
 // ── Daily Task System ─────────────────────────────────────────────────
 var currentTaskMode = 'gate'; // 'gate' for onboarding, 'daily' for path tasks
@@ -2260,7 +2266,47 @@ function selectOption(el, group) {
   const nextScreen = { q1:'s-q2', q2:'s-q3', q4:'s-q6', q6:'s-q7', q7:'s-q8', q8:null };
   const dest = nextScreen[group];
   if (dest) setTimeout(() => showScreen(dest), 350);
-  else if (group === 'q8') { saveProfile(); setTimeout(() => startLoading(), 350); }
+  else if (group === 'q8') {
+    saveProfile();
+    if (_retakeMode) {
+      _retakeMode = false;
+      setTimeout(() => finishRetakeAssessment(), 350);
+    } else {
+      setTimeout(() => startLoading(), 350);
+    }
+  }
+}
+
+function startRetakeAssessment() {
+  _retakeMode = true;
+  // Reset expSignals checkboxes visually
+  ['exp-built','exp-stakeholders','exp-data','exp-ai','exp-side'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.remove('selected'); var c = el.querySelector('div[id$="-check"]'); if (c) { c.style.background='transparent'; c.style.borderColor='var(--border-bright)'; c.innerHTML=''; } }
+  });
+  // Reset skills pills visually
+  document.querySelectorAll('#skills-grid .company-pill.selected').forEach(function(s) { s.classList.remove('selected'); });
+  showScreen('s-q1');
+}
+
+function cancelRetake() {
+  _retakeMode = false;
+  showScreen('s-profile');
+}
+
+async function finishRetakeAssessment() {
+  // Show readiness screen with a re-scoring indicator
+  showScreen('s-readiness');
+  try {
+    const scores = await fetchReadinessScores();
+    if (scores) {
+      animateRadar();
+      animateScoreRing();
+      updateProfileDimensions();
+    }
+  } catch (e) {
+    console.warn('Retake re-scoring failed:', e.message);
+  }
 }
 
 // ── Experience Signals toggle (Q3 screen) ──────────────────────────────────
