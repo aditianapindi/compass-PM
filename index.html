@@ -3803,19 +3803,14 @@ function northAutoPopup(screenId, message, delay) {
   if (!sb) return;
   _sb = sb; // expose globally for saveProfile/loadProfile
 
-  // Single auth handler — handles initial session check AND sign-in/sign-out events
-  var _authHandled = false;
+  // Auth handler — handles page load session check, sign-in/sign-out, and OAuth redirects
   sb.auth.onAuthStateChange(async function (event, session) {
     console.log('[Compass] Auth event:', event, session ? 'session exists' : 'no session');
     if (!session) {
-      _authHandled = false; // Reset so next sign-in is handled
       var cur = document.querySelector('.screen.active');
       if (!cur) showScreen('s-landing');
       return;
     }
-    // Prevent double navigation from INITIAL_SESSION + SIGNED_IN firing together
-    if (_authHandled) return;
-    _authHandled = true;
     try {
       var user = session.user;
       var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
@@ -3823,34 +3818,21 @@ function northAutoPopup(screenId, message, delay) {
       userData.profileConnected = true;
       applyName();
 
-      // Load saved profile — pass session directly to avoid getSession() race
       var current = document.querySelector('.screen.active');
-      console.log('[Compass] onAuthStateChange current screen:', current ? current.id : 'none');
       var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-connect', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
       if (!current || preAuthScreens.includes(current.id)) {
         var profile = await loadProfile(session);
-        console.log('[Compass] onAuthStateChange profile loaded:', profile ? 'has data' : 'empty');
-        // Prefer resume name over auth email fallback
-        if (userData.resumeData && userData.resumeData.name) {
-          userData.name = userData.resumeData.name;
-          applyName();
-        }
+        if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
         if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
-          // Returning user — restore UI state
           if (userData.resumeData) updateProfileFromResume(userData.resumeData);
           if (userData.q1) personalize();
-          var target = getReturningScreen(profile);
-          console.log('[Compass] onAuthStateChange navigating to:', target);
-          showScreen(target);
+          showScreen(getReturningScreen(profile));
         } else {
-          console.log('[Compass] onAuthStateChange navigating to: s-connect (new user)');
           showScreen('s-connect');
         }
       }
     } catch (e) {
       console.error('[Compass] onAuthStateChange error:', e);
-      _authHandled = false; // Reset so retry is possible
-      // Fallback: ensure user isn't stuck — navigate even if no screen is active
       var cur = document.querySelector('.screen.active');
       if (!cur || ['s-signin', 's-landing', 's-verdict', 's-connect'].includes(cur.id)) {
         showScreen('s-connect');
@@ -3934,14 +3916,8 @@ function northAutoPopup(screenId, message, delay) {
           }
         }
 
-        // Account created — navigate directly
+        // Account created — navigate immediately
         signupBtn.textContent = '✓ Account created';
-        _authHandled = true; // Prevent onAuthStateChange from double-navigating
-        var user = data.session ? data.session.user : (data.user || {});
-        var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
-        userData.name = authName || email;
-        userData.profileConnected = true;
-        applyName();
         showScreen('s-connect');
       } catch (e) {
         console.error('[Compass] Sign-up exception:', e);
@@ -3983,28 +3959,9 @@ function northAutoPopup(screenId, message, delay) {
           return;
         }
 
-        // Sign-in succeeded — navigate directly
+        // Sign-in succeeded — navigate immediately, onAuthStateChange will redirect returning users
         signupBtn.textContent = '✓ Signed in';
-        _authHandled = true; // Prevent onAuthStateChange from double-navigating
-        var user = result.data.session ? result.data.session.user : {};
-        var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
-        userData.name = authName || email;
-        userData.profileConnected = true;
-        applyName();
-        try {
-          var profile = await loadProfile(result.data.session);
-          if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
-          if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
-            if (userData.resumeData) updateProfileFromResume(userData.resumeData);
-            if (userData.q1) personalize();
-            showScreen(getReturningScreen(profile));
-          } else {
-            showScreen('s-connect');
-          }
-        } catch (loadErr) {
-          console.error('[Compass] Sign-in profile load failed:', loadErr);
-          showScreen('s-connect');
-        }
+        showScreen('s-connect');
       } catch (e) {
         console.error('[Compass] Sign-in exception:', e);
         errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
