@@ -71,7 +71,7 @@
   .verdict-score-dashes { animation: rotate-slow 12s linear infinite; transform-origin: 65px 65px; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .fade-up { animation: fadeUp 0.5s ease forwards; }
-  #parsing-quote, #parsing-quote-author { transition: opacity 0.5s ease; }
+  #parsing-quote, #parsing-quote-author, #gate-scoring-quote, #gate-scoring-author { transition: opacity 0.5s ease; }
   .drag-zone { border: 1.5px dashed var(--border-bright); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.15s; }
   .drag-zone:hover, .drag-zone.dragging { border-color: var(--accent); background: rgba(129,140,248,0.05); }
   .connect-card { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
@@ -814,6 +814,14 @@
 
         <div style="text-align:center">
           <button id="gate-btn" class="btn-primary" style="font-size:15px;padding:14px 36px" disabled onclick="handleGateSubmit()">Submit and See My Path →</button>
+        </div>
+
+        <!-- Scoring motivation — shown while AI scores -->
+        <div id="gate-scoring-motivation" style="display:none;text-align:center;padding:24px 0 8px">
+          <div style="max-width:420px;margin:0 auto">
+            <p id="gate-scoring-quote" style="font-size:15px;color:var(--text);font-style:italic;line-height:1.6;margin-bottom:8px"></p>
+            <p id="gate-scoring-author" style="font-size:12px;color:var(--faint);font-weight:600"></p>
+          </div>
         </div>
 
         <!-- Gate feedback — revealed after scoring -->
@@ -2053,6 +2061,39 @@ function stopParsingQuotes() {
   if (motiv) motiv.style.display = 'none';
 }
 
+// Gate/task scoring quotes — reuses PM_PARSING_QUOTES
+var _scoringQuoteTimer = null;
+
+function startScoringQuotes() {
+  var motiv = document.getElementById('gate-scoring-motivation');
+  var quoteEl = document.getElementById('gate-scoring-quote');
+  var authorEl = document.getElementById('gate-scoring-author');
+  if (!motiv || !quoteEl) return;
+  motiv.style.display = 'block';
+  var idx = Math.floor(Math.random() * PM_PARSING_QUOTES.length);
+  quoteEl.textContent = '"' + PM_PARSING_QUOTES[idx].text + '"';
+  if (authorEl) authorEl.textContent = '— ' + PM_PARSING_QUOTES[idx].author;
+  quoteEl.style.opacity = '1';
+  if (authorEl) authorEl.style.opacity = '1';
+  _scoringQuoteTimer = setInterval(function() {
+    idx = (idx + 1) % PM_PARSING_QUOTES.length;
+    quoteEl.style.opacity = '0';
+    if (authorEl) authorEl.style.opacity = '0';
+    setTimeout(function() {
+      quoteEl.textContent = '"' + PM_PARSING_QUOTES[idx].text + '"';
+      if (authorEl) authorEl.textContent = '— ' + PM_PARSING_QUOTES[idx].author;
+      quoteEl.style.opacity = '1';
+      if (authorEl) authorEl.style.opacity = '1';
+    }, 500);
+  }, 6000);
+}
+
+function stopScoringQuotes() {
+  if (_scoringQuoteTimer) { clearInterval(_scoringQuoteTimer); _scoringQuoteTimer = null; }
+  var motiv = document.getElementById('gate-scoring-motivation');
+  if (motiv) motiv.style.display = 'none';
+}
+
 async function processResumeFile(file) {
   const zone  = document.getElementById('drop-zone');
   const label = document.getElementById('drop-label');
@@ -2781,6 +2822,7 @@ async function submitDailyTask() {
   btn.textContent = 'Scoring your thinking…';
   btn.disabled = true;
   btn.style.opacity = '0.7';
+  startScoringQuotes();
 
   try {
     var res = await fetch('/api/score-task', {
@@ -2797,6 +2839,7 @@ async function submitDailyTask() {
       })
     });
     var data = await res.json();
+    stopScoringQuotes();
     if (data.error || !data.score) { addNorthMessage('Scoring failed — try again.', 'bot'); btn.textContent = 'Submit Response →'; btn.disabled = false; btn.style.opacity = '1'; return; }
 
     // Show feedback
@@ -2821,6 +2864,7 @@ async function submitDailyTask() {
     saveProfile();
 
   } catch(e) {
+    stopScoringQuotes();
     btn.textContent = 'Submit Response →';
     btn.disabled = false;
     btn.style.opacity = '1';
@@ -3066,6 +3110,7 @@ async function submitGate() {
   btn.textContent = 'Scoring your thinking…';
   btn.disabled = true;
   btn.style.opacity = '0.7';
+  startScoringQuotes();
 
   try {
     const res  = await fetch('/api/score-gate', {
@@ -3075,6 +3120,7 @@ async function submitGate() {
     });
     const data = await res.json();
 
+    stopScoringQuotes();
     if (data.error || !data.score) { showScreen('s-readiness'); return; }
 
     userData.gateScore = data;
@@ -3100,6 +3146,7 @@ async function submitGate() {
     btn.style.display = 'none';
 
   } catch (e) {
+    stopScoringQuotes();
     btn.textContent = 'Submit Response →';
     btn.disabled = false;
     btn.style.opacity = '1';
