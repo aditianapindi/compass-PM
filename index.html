@@ -95,6 +95,18 @@
   @keyframes ringExpand { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.6); opacity:0; } }
   .riva-ring { animation: ringExpand 2s ease-out infinite; }
   .riva-ring-2 { animation: ringExpand 2s ease-out 0.7s infinite; }
+  @keyframes waveBar { 0%,100% { height:4px; } 50% { height:var(--wave-h,18px); } }
+  .riva-wave-bar { width:3px; border-radius:2px; background:var(--accent); animation: waveBar var(--wave-d,0.6s) ease-in-out infinite; animation-play-state:paused; }
+  .riva-speaking .riva-wave-bar { animation-play-state:running; }
+  @keyframes subtleBreathe { 0%,100% { transform:scale(1); } 50% { transform:scale(1.012); } }
+  .riva-video-feed { animation: subtleBreathe 4s ease-in-out infinite; }
+  @keyframes glowPulse { 0%,100% { box-shadow:0 0 30px rgba(129,140,248,0.15); } 50% { box-shadow:0 0 50px rgba(129,140,248,0.35); } }
+  .riva-speaking .riva-video-frame { animation: glowPulse 1.2s ease-in-out infinite; }
+  @keyframes dotBlink { 0%,80%,100% { opacity:0; } 40% { opacity:1; } }
+  .riva-typing-dot { width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block; }
+  .riva-typing-dot:nth-child(1) { animation:dotBlink 1.4s infinite 0s; }
+  .riva-typing-dot:nth-child(2) { animation:dotBlink 1.4s infinite 0.2s; }
+  .riva-typing-dot:nth-child(3) { animation:dotBlink 1.4s infinite 0.4s; }
   .round-card { background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all 0.15s;text-align:left; }
   .round-card:hover { border-color:var(--accent);background:rgba(129,140,248,0.05); }
   .round-card.selected { border-color:var(--accent);background:rgba(129,140,248,0.1); }
@@ -1290,63 +1302,172 @@
 
     <div style="display:grid;grid-template-columns:360px 1fr;gap:28px;align-items:start" class="interview-grid">
 
-      <!-- LEFT: Riva avatar panel -->
+      <!-- LEFT: Riva video call panel -->
       <div>
-        <div class="card" style="padding:32px;text-align:center;background:linear-gradient(160deg,#0f0c24,#111827)">
+        <div id="riva-video-panel" class="card" style="padding:0;overflow:hidden;background:#070714;border-color:rgba(129,140,248,0.2)">
 
-          <!-- Avatar with breathing rings -->
-          <div style="position:relative;width:140px;height:140px;margin:0 auto 24px">
-            <!-- Outer ring 1 -->
-            <div class="riva-ring" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.35)"></div>
-            <!-- Outer ring 2 -->
-            <div class="riva-ring-2" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.2)"></div>
-            <!-- Avatar circle -->
-            <div style="width:140px;height:140px;border-radius:50%;background:linear-gradient(145deg,#312e81,#4c1d95);border:2px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
-              <!-- Abstract face: geometric illustration -->
-              <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <!-- Video feed area -->
+          <div style="position:relative;aspect-ratio:3/4;background:linear-gradient(170deg,#0c0a1f 0%,#0f0d24 40%,#12101f 100%);display:flex;align-items:center;justify-content:center;overflow:hidden">
+
+            <!-- Ambient background glow -->
+            <div style="position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,0.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+
+            <!-- Riva portrait — realistic SVG illustration -->
+            <div class="riva-video-feed riva-video-frame" style="position:relative;z-index:1;width:200px;height:240px;border-radius:16px;overflow:hidden">
+              <svg width="200" height="240" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background/shoulders -->
+                <rect width="200" height="240" fill="transparent"/>
+
+                <!-- Neck -->
+                <path d="M85 170 L85 195 Q85 200 90 202 L110 202 Q115 200 115 195 L115 170" fill="#C4956A"/>
+                <path d="M85 170 L85 195 Q85 200 90 202 L110 202 Q115 200 115 195 L115 170" fill="url(#neckShade)"/>
+
+                <!-- Shoulders/top -->
+                <path d="M40 240 Q42 210 70 202 L90 198 Q100 196 110 198 L130 202 Q158 210 160 240" fill="#1a1740"/>
+                <path d="M40 240 Q42 210 70 202 L90 198 Q100 196 110 198 L130 202 Q158 210 160 240" fill="url(#shirtGrad)"/>
+                <!-- Collar detail -->
+                <path d="M88 198 L96 212 L100 198" fill="#15132e" opacity="0.6"/>
+                <path d="M112 198 L104 212 L100 198" fill="#15132e" opacity="0.6"/>
+
                 <!-- Head shape -->
-                <ellipse cx="36" cy="34" rx="22" ry="24" fill="rgba(129,140,248,0.15)" stroke="rgba(129,140,248,0.5)" stroke-width="1.5"/>
+                <ellipse cx="100" cy="120" rx="56" ry="66" fill="#D4A574"/>
+                <ellipse cx="100" cy="120" rx="56" ry="66" fill="url(#skinGrad)"/>
+
+                <!-- Hair -->
+                <path d="M44 110 Q44 52 100 48 Q156 52 156 110 L156 90 Q156 50 120 42 Q100 38 80 42 Q44 50 44 90 Z" fill="#1a1118"/>
+                <path d="M44 110 Q44 52 100 48 Q156 52 156 110 L156 90 Q156 50 120 42 Q100 38 80 42 Q44 50 44 90 Z" fill="url(#hairGrad)"/>
+                <!-- Hair side strands -->
+                <path d="M44 100 Q38 120 42 150 Q44 140 46 130" fill="#1a1118"/>
+                <path d="M156 100 Q162 120 158 150 Q156 140 154 130" fill="#1a1118"/>
+                <!-- Hair shine -->
+                <path d="M70 55 Q85 48 110 50" stroke="rgba(255,255,255,0.06)" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+                <!-- Eyebrows -->
+                <path d="M72 100 Q80 95 92 98" stroke="#2a2020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                <path d="M108 98 Q120 95 128 100" stroke="#2a2020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
                 <!-- Eyes -->
-                <ellipse cx="28" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
-                <ellipse cx="44" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
-                <!-- Eye shine -->
-                <circle cx="29.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
-                <circle cx="45.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
-                <!-- Neutral line mouth — firm, professional -->
-                <path d="M29 42 Q36 45 43 42" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                <!-- Hair / top detail -->
-                <path d="M14 30 Q14 10 36 10 Q58 10 58 30" stroke="rgba(129,140,248,0.4)" stroke-width="1.5" fill="rgba(129,140,248,0.06)" stroke-linecap="round"/>
-                <!-- Collar / shoulders hint -->
-                <path d="M18 60 Q24 52 36 54 Q48 52 54 60" stroke="rgba(129,140,248,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <!-- Left eye -->
+                <ellipse cx="82" cy="112" rx="11" ry="8" fill="white"/>
+                <ellipse cx="82" cy="112" rx="11" ry="8" fill="url(#eyeWhite)" opacity="0.3"/>
+                <circle cx="83" cy="112" r="5.5" fill="#2C1810"/>
+                <circle cx="83" cy="112" r="3.2" fill="#0f0906"/>
+                <circle cx="85" cy="110" r="1.8" fill="white" opacity="0.85"/>
+                <circle cx="80" cy="114" r="0.8" fill="white" opacity="0.4"/>
+                <!-- Left eyelid line -->
+                <path d="M71 108 Q82 103 93 108" stroke="#8B6F5E" stroke-width="1" fill="none" opacity="0.5"/>
+                <!-- Left lower lash line -->
+                <path d="M73 116 Q82 120 91 116" stroke="#6B5548" stroke-width="0.7" fill="none" opacity="0.3"/>
+
+                <!-- Right eye -->
+                <ellipse cx="118" cy="112" rx="11" ry="8" fill="white"/>
+                <ellipse cx="118" cy="112" rx="11" ry="8" fill="url(#eyeWhite)" opacity="0.3"/>
+                <circle cx="117" cy="112" r="5.5" fill="#2C1810"/>
+                <circle cx="117" cy="112" r="3.2" fill="#0f0906"/>
+                <circle cx="119" cy="110" r="1.8" fill="white" opacity="0.85"/>
+                <circle cx="115" cy="114" r="0.8" fill="white" opacity="0.4"/>
+                <!-- Right eyelid line -->
+                <path d="M107 108 Q118 103 129 108" stroke="#8B6F5E" stroke-width="1" fill="none" opacity="0.5"/>
+                <!-- Right lower lash line -->
+                <path d="M109 116 Q118 120 127 116" stroke="#6B5548" stroke-width="0.7" fill="none" opacity="0.3"/>
+
+                <!-- Nose -->
+                <path d="M98 110 Q97 125 93 134" stroke="#B8926E" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
+                <path d="M93 134 Q96 137 100 137 Q104 137 107 134" stroke="#B8926E" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.4"/>
+                <!-- Nose highlight -->
+                <ellipse cx="100" cy="124" rx="3" ry="6" fill="white" opacity="0.06"/>
+
+                <!-- Lips -->
+                <path d="M86 148 Q93 143 100 145 Q107 143 114 148" fill="#C47A6A" opacity="0.9"/>
+                <path d="M86 148 Q93 152 100 153 Q107 152 114 148" fill="#B86B5C" opacity="0.85"/>
+                <!-- Lip line -->
+                <path d="M86 148 Q93 146 100 148 Q107 146 114 148" stroke="#A05A4C" stroke-width="0.8" fill="none" opacity="0.6"/>
+                <!-- Lip highlight -->
+                <ellipse cx="100" cy="146" rx="5" ry="1.5" fill="white" opacity="0.1"/>
+
+                <!-- Subtle cheek blush -->
+                <ellipse cx="68" cy="130" rx="12" ry="8" fill="#D4856A" opacity="0.12"/>
+                <ellipse cx="132" cy="130" rx="12" ry="8" fill="#D4856A" opacity="0.12"/>
+
+                <!-- Ear hints -->
+                <ellipse cx="45" cy="118" rx="5" ry="10" fill="#C4956A" opacity="0.6"/>
+                <ellipse cx="155" cy="118" rx="5" ry="10" fill="#C4956A" opacity="0.6"/>
+
+                <!-- Small earring -->
+                <circle cx="45" cy="128" r="2" fill="#818CF8" opacity="0.5"/>
+                <circle cx="155" cy="128" r="2" fill="#818CF8" opacity="0.5"/>
+
+                <!-- Gradients -->
+                <defs>
+                  <linearGradient id="skinGrad" x1="100" y1="54" x2="100" y2="186" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#DEAC7E" stop-opacity="0.3"/>
+                    <stop offset="1" stop-color="#B8865A" stop-opacity="0.2"/>
+                  </linearGradient>
+                  <linearGradient id="hairGrad" x1="100" y1="38" x2="100" y2="110" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#2a1f28" stop-opacity="0.8"/>
+                    <stop offset="1" stop-color="#0f0a0f" stop-opacity="0.6"/>
+                  </linearGradient>
+                  <radialGradient id="eyeWhite" cx="50%" cy="50%">
+                    <stop offset="0" stop-color="transparent"/>
+                    <stop offset="1" stop-color="#C4A882" stop-opacity="0.3"/>
+                  </radialGradient>
+                  <linearGradient id="neckShade" x1="100" y1="170" x2="100" y2="202" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#000" stop-opacity="0.15"/>
+                    <stop offset="1" stop-color="transparent"/>
+                  </linearGradient>
+                  <linearGradient id="shirtGrad" x1="100" y1="198" x2="100" y2="240" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#252050"/>
+                    <stop offset="1" stop-color="#1a1740"/>
+                  </linearGradient>
+                </defs>
               </svg>
             </div>
+
+            <!-- Name overlay (bottom of video feed) -->
+            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(7,7,20,0.95));padding:20px 20px 16px;z-index:2">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <h2 style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.03em;margin-bottom:2px">Riva</h2>
+                  <p style="font-size:11px;color:var(--muted)">AI Interview Partner</p>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <span class="badge badge-accent" style="font-size:10px">Ex-Razorpay PM</span>
+                  <span class="badge" style="background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);font-size:10px">200+ interviews</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Voice waveform overlay -->
+            <div id="riva-waveform" style="position:absolute;bottom:72px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:3px;z-index:2;height:24px;opacity:0;transition:opacity 0.3s">
+              <div class="riva-wave-bar" style="--wave-h:10px;--wave-d:0.5s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:18px;--wave-d:0.4s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:14px;--wave-d:0.55s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:22px;--wave-d:0.35s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:16px;--wave-d:0.45s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:20px;--wave-d:0.5s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:12px;--wave-d:0.6s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:18px;--wave-d:0.38s;height:4px"></div>
+              <div class="riva-wave-bar" style="--wave-h:14px;--wave-d:0.52s;height:4px"></div>
+            </div>
+
+            <!-- Status badge (top-right of video feed) -->
+            <div id="riva-status" style="position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(52,211,153,0.3);border-radius:99px;padding:5px 12px">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--emerald)"></div>
+              <span style="font-size:11px;font-weight:600;color:var(--emerald)">Online</span>
+            </div>
+
           </div>
 
-          <!-- Name & credentials -->
-          <h2 style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.03em;margin-bottom:4px">Riva</h2>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:6px">AI Interview Partner</p>
-          <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:20px">
-            <span class="badge badge-accent" style="font-size:11px">Ex-Razorpay PM</span>
-            <span class="badge" style="background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);font-size:11px">200+ interviews</span>
-          </div>
-
-          <!-- Status indicator -->
-          <div id="riva-status" style="display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:7px 16px;margin-bottom:24px">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--emerald)"></div>
-            <span style="font-size:13px;font-weight:600;color:var(--emerald)">Ready to interview you</span>
-          </div>
-
-          <!-- Riva intro quote -->
-          <div style="background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:14px 16px;text-align:left">
-            <p style="font-size:13px;color:var(--muted);line-height:1.65;font-style:italic">"I'm not here to make you feel good. I'm here to make you interview-ready. I'll probe your reasoning, push on your assumptions, and tell you exactly what a Razorpay PM interviewer would think of that answer."</p>
-            <p style="font-size:11px;color:var(--faint);margin-top:8px">— Riva</p>
+          <!-- Quote bar below video -->
+          <div style="padding:14px 16px;border-top:1px solid rgba(129,140,248,0.1);background:rgba(129,140,248,0.04)">
+            <p style="font-size:12px;color:var(--muted);line-height:1.55;font-style:italic">"I'm not here to make you feel good. I'm here to make you interview-ready."</p>
           </div>
         </div>
 
         <!-- Previous sessions -->
-        <div class="card" style="padding:20px;margin-top:16px">
-          <p style="font-size:13px;font-weight:700;margin-bottom:14px">Previous Sessions</p>
-          <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="card" style="padding:16px;margin-top:12px">
+          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Previous Sessions</p>
+          <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--elevated);border-radius:10px">
               <div>
                 <p style="font-size:13px;font-weight:600;margin-bottom:2px">Product Sense · Razorpay</p>
@@ -1464,33 +1585,44 @@
 
         <!-- Live session panel (hidden until started) -->
         <div id="riva-live" style="display:none">
-          <div class="card" style="padding:0;overflow:hidden;border-color:rgba(129,140,248,0.35)">
-            <!-- Session header -->
-            <div style="background:linear-gradient(135deg,#1a1035,#111827);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.2)">
+          <div class="card" style="padding:0;overflow:hidden;border-color:rgba(129,140,248,0.25);background:#070714">
+            <!-- Session header — video call style -->
+            <div style="background:linear-gradient(135deg,#0f0a1f,#0d0b18);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.15)">
               <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:10px;height:10px;border-radius:50%;background:var(--rose)" id="rec-dot"></div>
-                <span style="font-size:13px;font-weight:700;color:#FAFAFA">Live · Product Sense · Razorpay</span>
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--rose);animation:bubblePulse 1.5s ease-in-out infinite" id="rec-dot"></div>
+                <span style="font-size:12px;font-weight:600;color:var(--rose);letter-spacing:0.5px">REC</span>
+                <span style="font-size:12px;color:var(--faint)">·</span>
+                <span id="riva-timer" style="font-size:13px;color:var(--text);font-weight:600;font-family:'Syne',sans-serif">00:00</span>
               </div>
-              <div style="display:flex;align-items:center;gap:12px">
-                <span id="riva-timer" style="font-size:13px;color:var(--amber);font-weight:600;font-family:'Syne',sans-serif">00:00</span>
-                <button onclick="endInterview()" style="font-size:12px;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:var(--rose);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif">End Session</button>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;font-weight:600;color:var(--muted)">Product Sense · Razorpay</span>
+                <button onclick="endInterview()" style="font-size:11px;background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--rose);border-radius:8px;padding:5px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">End</button>
               </div>
             </div>
-            <!-- Chat area -->
-            <div id="riva-chat" style="padding:20px;display:flex;flex-direction:column;gap:14px;min-height:220px;max-height:320px;overflow-y:auto">
+            <!-- Transcript area -->
+            <div id="riva-chat" style="padding:20px;display:flex;flex-direction:column;gap:16px;min-height:260px;max-height:380px;overflow-y:auto;background:linear-gradient(180deg,#0a0918,#070714)">
+              <!-- Riva's first message -->
               <div style="display:flex;gap:10px;align-items:flex-start">
-                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
-                  <span style="font-size:10px;font-weight:800;color:#818CF8">R</span>
+                <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1.5px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                  <span style="font-size:11px;font-weight:800;color:#818CF8">R</span>
                 </div>
-                <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:12px 16px;max-width:440px">
-                  <p style="font-size:14px;color:var(--text);line-height:1.65">Good. Let's begin. I'm interviewing you for a Growth PM role at Razorpay. You have 2 minutes to answer this.<br/><br/><strong>Razorpay's payment success rate dropped 8% last Tuesday. As the PM, walk me through how you'd diagnose this.</strong><br/><br/>Take a moment to structure your thinking before you answer.</p>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                    <span style="font-size:11px;font-weight:700;color:var(--accent)">Riva</span>
+                    <span style="font-size:10px;color:var(--faint)">just now</span>
+                  </div>
+                  <div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:2px 14px 14px 14px;padding:14px 16px;max-width:460px">
+                    <p style="font-size:14px;color:var(--text);line-height:1.7">Good. Let's begin. I'm interviewing you for a <strong>Growth PM role at Razorpay.</strong></p>
+                    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-top:10px"><strong style="color:var(--accent)">Razorpay's payment success rate dropped 8% last Tuesday.</strong> As the PM, walk me through how you'd diagnose this.</p>
+                    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px">Take a moment to structure your thinking. I'll push back on anything shallow.</p>
+                  </div>
                 </div>
               </div>
             </div>
-            <!-- Input -->
-            <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
-              <textarea id="riva-input" class="textarea-dark" rows="2" placeholder="Type your answer — or speak it if you have mic access…" style="flex:1;resize:none"></textarea>
-              <button onclick="rivaRespond()" style="background:var(--accent-bright);border:none;border-radius:10px;padding:0 16px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:white">Send →</button>
+            <!-- Input bar -->
+            <div style="padding:12px 16px;border-top:1px solid rgba(129,140,248,0.1);display:flex;gap:10px;background:rgba(129,140,248,0.02)">
+              <textarea id="riva-input" class="textarea-dark" rows="2" placeholder="Type your answer..." style="flex:1;resize:none;font-size:14px;border-radius:12px;padding:10px 14px"></textarea>
+              <button onclick="rivaRespond()" style="background:var(--accent-bright);border:none;border-radius:12px;padding:0 20px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:white;transition:all 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Send</button>
             </div>
           </div>
         </div>
@@ -3455,60 +3587,102 @@ function selectPressure(el) {
   el.classList.add('selected');
 }
 
+function rivaSetSpeaking(on) {
+  var panel = document.getElementById('riva-video-panel');
+  var waveform = document.getElementById('riva-waveform');
+  if (panel) { if (on) panel.classList.add('riva-speaking'); else panel.classList.remove('riva-speaking'); }
+  if (waveform) waveform.style.opacity = on ? '1' : '0';
+}
+
 function startInterview() {
-  const live = document.getElementById('riva-live');
-  const status = document.getElementById('riva-status');
+  var live = document.getElementById('riva-live');
+  var status = document.getElementById('riva-status');
   if (live) live.style.display = 'block';
-  if (status) status.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:var(--rose);animation:bubblePulse 1s ease-in-out infinite"></div><span style="font-size:13px;font-weight:600;color:var(--rose)">Interview in progress</span>';
+  if (status) status.innerHTML = '<div style="width:7px;height:7px;border-radius:50%;background:var(--rose);animation:bubblePulse 1.5s ease-in-out infinite"></div><span style="font-size:11px;font-weight:600;color:var(--rose)">In Session</span>';
   live.scrollIntoView({ behavior: 'smooth', block: 'start' });
   rivaSeconds = 0;
-  rivaTimerInterval = setInterval(() => {
+  rivaTimerInterval = setInterval(function() {
     rivaSeconds++;
-    const m = String(Math.floor(rivaSeconds / 60)).padStart(2, '0');
-    const s = String(rivaSeconds % 60).padStart(2, '0');
-    const el = document.getElementById('riva-timer');
-    if (el) el.textContent = `${m}:${s}`;
+    var m = String(Math.floor(rivaSeconds / 60)).padStart(2, '0');
+    var s = String(rivaSeconds % 60).padStart(2, '0');
+    var el = document.getElementById('riva-timer');
+    if (el) el.textContent = m + ':' + s;
   }, 1000);
+  // Simulate Riva speaking for the opening question
+  rivaSetSpeaking(true);
+  setTimeout(function() { rivaSetSpeaking(false); }, 4000);
 }
 
 function endInterview() {
   clearInterval(rivaTimerInterval);
-  const live = document.getElementById('riva-live');
-  const status = document.getElementById('riva-status');
-  if (status) status.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:var(--emerald)"></div><span style="font-size:13px;font-weight:600;color:var(--emerald)">Ready to interview you</span>';
+  rivaSetSpeaking(false);
+  var live = document.getElementById('riva-live');
+  var status = document.getElementById('riva-status');
+  if (status) status.innerHTML = '<div style="width:7px;height:7px;border-radius:50%;background:var(--emerald)"></div><span style="font-size:11px;font-weight:600;color:var(--emerald)">Online</span>';
   if (live) {
-    live.innerHTML = `<div class="card" style="padding:24px;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.04)">
-      <p style="font-size:12px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Session complete</p>
-      <p style="font-size:15px;font-weight:700;margin-bottom:8px">Riva's assessment is being scored.</p>
-      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:16px">Your Product Sense response showed good problem awareness but jumped to a solution before isolating the root cause. This maps directly to your 58/100 on that dimension. Full breakdown will appear in your dashboard.</p>
-      <div style="display:flex;gap:10px">
-        <button class="btn-primary" style="font-size:13px;padding:10px 20px" onclick="location.reload()">Try Another Round →</button>
-        <button class="btn-secondary" style="font-size:13px;padding:10px 20px" onclick="showScreen('s-dashboard')">Back to Dashboard</button>
-      </div>
-    </div>`;
+    live.innerHTML = '<div class="card" style="padding:24px;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.04)">' +
+      '<p style="font-size:12px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Session Complete</p>' +
+      '<p style="font-size:15px;font-weight:700;margin-bottom:8px">Riva\'s assessment is being scored.</p>' +
+      '<p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:16px">Your Product Sense response showed good problem awareness but jumped to a solution before isolating the root cause. This maps directly to your 58/100 on that dimension. Full breakdown will appear in your dashboard.</p>' +
+      '<div style="display:flex;gap:10px">' +
+        '<button class="btn-primary" style="font-size:13px;padding:10px 20px" onclick="location.reload()">Try Another Round</button>' +
+        '<button class="btn-secondary" style="font-size:13px;padding:10px 20px" onclick="showScreen(\'s-dashboard\')">Back to Dashboard</button>' +
+      '</div></div>';
   }
 }
 
+var _rivaFollowUps = [
+  "You jumped straight to \"check the payment gateway logs.\" Before you do that — what's your hypothesis on whether this is a <strong>frontend, backend, or third-party issue?</strong> And how does an 8% drop on a Tuesday specifically change your investigation versus a Monday?",
+  "You're listing causes but not <strong>prioritizing.</strong> If you had one engineer for 2 hours, which of those would you investigate first? Why?",
+  "Okay, that's a reasonable next step. But I notice you haven't mentioned <strong>user segmentation.</strong> Is this 8% drop across all merchants or concentrated? What data would you look at?",
+  "Interesting framing. Let's say the data shows it's primarily affecting <strong>UPI transactions on Android.</strong> Now what? Walk me through your next 48 hours as the PM owning this.",
+  "Good. Last question — the VP of Engineering wants to ship a hotfix tonight. Your data suggests it might be a <strong>third-party bank issue</strong> that will auto-resolve. How do you handle that conversation?"
+];
+var _rivaFollowUpIdx = 0;
+
 function rivaRespond() {
-  const input = document.getElementById('riva-input');
-  const chat = document.getElementById('riva-chat');
+  var input = document.getElementById('riva-input');
+  var chat = document.getElementById('riva-chat');
   if (!input || !chat || !input.value.trim()) return;
-  const userText = input.value.trim();
+  var userText = input.value.trim();
   input.value = '';
-  // User message
-  const userDiv = document.createElement('div');
+
+  // User message bubble
+  var userDiv = document.createElement('div');
   userDiv.style.cssText = 'display:flex;justify-content:flex-end';
-  userDiv.innerHTML = `<div style="background:rgba(99,102,241,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:14px 14px 4px 14px;padding:12px 16px;max-width:400px"><p style="font-size:14px;color:var(--text);line-height:1.6">${userText}</p></div>`;
+  userDiv.innerHTML = '<div style="max-width:420px"><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:5px"><span style="font-size:10px;color:var(--faint)">just now</span><span style="font-size:11px;font-weight:700;color:var(--emerald)">You</span></div><div style="background:rgba(99,102,241,0.08);border:1px solid rgba(129,140,248,0.15);border-radius:14px 2px 14px 14px;padding:12px 16px"><p style="font-size:14px;color:var(--text);line-height:1.65">' + userText.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p></div></div>';
   chat.appendChild(userDiv);
   chat.scrollTop = chat.scrollHeight;
-  // Riva follow-up
-  setTimeout(() => {
-    const rivaDiv = document.createElement('div');
+
+  // Show typing indicator
+  var typingDiv = document.createElement('div');
+  typingDiv.id = 'riva-typing';
+  typingDiv.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+  typingDiv.innerHTML = '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1.5px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><span style="font-size:11px;font-weight:800;color:#818CF8">R</span></div><div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.12);border-radius:2px 14px 14px 14px;padding:12px 18px;display:flex;gap:4px;align-items:center;height:42px"><span class="riva-typing-dot"></span><span class="riva-typing-dot"></span><span class="riva-typing-dot"></span></div>';
+  chat.appendChild(typingDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  // Riva "thinks" then responds
+  rivaSetSpeaking(true);
+  var followUp = _rivaFollowUps[_rivaFollowUpIdx % _rivaFollowUps.length];
+  _rivaFollowUpIdx++;
+  var delay = 1500 + Math.random() * 1500; // 1.5–3s thinking time
+
+  setTimeout(function() {
+    // Remove typing indicator
+    var typing = document.getElementById('riva-typing');
+    if (typing) typing.remove();
+
+    // Riva message
+    var rivaDiv = document.createElement('div');
     rivaDiv.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
-    rivaDiv.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><span style="font-size:10px;font-weight:800;color:#818CF8">R</span></div><div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:12px 16px;max-width:440px"><p style="font-size:14px;color:var(--text);line-height:1.65">You jumped straight to "check the payment gateway logs." Before you do that — what's your hypothesis on whether this is a frontend, backend, or third-party issue? And how does an 8% drop on a Tuesday specifically change your investigation approach versus a Monday or weekend drop?</p></div>`;
+    rivaDiv.innerHTML = '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1.5px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><span style="font-size:11px;font-weight:800;color:#818CF8">R</span></div><div style="max-width:460px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-size:11px;font-weight:700;color:var(--accent)">Riva</span><span style="font-size:10px;color:var(--faint)">just now</span></div><div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:2px 14px 14px 14px;padding:14px 16px"><p style="font-size:14px;color:var(--text);line-height:1.7">' + followUp + '</p></div></div>';
     chat.appendChild(rivaDiv);
     chat.scrollTop = chat.scrollHeight;
-  }, 900);
+
+    // Stop speaking after a bit
+    setTimeout(function() { rivaSetSpeaking(false); }, 3000);
+  }, delay);
 }
 
 // ── North AI Assistant ──────────────────────────────────────────
