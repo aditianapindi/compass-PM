@@ -40,3 +40,11 @@ begin
   limit match_count;
 end;
 $$;
+
+-- Step 4: Add v2 enriched onboarding columns to profiles table
+-- (Run this if profiles table already exists — safe to re-run, uses IF NOT EXISTS)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS q6 text;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS q7 text;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS q8 text;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS exp_signals jsonb;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS skills jsonb;
