@@ -1739,20 +1739,12 @@ function selectDailyTask() {
   const completedIds = tp.completedTasks.map(t => t.id);
   const co = companyMap[userData.q4] || companyMap['Fintech and payments'];
 
-  // Get weakest dimensions from actual scores
+  // Pick next task targeting weakest dimensions
   var dims = userData.readinessScores.dimensions.slice().sort((a, b) => a.score - b.score);
   var weakestNames = dims.slice(0, 3).map(d => d.name);
-
-  // Filter to tasks targeting weak dimensions, not yet completed
-  var available = TASK_BANK.filter(t => !completedIds.includes(t.id) && weakestNames.includes(t.dimension));
-  // If all weak-dimension tasks done, open to any remaining
-  if (available.length === 0) available = TASK_BANK.filter(t => !completedIds.includes(t.id));
-  // If ALL tasks done, restart from beginning
-  if (available.length === 0) available = TASK_BANK.slice();
-
-  // Sort by phase to keep progression natural
-  available.sort((a, b) => a.phase - b.phase);
-  var task = available[0];
+  var task = TASK_BANK.find(t => !completedIds.includes(t.id) && weakestNames.includes(t.dimension));
+  if (!task) task = TASK_BANK.find(t => !completedIds.includes(t.id));
+  if (!task) task = TASK_BANK[0];
 
   // Resolve {company} placeholder
   var resolved = Object.assign({}, task);
@@ -2993,48 +2985,48 @@ function renderTaskList() {
   if (!container) return;
   container.innerHTML = '';
   initTaskProgress();
+  ensureReadinessScores();
   var completedMap = {};
   (userData.taskProgress.completedTasks || []).forEach(function(c) { completedMap[c.id] = c; });
   var co = companyMap[userData.q4] || companyMap['Fintech and payments'];
   var currentTask = userData.taskProgress.currentTask;
 
-  var phases = [
-    { num:1, title:'Product Sense + Business Framing', color:'var(--accent)', weeks:'Weeks 1–2' },
-    { num:2, title:'Analytical Depth + Business Case', color:'var(--rose)', weeks:'Weeks 3–4' },
-    { num:3, title:'AI Fluency + Technical + Behavioural', color:'var(--violet)', weeks:'Weeks 5–6' }
-  ];
+  // Group tasks by dimension, sorted weakest-first
+  var dimScores = {};
+  var dimColors = { 'Product Sense':'var(--accent)', 'Analytical Depth':'var(--rose)', 'Business Framing':'var(--amber)', 'AI Fluency':'var(--violet)', 'Technical Credibility':'var(--emerald)', 'Behavioural':'var(--sky, #38BDF8)' };
+  userData.readinessScores.dimensions.forEach(function(d) { dimScores[d.name] = d.score; });
+  var sortedDims = Object.keys(dimScores).sort(function(a, b) { return dimScores[a] - dimScores[b]; });
 
-  phases.forEach(function(phase) {
-    var phaseTasks = TASK_BANK.filter(function(t) { return t.phase === phase.num; });
-    var completedInPhase = phaseTasks.filter(function(t) { return completedMap[t.id]; }).length;
-    var pct = phaseTasks.length > 0 ? Math.round((completedInPhase / phaseTasks.length) * 100) : 0;
+  sortedDims.forEach(function(dimName) {
+    var dimTasks = TASK_BANK.filter(function(t) { return t.dimension === dimName; });
+    if (dimTasks.length === 0) return;
+    var completedInDim = dimTasks.filter(function(t) { return completedMap[t.id]; }).length;
+    var pct = Math.round((completedInDim / dimTasks.length) * 100);
+    var score = dimScores[dimName] || 50;
+    var color = dimColors[dimName] || 'var(--accent)';
 
-    // Phase header card
     var card = document.createElement('div');
     card.className = 'card';
-    card.style.cssText = 'padding:24px;border-left:3px solid ' + phase.color;
-
+    card.style.cssText = 'padding:24px;border-left:3px solid ' + color;
     card.innerHTML =
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
-        '<span class="badge" style="font-size:11px;background:rgba(99,102,241,0.1);color:' + phase.color + ';border:1px solid ' + phase.color + '30">Phase ' + phase.num + ' · ' + phase.weeks + '</span>' +
-        '<span style="font-size:12px;color:' + phase.color + ';font-weight:600">' + completedInPhase + '/' + phaseTasks.length + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:var(--text)">' + dimName + '</span>' +
+        '<span style="font-size:12px;color:' + color + ';font-weight:600">Score: ' + score + ' · ' + completedInDim + '/' + dimTasks.length + ' done</span>' +
       '</div>' +
-      '<h3 style="font-size:16px;font-weight:700;margin-bottom:8px">' + phase.title + '</h3>' +
-      '<div style="height:4px;background:var(--elevated);border-radius:2px;margin-bottom:16px;overflow:hidden">' +
-        '<div style="height:100%;width:' + pct + '%;background:' + phase.color + ';border-radius:2px;transition:width 0.8s ease"></div>' +
+      '<div style="height:4px;background:var(--elevated);border-radius:2px;margin-bottom:14px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:2px;transition:width 0.8s ease"></div>' +
       '</div>';
 
     var taskList = document.createElement('div');
     taskList.style.cssText = 'display:flex;flex-direction:column;gap:4px';
 
-    phaseTasks.forEach(function(t) {
+    dimTasks.forEach(function(t) {
       var c = completedMap[t.id];
       var isCurrent = currentTask && currentTask.id === t.id;
       var title = t.title.replace(/\{company\}/g, co.company);
       var row = document.createElement('div');
 
       if (isCurrent) {
-        // Current task — highlighted, expandable
         row.style.cssText = 'padding:16px;border-radius:12px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);cursor:pointer';
         row.onclick = function() { startSpecificTask(t.id); };
         row.innerHTML =
@@ -3044,35 +3036,25 @@ function renderTaskList() {
             '</div>' +
             '<div style="flex:1;min-width:0">' +
               '<div style="font-size:14px;font-weight:700;color:var(--text)">' + title + '</div>' +
-              '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + t.dimension + ' · ~' + t.minutes + ' min</div>' +
+              '<div style="font-size:11px;color:var(--muted);margin-top:2px">~' + t.minutes + ' min</div>' +
             '</div>' +
           '</div>' +
-          '<div style="display:flex;align-items:center;gap:10px">' +
-            '<button class="btn-primary" style="flex:1;font-size:13px;padding:10px" onclick="event.stopPropagation();startSpecificTask(\'' + t.id + '\')">Start Task →</button>' +
-          '</div>';
+          '<button class="btn-primary" style="width:100%;font-size:13px;padding:10px" onclick="event.stopPropagation();startSpecificTask(\'' + t.id + '\')">Start Task →</button>';
       } else if (c) {
-        // Completed task
         var clr = c.score >= 70 ? 'var(--emerald)' : c.score >= 50 ? 'var(--amber)' : 'var(--rose)';
         row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px';
         row.innerHTML =
           '<div style="width:24px;height:24px;border-radius:50%;background:' + clr + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#000">\u2713</div>' +
-          '<div style="flex:1;min-width:0">' +
-            '<div style="font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</div>' +
-            '<div style="font-size:11px;color:var(--faint);margin-top:1px">' + t.dimension + '</div>' +
-          '</div>' +
+          '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</div></div>' +
           '<div style="font-size:12px;font-weight:700;color:' + clr + '">' + c.score + (c.delta > 0 ? ' <span style="font-size:10px;opacity:0.7">+' + c.delta + '</span>' : '') + '</div>';
       } else {
-        // Upcoming task — clickable but dimmed
         row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:background 0.15s';
         row.onmouseenter = function() { row.style.background = 'rgba(255,255,255,0.03)'; };
         row.onmouseleave = function() { row.style.background = 'transparent'; };
         row.onclick = function() { startSpecificTask(t.id); };
         row.innerHTML =
-          '<div style="width:24px;height:24px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>' +
-          '<div style="flex:1;min-width:0">' +
-            '<div style="font-size:13px;font-weight:600;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</div>' +
-            '<div style="font-size:11px;color:var(--faint);margin-top:1px">' + t.dimension + ' · ~' + t.minutes + ' min</div>' +
-          '</div>';
+          '<div style="width:24px;height:24px;border-radius:50%;border:1px solid var(--border);flex-shrink:0"></div>' +
+          '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</div><div style="font-size:11px;color:var(--faint);margin-top:1px">~' + t.minutes + ' min</div></div>';
       }
       taskList.appendChild(row);
     });
