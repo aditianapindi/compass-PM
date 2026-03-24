@@ -1663,6 +1663,17 @@
 
       </div>
     </div>
+
+    <!-- Log Out -->
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <p style="font-size:13px;color:var(--faint)">Signed in as <span id="profile-email" style="color:var(--muted)"></span></p>
+      </div>
+      <button onclick="logOut()" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--rose)';this.style.color='var(--rose)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1969,6 +1980,23 @@ function applyName() {
   if (subEl && userData.q1) subEl.textContent = `${userData.q1} · transitioning to PM`;
   const liSub = document.getElementById('linkedin-subtext');
   if (liSub && userData.firstName) liSub.textContent = `${userData.firstName.toLowerCase()} · Connected`;
+}
+
+async function logOut() {
+  try {
+    if (_sb) await _sb.auth.signOut();
+  } catch (e) { console.error('[Compass] Sign-out error:', e); }
+  // Clear local state
+  Object.keys(userData).forEach(function(k) {
+    if (k === 'expSignals') { userData[k] = { hasBuiltProducts:false, hasManagedStakeholders:false, hasUsedDataForDecisions:false, hasAIExperience:false, hasSideProjects:false }; }
+    else if (k === 'skills') { userData[k] = []; }
+    else if (k === 'profileConnected') { userData[k] = false; }
+    else { userData[k] = null; }
+  });
+  localStorage.removeItem('compass_task_progress');
+  localStorage.removeItem('compass_readiness_scores');
+  localStorage.removeItem('compass_v2_enriched');
+  showScreen('s-landing');
 }
 
 // ── Connect screen handlers ──────────────────────────────────────────────────
@@ -3939,6 +3967,8 @@ function northAutoPopup(screenId, message, delay) {
       userData.name = authName || user.email;
       userData.profileConnected = true;
       applyName();
+      var profileEmailEl = document.getElementById('profile-email');
+      if (profileEmailEl) profileEmailEl.textContent = user.email || '';
 
       var current = document.querySelector('.screen.active');
       var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
@@ -3982,6 +4012,21 @@ function northAutoPopup(screenId, message, delay) {
     });
   }
 
+  // Reset sign-in mode when email changes
+  var emailInput = document.getElementById('signup-email');
+  if (emailInput) {
+    emailInput.addEventListener('input', function() {
+      var btn = document.getElementById('btn-email-signup');
+      if (btn && btn._signinMode) {
+        btn._signinMode = false;
+        btn.textContent = 'Create Account →';
+        document.getElementById('signup-password').placeholder = 'Create a password (min. 8 characters)';
+        var err = document.getElementById('signup-error');
+        if (err) err.style.display = 'none';
+      }
+    });
+  }
+
   // Wire email sign-up
   var signupBtn = document.getElementById('btn-email-signup');
   var errorEl   = document.getElementById('signup-error');
@@ -3990,6 +4035,54 @@ function northAutoPopup(screenId, message, delay) {
       var email    = document.getElementById('signup-email').value.trim();
       var password = document.getElementById('signup-password').value;
       errorEl.style.display = 'none';
+
+      // If in sign-in mode (existing account detected), do sign-in instead
+      if (signupBtn._signinMode) {
+        if (!email || !password) {
+          errorEl.textContent = 'Enter your password to sign in.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        signupBtn.textContent = 'Signing in…';
+        signupBtn.disabled = true;
+        try {
+          var result = await sb.auth.signInWithPassword({ email: email, password: password });
+          if (result.error) {
+            errorEl.style.color = 'var(--rose)';
+            errorEl.textContent = result.error.message;
+            errorEl.style.display = 'block';
+            signupBtn.textContent = 'Sign in →';
+            signupBtn.disabled = false;
+            return;
+          }
+          signupBtn.textContent = '✓ Signed in';
+          var session = result.data.session;
+          if (session) {
+            var u = session.user;
+            userData.name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || email;
+            userData.profileConnected = true;
+            applyName();
+            var profileEmailEl = document.getElementById('profile-email');
+            if (profileEmailEl) profileEmailEl.textContent = u.email || '';
+          }
+          showScreen('s-connect');
+          loadProfile(session).then(function(profile) {
+            if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
+            if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+              if (userData.resumeData) updateProfileFromResume(userData.resumeData);
+              if (userData.q1) personalize();
+              showScreen(getReturningScreen(profile));
+            }
+          }).catch(function(err) { console.error('[Compass] Sign-in profile load error:', err); });
+        } catch (e) {
+          errorEl.style.color = 'var(--rose)';
+          errorEl.textContent = e.message || 'Sign-in failed.';
+          errorEl.style.display = 'block';
+          signupBtn.textContent = 'Sign in →';
+          signupBtn.disabled = false;
+        }
+        return;
+      }
 
       if (!email || !password) {
         errorEl.textContent = 'Please enter your email and a password.';
@@ -4020,11 +4113,16 @@ function northAutoPopup(screenId, message, delay) {
 
         // Supabase may require email confirmation — check
         if (data.user && data.user.identities && data.user.identities.length === 0) {
+          // Account exists — switch to sign-in mode automatically
           errorEl.style.color = 'var(--amber)';
-          errorEl.textContent = 'An account with this email already exists. Use Sign in instead.';
+          errorEl.textContent = 'Account found — enter your password to sign in.';
           errorEl.style.display = 'block';
-          signupBtn.textContent = 'Create Account →';
+          signupBtn.textContent = 'Sign in →';
           signupBtn.disabled = false;
+          signupBtn._signinMode = true;
+          document.getElementById('signup-password').value = '';
+          document.getElementById('signup-password').placeholder = 'Enter your password';
+          document.getElementById('signup-password').focus();
           return;
         }
 
