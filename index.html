@@ -3934,8 +3934,15 @@ function northAutoPopup(screenId, message, delay) {
           }
         }
 
-        // Account created — let onAuthStateChange handle navigation
+        // Account created — navigate directly
         signupBtn.textContent = '✓ Account created';
+        _authHandled = true; // Prevent onAuthStateChange from double-navigating
+        var user = data.session ? data.session.user : (data.user || {});
+        var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
+        userData.name = authName || email;
+        userData.profileConnected = true;
+        applyName();
+        showScreen('s-connect');
       } catch (e) {
         console.error('[Compass] Sign-up exception:', e);
         errorEl.textContent = e.message || 'Sign-up failed. Please try again.';
@@ -3976,18 +3983,28 @@ function northAutoPopup(screenId, message, delay) {
           return;
         }
 
-        // Sign-in succeeded — let onAuthStateChange handle all navigation
+        // Sign-in succeeded — navigate directly
         signupBtn.textContent = '✓ Signed in';
-        console.log('[Compass] Sign-in success, onAuthStateChange will navigate');
-
-        // Fallback: if still stuck after 3s, force navigate
-        setTimeout(function() {
-          var cur = document.querySelector('.screen.active');
-          if (!cur || cur.id === 's-signin' || cur.id === 's-landing') {
-            console.warn('[Compass] Sign-in fallback: forcing navigation to s-connect');
+        _authHandled = true; // Prevent onAuthStateChange from double-navigating
+        var user = result.data.session ? result.data.session.user : {};
+        var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
+        userData.name = authName || email;
+        userData.profileConnected = true;
+        applyName();
+        try {
+          var profile = await loadProfile(result.data.session);
+          if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
+          if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+            if (userData.resumeData) updateProfileFromResume(userData.resumeData);
+            if (userData.q1) personalize();
+            showScreen(getReturningScreen(profile));
+          } else {
             showScreen('s-connect');
           }
-        }, 3000);
+        } catch (loadErr) {
+          console.error('[Compass] Sign-in profile load failed:', loadErr);
+          showScreen('s-connect');
+        }
       } catch (e) {
         console.error('[Compass] Sign-in exception:', e);
         errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
