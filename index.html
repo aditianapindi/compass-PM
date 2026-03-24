@@ -1457,12 +1457,9 @@
 
         <!-- Start CTA -->
         <div style="position:relative">
-          <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px;opacity:0.5;cursor:not-allowed" disabled>
+          <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px" onclick="startInterview()">
             Start Interview with Riva →
           </button>
-          <div style="text-align:center;margin-top:10px">
-            <span class="badge badge-amber" style="font-size:12px">Coming in next release — AI interview scoring in development</span>
-          </div>
         </div>
 
         <!-- Live session panel (hidden until started) -->
@@ -3066,6 +3063,41 @@ function renderTaskList() {
     card.appendChild(taskList);
     container.appendChild(card);
   });
+
+  // Mock Interview milestone — appears after 8+ tasks completed
+  var doneCount = (userData.taskProgress.completedTasks || []).length;
+  var interviewCard = document.createElement('div');
+  interviewCard.className = 'card';
+  var isReady = doneCount >= 8;
+  if (isReady) {
+    interviewCard.style.cssText = 'padding:24px;border:1px solid rgba(129,140,248,0.35);background:linear-gradient(160deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06))';
+    interviewCard.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">' +
+        '<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:2px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<span style="font-size:16px;font-weight:800;color:#818CF8">R</span>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:16px;font-weight:700">Mock Interview with Riva</div>' +
+          '<div style="font-size:12px;color:var(--emerald);font-weight:600">You\'re ready to practice</div>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">You\'ve built enough signal across your dimensions. Time to put it to the test — Riva will interview you like a real PM hiring panel and score your responses.</p>' +
+      '<button class="btn-primary" style="width:100%;font-size:14px;padding:12px" onclick="showScreen(\'s-interview\')">Start Mock Interview →</button>';
+  } else {
+    interviewCard.style.cssText = 'padding:24px;border:1px solid var(--border);opacity:0.6';
+    interviewCard.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' +
+        '<div style="width:44px;height:44px;border-radius:50%;background:var(--elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<span style="font-size:16px;font-weight:800;color:var(--faint)">R</span>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:16px;font-weight:700;color:var(--muted)">Mock Interview with Riva</div>' +
+          '<div style="font-size:12px;color:var(--faint)">Unlocks after ' + (8 - doneCount) + ' more task' + (8 - doneCount === 1 ? '' : 's') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:13px;color:var(--faint);line-height:1.6">Complete more tasks to build your signal. Riva will be ready when you are.</p>';
+  }
+  container.appendChild(interviewCard);
 }
 
 function startSpecificTask(taskId) {
