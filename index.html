@@ -1182,7 +1182,7 @@
       <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.5px">Your Learning Path</h1>
       <div style="display:flex;align-items:center;gap:16px">
         <span style="font-size:13px;color:var(--faint)">🔥 <span id="streak-count">0</span> day streak</span>
-        <span id="dash-progress-label" style="font-size:13px;color:var(--muted);font-weight:600">0 / 17</span>
+        <span id="dash-progress-label" style="font-size:13px;color:var(--muted);font-weight:600">0 / 21</span>
       </div>
     </div>
     <div style="height:6px;background:var(--elevated);border-radius:3px;margin-bottom:10px;overflow:hidden">
@@ -2260,6 +2260,40 @@ function updateProfileFromResume(parsed) {
 }
 
 var _showScreenTimer = null;
+function onScreenReady(id) {
+    if (id === 's-readiness') {
+      var estBanner = document.getElementById('readiness-estimated-banner');
+      if (!userData.readinessScores) {
+        fetchReadinessScores().then(() => {
+          animateRadar(); animateScoreRing(); buildAndAnimateGaps();
+          if (estBanner) estBanner.style.display = userData.readinessScores && userData.readinessScores._source === 'api' ? 'none' : 'block';
+        });
+      } else {
+        setTimeout(animateRadar, 400); setTimeout(() => { animateScoreRing(); buildAndAnimateGaps(); }, 600);
+        if (estBanner) estBanner.style.display = userData.readinessScores._source === 'api' ? 'none' : 'block';
+      }
+    }
+    if (id === 's-paywall') {
+      const sc = (userData.readinessScores && userData.readinessScores.overall) || 56;
+      const el = document.getElementById('paywall-score');
+      if (el) el.textContent = sc + ' / 75';
+    }
+    if (id === 's-profile') { updateProfileDimensions(); if (userData.resumeData) updateProfileFromResume(userData.resumeData); }
+    const northScreens = ['s-verdict','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
+    const bubble = document.getElementById('north-bubble');
+    if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
+    if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
+    if (id === 's-dashboard') {
+      try { renderDashboardTask(); } catch(e) { console.error('[Compass] renderDashboardTask error:', e); }
+      try { renderStreak(); } catch(e) { console.error('[Compass] renderStreak error:', e); }
+      try { renderTaskList(); } catch(e) { console.error('[Compass] renderTaskList error:', e); }
+      fetchJobMatches();
+      northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, I'm North — your PM career companion. Ask me anything.`, 2000);
+    }
+    if (id === 's-gate' && currentTaskMode === 'gate') { resetGateToOnboarding(); }
+    if (id === 's-jobs') { fetchJobListings(); fetchTrendSignals(); }
+}
+
 function showScreen(id) {
   if (id === 's-path') id = 's-dashboard'; // path merged into dashboard
   const nxt = document.getElementById(id);
@@ -2273,7 +2307,9 @@ function showScreen(id) {
     document.querySelectorAll('.screen').forEach(function(s) {
       if (s !== nxt) { s.style.display = 'none'; s.style.opacity = '0'; }
     });
-    nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return;
+    nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1';
+    onScreenReady(id);
+    return;
   }
   console.log('[Compass] showScreen:', cur.id, '→', id);
   // Immediately clean up ALL active screens
@@ -2292,34 +2328,7 @@ function showScreen(id) {
     nxt.style.opacity = '0';
     requestAnimationFrame(() => { nxt.style.opacity = '1'; });
     window.scrollTo(0,0);
-    if (id === 's-readiness') {
-      // Fetch AI readiness scores if not already loaded, then animate
-      var estBanner = document.getElementById('readiness-estimated-banner');
-      if (!userData.readinessScores) {
-        fetchReadinessScores().then(() => {
-          animateRadar(); animateScoreRing(); buildAndAnimateGaps();
-          if (estBanner) estBanner.style.display = userData.readinessScores && userData.readinessScores._source === 'api' ? 'none' : 'block';
-        });
-      } else {
-        setTimeout(animateRadar, 400); setTimeout(() => { animateScoreRing(); buildAndAnimateGaps(); }, 600);
-        if (estBanner) estBanner.style.display = userData.readinessScores._source === 'api' ? 'none' : 'block';
-      }
-    }
-    if (id === 's-paywall') {
-      const sc = (userData.readinessScores && userData.readinessScores.overall) || 56;
-      const el = document.getElementById('paywall-score');
-      if (el) el.textContent = sc + ' / 75';
-    }
-    if (id === 's-profile') { updateProfileDimensions(); if (userData.resumeData) updateProfileFromResume(userData.resumeData); }
-    // North bubble: show on post-onboarding screens
-    const northScreens = ['s-verdict','s-readiness','s-path','s-dashboard','s-profile','s-gate','s-paywall','s-jobs'];
-    const bubble = document.getElementById('north-bubble');
-    if (bubble) bubble.style.display = northScreens.includes(id) ? 'block' : 'none';
-    // North auto-popup triggers
-    if (id === 's-verdict') northAutoPopup('s-verdict', `${userData.firstName || 'Hey'}, your signal is in. Want to talk through what this verdict means for your path?`, 4500);
-    if (id === 's-dashboard') { renderDashboardTask(); renderStreak(); renderTaskList(); fetchJobMatches(); northAutoPopup('s-dashboard', `${userData.firstName || 'Hey'}, I'm North — your PM career companion. Ask me anything.`, 2000); }
-    if (id === 's-gate' && currentTaskMode === 'gate') { resetGateToOnboarding(); }
-    if (id === 's-jobs') { fetchJobListings(); fetchTrendSignals(); }
+    onScreenReady(id);
   }, 180);
 }
 
