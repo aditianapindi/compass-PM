@@ -1305,185 +1305,84 @@
 
     <div style="display:grid;grid-template-columns:360px 1fr;gap:28px;align-items:start" class="interview-grid">
 
-      <!-- LEFT: Riva video call panel -->
+      <!-- LEFT: Riva avatar panel -->
       <div>
-        <div id="riva-video-panel" class="card" style="padding:0;overflow:hidden;background:#070714;border-color:rgba(129,140,248,0.2)">
+        <div class="card" style="padding:32px;text-align:center;background:linear-gradient(160deg,#0f0c24,#111827)">
 
-          <!-- Video feed area -->
-          <div style="position:relative;aspect-ratio:3/4;background:linear-gradient(170deg,#0c0a1f 0%,#0f0d24 40%,#12101f 100%);display:flex;align-items:center;justify-content:center;overflow:hidden">
-
-            <!-- Ambient background glow -->
-            <div style="position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,0.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
-
-            <!-- Riva portrait — illustrated avatar -->
-            <div class="riva-video-feed riva-video-frame" style="position:relative;z-index:1;width:220px;height:280px">
-              <svg width="220" height="280" viewBox="0 0 220 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Shoulders & blazer -->
-                <path d="M30 280 Q35 238 72 225 L95 218 Q110 215 125 218 L148 225 Q185 238 190 280" fill="#1C1C2E"/>
-                <path d="M30 280 Q35 238 72 225 L95 218 Q110 215 125 218 L148 225 Q185 238 190 280" fill="url(#blazerGrad)"/>
-                <!-- Blazer lapels -->
-                <path d="M95 218 L102 245 L110 218" fill="#15152a" opacity="0.7"/>
-                <path d="M125 218 L118 245 L110 218" fill="#15152a" opacity="0.7"/>
-                <!-- Inner top (floral hint — colored neckline) -->
-                <path d="M96 220 Q103 228 110 220 Q117 228 124 220" fill="#8B5E6B" opacity="0.6"/>
-
-                <!-- Neck -->
-                <path d="M92 192 L92 222 Q92 226 97 228 L123 228 Q128 226 128 222 L128 192" fill="#C8976B"/>
-                <path d="M92 192 L92 222 Q92 226 97 228 L123 228 Q128 226 128 222 L128 192" fill="url(#neckSh)"/>
-
-                <!-- Face -->
-                <ellipse cx="110" cy="130" rx="62" ry="72" fill="#D4A27A"/>
-                <ellipse cx="110" cy="130" rx="62" ry="72" fill="url(#faceGrad)"/>
-
-                <!-- Hair — pulled back -->
-                <path d="M48 125 Q48 52 110 46 Q172 52 172 125 L172 95 Q172 50 135 40 Q110 34 85 40 Q48 50 48 95 Z" fill="#1a1118"/>
-                <path d="M48 125 Q48 52 110 46 Q172 52 172 125 L172 95 Q172 50 135 40 Q110 34 85 40 Q48 50 48 95 Z" fill="url(#hairG)"/>
-                <!-- Hair side coverage -->
-                <path d="M48 115 Q42 135 46 160 Q48 148 50 138" fill="#1a1118"/>
-                <path d="M172 115 Q178 135 174 160 Q172 148 170 138" fill="#1a1118"/>
-                <!-- Hair pulled-back top shine -->
-                <path d="M75 52 Q95 44 125 48" stroke="rgba(255,255,255,0.08)" stroke-width="6" stroke-linecap="round" fill="none"/>
-                <!-- Hair bun hint behind head -->
-                <ellipse cx="110" cy="60" rx="20" ry="12" fill="#1a1118" opacity="0.7"/>
-
-                <!-- Ears -->
-                <ellipse cx="49" cy="135" rx="6" ry="12" fill="#C8976B" opacity="0.7"/>
-                <ellipse cx="171" cy="135" rx="6" ry="12" fill="#C8976B" opacity="0.7"/>
-                <!-- Earrings — small gold studs -->
-                <circle cx="49" cy="147" r="3" fill="#D4A04A"/>
-                <circle cx="49" cy="147" r="1.5" fill="#E8C060" opacity="0.8"/>
-                <circle cx="171" cy="147" r="3" fill="#D4A04A"/>
-                <circle cx="171" cy="147" r="1.5" fill="#E8C060" opacity="0.8"/>
-
-                <!-- Eyebrows — defined, slightly arched -->
-                <path d="M78 108 Q88 102 100 105" stroke="#3a2a22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                <path d="M120 105 Q132 102 142 108" stroke="#3a2a22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-
-                <!-- Eyes — warm brown, larger -->
-                <!-- Left eye -->
-                <ellipse cx="90" cy="122" rx="13" ry="9.5" fill="white"/>
-                <circle cx="91" cy="122" r="6.5" fill="#3C2415"/>
-                <circle cx="91" cy="122" r="4" fill="#1a0e08"/>
-                <circle cx="93.5" cy="119.5" r="2.2" fill="white" opacity="0.9"/>
-                <circle cx="88" cy="124" r="1" fill="white" opacity="0.35"/>
-                <path d="M77 118 Q90 112 103 118" stroke="#5C4535" stroke-width="0.8" fill="none" opacity="0.4"/>
-
-                <!-- Right eye -->
-                <ellipse cx="130" cy="122" rx="13" ry="9.5" fill="white"/>
-                <circle cx="129" cy="122" r="6.5" fill="#3C2415"/>
-                <circle cx="129" cy="122" r="4" fill="#1a0e08"/>
-                <circle cx="131.5" cy="119.5" r="2.2" fill="white" opacity="0.9"/>
-                <circle cx="126" cy="124" r="1" fill="white" opacity="0.35"/>
-                <path d="M117 118 Q130 112 143 118" stroke="#5C4535" stroke-width="0.8" fill="none" opacity="0.4"/>
-
-                <!-- Glasses — rectangular/cat-eye frames -->
-                <rect x="74" y="112" rx="4" ry="4" width="34" height="22" fill="none" stroke="#2a2020" stroke-width="2.2"/>
-                <rect x="112" y="112" rx="4" ry="4" width="34" height="22" fill="none" stroke="#2a2020" stroke-width="2.2"/>
-                <!-- Bridge -->
-                <path d="M108 120 Q110 116 112 120" stroke="#2a2020" stroke-width="2" fill="none"/>
-                <!-- Temple arms -->
-                <path d="M74 118 L52 115" stroke="#2a2020" stroke-width="2" stroke-linecap="round"/>
-                <path d="M146 118 L168 115" stroke="#2a2020" stroke-width="2" stroke-linecap="round"/>
-                <!-- Glasses highlight -->
-                <path d="M78 115 L85 115" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M116 115 L123 115" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-linecap="round"/>
-
-                <!-- Nose -->
-                <path d="M108 120 Q106 140 101 150" stroke="#B8876A" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.5"/>
-                <path d="M101 150 Q105 154 110 154 Q115 154 119 150" stroke="#B8876A" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.35"/>
-
-                <!-- Smile — warm, friendly -->
-                <!-- Upper lip -->
-                <path d="M94 168 Q100 163 110 165 Q120 163 126 168" fill="#C06B60" opacity="0.85"/>
-                <!-- Lower lip -->
-                <path d="M94 168 Q100 175 110 176 Q120 175 126 168" fill="#B05B52" opacity="0.8"/>
-                <!-- Lip line -->
-                <path d="M94 168 Q102 166 110 168 Q118 166 126 168" stroke="#984A42" stroke-width="0.7" fill="none" opacity="0.5"/>
-                <!-- Lip shine -->
-                <ellipse cx="110" cy="166" rx="6" ry="1.5" fill="white" opacity="0.1"/>
-                <!-- Smile lines -->
-                <path d="M92 167 Q90 170 91 174" stroke="#B8876A" stroke-width="0.6" fill="none" opacity="0.2"/>
-                <path d="M128 167 Q130 170 129 174" stroke="#B8876A" stroke-width="0.6" fill="none" opacity="0.2"/>
-
-                <!-- Cheek warmth -->
-                <ellipse cx="72" cy="148" rx="14" ry="9" fill="#D0856A" opacity="0.12"/>
-                <ellipse cx="148" cy="148" rx="14" ry="9" fill="#D0856A" opacity="0.12"/>
-
-                <!-- Bindi (small, subtle) -->
-                <circle cx="110" cy="98" r="2" fill="#B22222" opacity="0.5"/>
-
-                <defs>
-                  <linearGradient id="faceGrad" x1="110" y1="58" x2="110" y2="202" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#E0B88E" stop-opacity="0.25"/>
-                    <stop offset="0.7" stop-color="#B07D58" stop-opacity="0.15"/>
-                    <stop offset="1" stop-color="#8B6040" stop-opacity="0.1"/>
-                  </linearGradient>
-                  <linearGradient id="hairG" x1="110" y1="34" x2="110" y2="125" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#2a1f28" stop-opacity="0.7"/>
-                    <stop offset="1" stop-color="#0f0a0f" stop-opacity="0.5"/>
-                  </linearGradient>
-                  <linearGradient id="neckSh" x1="110" y1="192" x2="110" y2="228" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#000" stop-opacity="0.12"/>
-                    <stop offset="1" stop-color="transparent"/>
-                  </linearGradient>
-                  <linearGradient id="blazerGrad" x1="110" y1="218" x2="110" y2="280" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#282845"/>
-                    <stop offset="1" stop-color="#1C1C2E"/>
-                  </linearGradient>
-                </defs>
+          <!-- Avatar with breathing rings -->
+          <div style="position:relative;width:140px;height:140px;margin:0 auto 24px">
+            <div class="riva-ring" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.35)"></div>
+            <div class="riva-ring-2" style="position:absolute;inset:-16px;border-radius:50%;border:1.5px solid rgba(129,140,248,0.2)"></div>
+            <div style="width:140px;height:140px;border-radius:50%;background:linear-gradient(145deg,#312e81,#4c1d95);border:2px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+              <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                <ellipse cx="36" cy="34" rx="22" ry="24" fill="rgba(129,140,248,0.15)" stroke="rgba(129,140,248,0.5)" stroke-width="1.5"/>
+                <ellipse cx="28" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
+                <ellipse cx="44" cy="30" rx="3.5" ry="4" fill="#818CF8"/>
+                <circle cx="29.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
+                <circle cx="45.5" cy="28.5" r="1.2" fill="white" opacity="0.8"/>
+                <path d="M29 42 Q36 45 43 42" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <path d="M14 30 Q14 10 36 10 Q58 10 58 30" stroke="rgba(129,140,248,0.4)" stroke-width="1.5" fill="rgba(129,140,248,0.06)" stroke-linecap="round"/>
+                <path d="M18 60 Q24 52 36 54 Q48 52 54 60" stroke="rgba(129,140,248,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
               </svg>
             </div>
-
-            <!-- Name overlay (bottom of video feed) -->
-            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(7,7,20,0.95));padding:20px 20px 16px;z-index:2">
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <div>
-                  <h2 style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.03em;margin-bottom:2px">Riva</h2>
-                  <p style="font-size:11px;color:var(--muted)">AI Interview Partner</p>
-                </div>
-                <div style="display:flex;gap:6px">
-                  <span class="badge badge-accent" style="font-size:10px">Ex-Razorpay PM</span>
-                  <span class="badge" style="background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);font-size:10px">200+ interviews</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Voice waveform overlay -->
-            <div id="riva-waveform" style="position:absolute;bottom:72px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:3px;z-index:2;height:24px;opacity:0;transition:opacity 0.3s">
-              <div class="riva-wave-bar" style="--wave-h:10px;--wave-d:0.5s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:18px;--wave-d:0.4s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:14px;--wave-d:0.55s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:22px;--wave-d:0.35s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:16px;--wave-d:0.45s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:20px;--wave-d:0.5s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:12px;--wave-d:0.6s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:18px;--wave-d:0.38s;height:4px"></div>
-              <div class="riva-wave-bar" style="--wave-h:14px;--wave-d:0.52s;height:4px"></div>
-            </div>
-
-            <!-- Status badge (top-right of video feed) -->
-            <div id="riva-status" style="position:absolute;top:12px;right:12px;z-index:2;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(52,211,153,0.3);border-radius:99px;padding:5px 12px">
-              <div style="width:7px;height:7px;border-radius:50%;background:var(--emerald)"></div>
-              <span style="font-size:11px;font-weight:600;color:var(--emerald)">Online</span>
-            </div>
-
           </div>
 
-          <!-- Quote bar below video -->
-          <div style="padding:14px 16px;border-top:1px solid rgba(129,140,248,0.1);background:rgba(129,140,248,0.04)">
-            <p style="font-size:12px;color:var(--muted);line-height:1.55;font-style:italic">"I'm not here to make you feel good. I'm here to make you interview-ready."</p>
+          <h2 style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-0.03em;margin-bottom:4px">Riva</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:6px">AI Interview Partner</p>
+          <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+            <span class="badge badge-accent" style="font-size:11px">Ex-Razorpay PM</span>
+            <span class="badge" style="background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);font-size:11px">200+ interviews</span>
+          </div>
+
+          <div id="riva-status" style="display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:99px;padding:7px 16px;margin-bottom:24px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--emerald)"></div>
+            <span style="font-size:13px;font-weight:600;color:var(--emerald)">Ready to interview you</span>
+          </div>
+
+          <div style="background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:14px 16px;text-align:left">
+            <p style="font-size:13px;color:var(--muted);line-height:1.65;font-style:italic">"I'm not here to make you feel good. I'm here to make you interview-ready. I'll probe your reasoning, push on your assumptions, and tell you exactly what a Razorpay PM interviewer would think of that answer."</p>
+            <p style="font-size:11px;color:var(--faint);margin-top:8px">— Riva</p>
           </div>
         </div>
 
-        <!-- Start Interview CTA — under Riva -->
-        <button class="btn-primary" style="font-size:15px;padding:14px;width:100%;border-radius:12px;margin-top:12px" onclick="startInterview()">
-          Start Interview with Riva
+        <!-- Start Interview CTA -->
+        <button class="btn-primary" style="font-size:16px;padding:16px;width:100%;border-radius:14px;margin-top:14px" onclick="startInterview()">
+          Start Interview with Riva →
         </button>
 
+        <!-- Live session panel — under Riva on the left -->
+        <div id="riva-live" style="display:none;margin-top:14px">
+          <div class="card" style="padding:0;overflow:hidden;border-color:rgba(129,140,248,0.25);background:#070714">
+            <div style="background:linear-gradient(135deg,#0f0a1f,#0d0b18);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.15)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--rose);animation:bubblePulse 1.5s ease-in-out infinite" id="rec-dot"></div>
+                <span style="font-size:12px;font-weight:600;color:var(--rose);letter-spacing:0.5px">REC</span>
+                <span style="font-size:12px;color:var(--faint)">·</span>
+                <span id="riva-timer" style="font-size:13px;color:var(--text);font-weight:600;font-family:'Syne',sans-serif">00:00</span>
+              </div>
+              <button onclick="endInterview()" style="font-size:11px;background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--rose);border-radius:8px;padding:5px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">End</button>
+            </div>
+            <div id="riva-chat" style="padding:16px;display:flex;flex-direction:column;gap:14px;min-height:200px;max-height:360px;overflow-y:auto;background:linear-gradient(180deg,#0a0918,#070714)">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                  <span style="font-size:10px;font-weight:800;color:#818CF8">R</span>
+                </div>
+                <div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:2px 12px 12px 12px;padding:12px 14px;max-width:280px">
+                  <p style="font-size:13px;color:var(--text);line-height:1.65"><strong style="color:var(--accent)">Razorpay's payment success rate dropped 8% last Tuesday.</strong> Walk me through how you'd diagnose this.</p>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px 12px;border-top:1px solid rgba(129,140,248,0.1);display:flex;gap:8px;background:rgba(129,140,248,0.02)">
+              <textarea id="riva-input" class="textarea-dark" rows="2" placeholder="Type your answer..." style="flex:1;resize:none;font-size:13px;border-radius:10px;padding:8px 12px"></textarea>
+              <button onclick="rivaRespond()" style="background:var(--accent-bright);border:none;border-radius:10px;padding:0 16px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;color:white">Send</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Previous sessions -->
-        <div class="card" style="padding:16px;margin-top:12px">
-          <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Previous Sessions</p>
-          <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card" style="padding:20px;margin-top:14px">
+          <p style="font-size:13px;font-weight:700;margin-bottom:14px">Previous Sessions</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--elevated);border-radius:10px">
               <div>
                 <p style="font-size:13px;font-weight:600;margin-bottom:2px">Product Sense · Razorpay</p>
@@ -1502,7 +1401,7 @@
         </div>
       </div>
 
-      <!-- RIGHT: Setup + live interface -->
+      <!-- RIGHT: Setup -->
       <div style="display:flex;flex-direction:column;gap:20px">
 
         <!-- Round selector -->
@@ -1590,50 +1489,6 @@
             </div>
           </div>
           <p style="font-size:12px;color:var(--faint);margin-top:12px">Scores feed directly into your Readiness Score after each session.</p>
-        </div>
-
-        <!-- Live session panel (hidden until started) -->
-        <div id="riva-live" style="display:none">
-          <div class="card" style="padding:0;overflow:hidden;border-color:rgba(129,140,248,0.25);background:#070714">
-            <!-- Session header — video call style -->
-            <div style="background:linear-gradient(135deg,#0f0a1f,#0d0b18);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(129,140,248,0.15)">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:8px;height:8px;border-radius:50%;background:var(--rose);animation:bubblePulse 1.5s ease-in-out infinite" id="rec-dot"></div>
-                <span style="font-size:12px;font-weight:600;color:var(--rose);letter-spacing:0.5px">REC</span>
-                <span style="font-size:12px;color:var(--faint)">·</span>
-                <span id="riva-timer" style="font-size:13px;color:var(--text);font-weight:600;font-family:'Syne',sans-serif">00:00</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:12px;font-weight:600;color:var(--muted)">Product Sense · Razorpay</span>
-                <button onclick="endInterview()" style="font-size:11px;background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--rose);border-radius:8px;padding:5px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">End</button>
-              </div>
-            </div>
-            <!-- Transcript area -->
-            <div id="riva-chat" style="padding:20px;display:flex;flex-direction:column;gap:16px;min-height:260px;max-height:380px;overflow-y:auto;background:linear-gradient(180deg,#0a0918,#070714)">
-              <!-- Riva's first message -->
-              <div style="display:flex;gap:10px;align-items:flex-start">
-                <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4c1d95);border:1.5px solid rgba(129,140,248,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
-                  <span style="font-size:11px;font-weight:800;color:#818CF8">R</span>
-                </div>
-                <div>
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-                    <span style="font-size:11px;font-weight:700;color:var(--accent)">Riva</span>
-                    <span style="font-size:10px;color:var(--faint)">just now</span>
-                  </div>
-                  <div style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:2px 14px 14px 14px;padding:14px 16px;max-width:460px">
-                    <p style="font-size:14px;color:var(--text);line-height:1.7">Good. Let's begin. I'm interviewing you for a <strong>Growth PM role at Razorpay.</strong></p>
-                    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-top:10px"><strong style="color:var(--accent)">Razorpay's payment success rate dropped 8% last Tuesday.</strong> As the PM, walk me through how you'd diagnose this.</p>
-                    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px">Take a moment to structure your thinking. I'll push back on anything shallow.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Input bar -->
-            <div style="padding:12px 16px;border-top:1px solid rgba(129,140,248,0.1);display:flex;gap:10px;background:rgba(129,140,248,0.02)">
-              <textarea id="riva-input" class="textarea-dark" rows="2" placeholder="Type your answer..." style="flex:1;resize:none;font-size:14px;border-radius:12px;padding:10px 14px"></textarea>
-              <button onclick="rivaRespond()" style="background:var(--accent-bright);border:none;border-radius:12px;padding:0 20px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:white;transition:all 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Send</button>
-            </div>
-          </div>
         </div>
 
       </div>
