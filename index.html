@@ -71,6 +71,7 @@
   .verdict-score-dashes { animation: rotate-slow 12s linear infinite; transform-origin: 65px 65px; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .fade-up { animation: fadeUp 0.5s ease forwards; }
+  #parsing-quote { transition: opacity 0.3s ease; }
   .drag-zone { border: 1.5px dashed var(--border-bright); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.15s; }
   .drag-zone:hover, .drag-zone.dragging { border-color: var(--accent); background: rgba(129,140,248,0.05); }
   .connect-card { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
@@ -328,6 +329,33 @@
 
     <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:36px">
 
+      <!-- Resume Upload — hero action -->
+      <div class="connect-card" style="flex-direction:column;border:1px solid rgba(129,140,248,0.3);background:rgba(99,102,241,0.04)">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div class="connect-icon" style="background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <h4 style="font-size:15px;font-weight:700">Resume / CV Upload</h4>
+              <span style="font-size:11px;color:var(--accent);background:rgba(129,140,248,0.1);padding:2px 8px;border-radius:99px;border:1px solid rgba(129,140,248,0.25)">Recommended</span>
+            </div>
+            <p style="font-size:13px;color:var(--muted)">Compass extracts your PM-relevant experience: scope, metrics owned, cross-functional work, and impact statements.</p>
+          </div>
+        </div>
+        <div id="drop-zone" class="drag-zone" style="margin-top:16px;margin-left:auto;margin-right:auto;width:100%;max-width:480px" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event)">
+          <input type="file" id="file-input" accept=".pdf,.doc,.docx" style="display:none"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5" style="margin:0 auto 8px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p id="drop-label" style="font-size:14px;color:var(--muted);text-align:center">Drag your resume here or <span style="color:var(--accent)">browse</span></p>
+          <p style="font-size:12px;color:var(--faint);margin-top:4px;text-align:center">PDF, DOC, DOCX · up to 5MB</p>
+        </div>
+        <!-- Parsing motivation — shown during AI parsing -->
+        <div id="resume-parsing-motivation" style="display:none;text-align:center;padding:16px 0 4px">
+          <p id="parsing-quote" style="font-size:14px;color:var(--muted);font-style:italic;line-height:1.5;margin-bottom:6px"></p>
+          <p id="parsing-quote-author" style="font-size:12px;color:var(--faint)"></p>
+        </div>
+      </div>
+
       <!-- LinkedIn -->
       <div class="connect-card" id="li-card">
         <div class="connect-icon" style="background:#0A66C2">
@@ -354,29 +382,9 @@
             <div>
               <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">Teal Resume</h4>
               <p style="font-size:13px;color:var(--muted)">Teal reads your resume and extracts your achievements, scope of work, and impact metrics automatically.</p>
-              <p style="font-size:12px;color:var(--faint);margin-top:6px">Don't have Teal? <span style="color:var(--accent);cursor:pointer">Upload your resume instead ↓</span></p>
             </div>
             <button id="teal-btn" onclick="handleConnect('teal')" style="background:rgba(20,184,166,0.15);color:#14B8A6;border:1px solid rgba(20,184,166,0.3);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:16px;font-family:'Plus Jakarta Sans',sans-serif">Connect →</button>
           </div>
-        </div>
-      </div>
-
-      <!-- Resume Upload -->
-      <div class="connect-card" style="flex-direction:column">
-        <div style="display:flex;gap:16px;align-items:flex-start">
-          <div class="connect-icon" style="background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          </div>
-          <div style="flex:1">
-            <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">Resume / CV Upload</h4>
-            <p style="font-size:13px;color:var(--muted)">Compass extracts your PM-relevant experience: scope, metrics owned, cross-functional work, and impact statements.</p>
-          </div>
-        </div>
-        <div id="drop-zone" class="drag-zone" style="margin-top:16px" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event)">
-          <input type="file" id="file-input" accept=".pdf,.doc,.docx" style="display:none"/>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="1.5" style="margin:0 auto 8px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <p id="drop-label" style="font-size:14px;color:var(--muted)">Drag your resume here or <span style="color:var(--accent)">browse</span></p>
-          <p style="font-size:12px;color:var(--faint);margin-top:4px">PDF, DOC, DOCX · up to 5MB</p>
         </div>
       </div>
 
@@ -2004,6 +2012,43 @@ function handleFileSelect(event) {
   if (file) processResumeFile(file);
 }
 
+// PM motivation quotes shown during resume parsing
+const PM_PARSING_QUOTES = [
+  { text: "The best PMs don't have the right answers — they ask the right questions.", author: "Shreyas Doshi" },
+  { text: "Google APM acceptance rate is 0.56%. You're already ahead by building signal.", author: "Compass Insight" },
+  { text: "75% of career switchers who land PM roles credit structured preparation over raw talent.", author: "PM Discovery Report" },
+  { text: "Product sense isn't innate — it's pattern-matched from hundreds of teardowns.", author: "Jackie Bavaro" },
+  { text: "The gap between 'I want to be a PM' and 'I am ready' is 12–18 months of low-feedback cycles. Until now.", author: "Compass" },
+  { text: "14,000+ AI PM roles are open globally. The market is creating a new category — and you're early.", author: "LinkedIn Data, 2025" },
+];
+var _parsingQuoteTimer = null;
+
+function startParsingQuotes() {
+  var motiv = document.getElementById('resume-parsing-motivation');
+  var quoteEl = document.getElementById('parsing-quote');
+  var authorEl = document.getElementById('parsing-quote-author');
+  if (!motiv || !quoteEl) return;
+  motiv.style.display = 'block';
+  var idx = Math.floor(Math.random() * PM_PARSING_QUOTES.length);
+  quoteEl.textContent = '"' + PM_PARSING_QUOTES[idx].text + '"';
+  if (authorEl) authorEl.textContent = '— ' + PM_PARSING_QUOTES[idx].author;
+  _parsingQuoteTimer = setInterval(function() {
+    idx = (idx + 1) % PM_PARSING_QUOTES.length;
+    quoteEl.style.opacity = '0';
+    setTimeout(function() {
+      quoteEl.textContent = '"' + PM_PARSING_QUOTES[idx].text + '"';
+      if (authorEl) authorEl.textContent = '— ' + PM_PARSING_QUOTES[idx].author;
+      quoteEl.style.opacity = '1';
+    }, 300);
+  }, 3500);
+}
+
+function stopParsingQuotes() {
+  if (_parsingQuoteTimer) { clearInterval(_parsingQuoteTimer); _parsingQuoteTimer = null; }
+  var motiv = document.getElementById('resume-parsing-motivation');
+  if (motiv) motiv.style.display = 'none';
+}
+
 async function processResumeFile(file) {
   const zone  = document.getElementById('drop-zone');
   const label = document.getElementById('drop-label');
@@ -2011,6 +2056,7 @@ async function processResumeFile(file) {
   // Immediate feedback — synchronous, happens before any async work
   if (zone)  zone.style.borderColor  = 'var(--accent)';
   if (label) label.innerHTML = `<span style="color:var(--accent)">⏳ Reading ${file.name}…</span>`;
+  startParsingQuotes();
 
   const parsed = { name: null, email: null, phone: null, experience: [], awards: [], fileName: file.name };
 
@@ -2069,6 +2115,7 @@ async function processResumeFile(file) {
   saveProfile();
 
   // Update drop zone
+  stopParsingQuotes();
   if (zone)  zone.style.borderColor = 'var(--emerald)';
   if (label) label.innerHTML = `<span style="color:var(--emerald)">✓ ${file.name} uploaded</span>${parsed.name ? `<br/><span style="font-size:12px;color:var(--muted)">Name: ${parsed.name}</span>` : ''}`;
 }
