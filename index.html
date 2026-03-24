@@ -1912,7 +1912,7 @@ async function loadProfile(existingSession) {
 
 function getReturningScreen(profile) {
   if (profile.readiness_scores) return 's-dashboard';
-  if (profile.gate_score && profile.gate_score.score) return 's-readiness';
+  if (profile.gate_score && profile.gate_score.score != null) return 's-readiness';
   if (profile.resume_data) return 's-gate';
   if (profile.q1) return 's-connect';
   return 's-connect';
@@ -3959,9 +3959,29 @@ function northAutoPopup(screenId, message, delay) {
           return;
         }
 
-        // Sign-in succeeded — navigate immediately, onAuthStateChange will redirect returning users
+        // Sign-in succeeded — load profile and go to the right screen
         signupBtn.textContent = '✓ Signed in';
-        showScreen('s-connect');
+        try {
+          var session = result.data.session;
+          if (session) {
+            var u = session.user;
+            userData.name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || email;
+            userData.profileConnected = true;
+            applyName();
+          }
+          var profile = await loadProfile(session);
+          if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
+          if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+            if (userData.resumeData) updateProfileFromResume(userData.resumeData);
+            if (userData.q1) personalize();
+            showScreen(getReturningScreen(profile));
+          } else {
+            showScreen('s-connect');
+          }
+        } catch (navErr) {
+          console.error('[Compass] Sign-in nav error:', navErr);
+          showScreen('s-connect');
+        }
       } catch (e) {
         console.error('[Compass] Sign-in exception:', e);
         errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
