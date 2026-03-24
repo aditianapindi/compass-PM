@@ -2287,14 +2287,23 @@ function updateProfileFromResume(parsed) {
   }
 }
 
+var _showScreenTimer = null;
 function showScreen(id) {
-  const cur = document.querySelector('.screen.active');
   const nxt = document.getElementById(id);
-  if (!nxt || cur === nxt) return;
+  if (!nxt) { console.warn('[Compass] showScreen: target not found:', id); return; }
+  const cur = document.querySelector('.screen.active');
+  if (cur === nxt) return;
   if (!cur) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; return; }
   console.log('[Compass] showScreen:', cur.id, '→', id);
+  // Cancel any in-flight transition to prevent overlapping animations
+  if (_showScreenTimer) { clearTimeout(_showScreenTimer); _showScreenTimer = null; }
+  // Immediately clean up ALL active screens
+  document.querySelectorAll('.screen.active').forEach(function(s) {
+    if (s !== nxt) { s.classList.remove('active'); s.style.display = 'none'; s.style.opacity = '0'; }
+  });
   cur.style.opacity = '0';
-  setTimeout(() => {
+  _showScreenTimer = setTimeout(() => {
+    _showScreenTimer = null;
     cur.classList.remove('active');
     cur.style.display = 'none';
     nxt.style.display = 'block';
@@ -3731,29 +3740,42 @@ function northAutoPopup(screenId, message, delay) {
   sb.auth.onAuthStateChange(async function (event, session) {
     console.log('[Compass] Auth event:', event, session ? 'session exists' : 'no session');
     if (!session) return;
-    var user = session.user;
-    var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
-    userData.name = authName || user.email;
-    userData.profileConnected = true;
-    applyName();
+    try {
+      var user = session.user;
+      var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
+      userData.name = authName || user.email;
+      userData.profileConnected = true;
+      applyName();
 
-    // Load saved profile for returning users
-    var current = document.querySelector('.screen.active');
-    console.log('[Compass] Current screen:', current ? current.id : 'none');
-    var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
-    if (!current || preAuthScreens.includes(current.id)) {
-      var profile = await loadProfile();
-      // Prefer resume name over auth email fallback
-      if (userData.resumeData && userData.resumeData.name) {
-        userData.name = userData.resumeData.name;
-        applyName();
+      // Load saved profile for returning users
+      var current = document.querySelector('.screen.active');
+      console.log('[Compass] onAuthStateChange current screen:', current ? current.id : 'none');
+      var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
+      if (!current || preAuthScreens.includes(current.id)) {
+        var profile = await loadProfile();
+        console.log('[Compass] onAuthStateChange profile loaded:', profile ? 'has data' : 'empty');
+        // Prefer resume name over auth email fallback
+        if (userData.resumeData && userData.resumeData.name) {
+          userData.name = userData.resumeData.name;
+          applyName();
+        }
+        if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
+          // Returning user — restore UI state
+          if (userData.resumeData) updateProfileFromResume(userData.resumeData);
+          if (userData.q1) personalize();
+          var target = getReturningScreen(profile);
+          console.log('[Compass] onAuthStateChange navigating to:', target);
+          showScreen(target);
+        } else {
+          console.log('[Compass] onAuthStateChange navigating to: s-connect (new user)');
+          showScreen('s-connect');
+        }
       }
-      if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
-        // Returning user — restore UI state
-        if (userData.resumeData) updateProfileFromResume(userData.resumeData);
-        if (userData.q1) personalize();
-        showScreen(getReturningScreen(profile));
-      } else {
+    } catch (e) {
+      console.error('[Compass] onAuthStateChange error:', e);
+      // Fallback: ensure user isn't stuck on auth screen
+      var cur = document.querySelector('.screen.active');
+      if (cur && ['s-signin', 's-landing', 's-verdict'].includes(cur.id)) {
         showScreen('s-connect');
       }
     }
@@ -3802,39 +3824,48 @@ function northAutoPopup(screenId, message, delay) {
       signupBtn.textContent = 'Creating account…';
       signupBtn.disabled = true;
 
-      var { data, error } = await sb.auth.signUp({ email, password });
+      try {
+        console.log('[Compass] Sign-up attempt for:', email);
+        var { data, error } = await sb.auth.signUp({ email, password });
+        console.log('[Compass] Sign-up result:', error ? 'error: ' + error.message : 'success');
 
-      if (error) {
-        errorEl.textContent = error.message;
-        errorEl.style.display = 'block';
-        signupBtn.textContent = 'Create Account →';
-        signupBtn.disabled = false;
-        return;
-      }
-
-      // Supabase may require email confirmation — check
-      if (data.user && data.user.identities && data.user.identities.length === 0) {
-        errorEl.style.color = 'var(--amber)';
-        errorEl.textContent = 'An account with this email already exists. Use Sign in instead.';
-        errorEl.style.display = 'block';
-        signupBtn.textContent = 'Create Account →';
-        signupBtn.disabled = false;
-        return;
-      }
-
-      // If no session (email confirmation required), try auto-sign-in
-      if (!data.session) {
-        var { error: signInErr } = await sb.auth.signInWithPassword({ email, password });
-        if (signInErr) {
-          // Truly needs email confirmation — tell the user
-          signupBtn.textContent = '✓ Check your email to confirm';
-          signupBtn.style.background = 'var(--emerald)';
+        if (error) {
+          errorEl.textContent = error.message;
+          errorEl.style.display = 'block';
+          signupBtn.textContent = 'Create Account →';
+          signupBtn.disabled = false;
           return;
         }
-        // Auto-sign-in worked — proceed
-      }
 
-      showScreen('s-connect');
+        // Supabase may require email confirmation — check
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          errorEl.style.color = 'var(--amber)';
+          errorEl.textContent = 'An account with this email already exists. Use Sign in instead.';
+          errorEl.style.display = 'block';
+          signupBtn.textContent = 'Create Account →';
+          signupBtn.disabled = false;
+          return;
+        }
+
+        // If no session (email confirmation required), try auto-sign-in
+        if (!data.session) {
+          var signInResult = await sb.auth.signInWithPassword({ email: email, password: password });
+          if (signInResult.error) {
+            signupBtn.textContent = '✓ Check your email to confirm';
+            signupBtn.style.background = 'var(--emerald)';
+            return;
+          }
+        }
+
+        signupBtn.textContent = '✓ Account created';
+        showScreen('s-connect');
+      } catch (e) {
+        console.error('[Compass] Sign-up exception:', e);
+        errorEl.textContent = e.message || 'Sign-up failed. Please try again.';
+        errorEl.style.display = 'block';
+        signupBtn.textContent = 'Create Account →';
+        signupBtn.disabled = false;
+      }
     });
   }
 
@@ -3855,17 +3886,42 @@ function northAutoPopup(screenId, message, delay) {
       signupBtn.textContent = 'Signing in…';
       signupBtn.disabled = true;
 
-      var { error } = await sb.auth.signInWithPassword({ email, password });
+      try {
+        console.log('[Compass] Sign-in attempt for:', email);
+        var result = await sb.auth.signInWithPassword({ email: email, password: password });
+        console.log('[Compass] Sign-in result:', result.error ? 'error: ' + result.error.message : 'success');
 
-      if (error) {
-        errorEl.textContent = error.message;
+        if (result.error) {
+          errorEl.textContent = result.error.message;
+          errorEl.style.display = 'block';
+          signupBtn.textContent = 'Create Account →';
+          signupBtn.disabled = false;
+          return;
+        }
+
+        // Sign-in succeeded — onAuthStateChange will also navigate for returning users
+        signupBtn.textContent = '✓ Signed in';
+        console.log('[Compass] Sign-in success, calling showScreen s-connect');
+        showScreen('s-connect');
+
+        // Fallback: if still on signin screen after 2s, force navigate
+        setTimeout(function() {
+          var cur = document.querySelector('.screen.active');
+          if (cur && cur.id === 's-signin') {
+            console.warn('[Compass] Sign-in fallback: still on signin, forcing navigation');
+            cur.classList.remove('active');
+            cur.style.display = 'none';
+            var nxt = document.getElementById('s-connect');
+            if (nxt) { nxt.style.display = 'block'; nxt.classList.add('active'); nxt.style.opacity = '1'; }
+          }
+        }, 2000);
+      } catch (e) {
+        console.error('[Compass] Sign-in exception:', e);
+        errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
         errorEl.style.display = 'block';
         signupBtn.textContent = 'Create Account →';
         signupBtn.disabled = false;
-        return;
       }
-
-      showScreen('s-connect');
     });
   }
 }());
