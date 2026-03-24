@@ -3999,7 +3999,7 @@ function northAutoPopup(screenId, message, delay) {
       applyName();
 
       var current = document.querySelector('.screen.active');
-      var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-connect', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
+      var preAuthScreens = ['s-signin', 's-landing', 's-verdict', 's-q1', 's-q2', 's-q3', 's-q4', 's-q5', 's-q6', 's-q7', 's-q8', 's-loading'];
       if (!current || preAuthScreens.includes(current.id)) {
         var profile = await loadProfile(session);
         if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
@@ -4139,29 +4139,26 @@ function northAutoPopup(screenId, message, delay) {
           return;
         }
 
-        // Sign-in succeeded — load profile and go to the right screen
+        // Sign-in succeeded — navigate IMMEDIATELY, then load profile in background
         signupBtn.textContent = '✓ Signed in';
-        try {
-          var session = result.data.session;
-          if (session) {
-            var u = session.user;
-            userData.name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || email;
-            userData.profileConnected = true;
-            applyName();
-          }
-          var profile = await loadProfile(session);
+        var session = result.data.session;
+        if (session) {
+          var u = session.user;
+          userData.name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || email;
+          userData.profileConnected = true;
+          applyName();
+        }
+        // Navigate to s-connect instantly so user isn't stuck on sign-in
+        showScreen('s-connect');
+        // Background: load profile and route to correct screen
+        loadProfile(session).then(function(profile) {
           if (userData.resumeData && userData.resumeData.name) { userData.name = userData.resumeData.name; applyName(); }
           if (profile && (profile.q1 || profile.resume_data || profile.gate_score)) {
             if (userData.resumeData) updateProfileFromResume(userData.resumeData);
             if (userData.q1) personalize();
             showScreen(getReturningScreen(profile));
-          } else {
-            showScreen('s-connect');
           }
-        } catch (navErr) {
-          console.error('[Compass] Sign-in nav error:', navErr);
-          showScreen('s-connect');
-        }
+        }).catch(function(err) { console.error('[Compass] Sign-in profile load error:', err); });
       } catch (e) {
         console.error('[Compass] Sign-in exception:', e);
         errorEl.textContent = e.message || 'Sign-in failed. Please try again.';
