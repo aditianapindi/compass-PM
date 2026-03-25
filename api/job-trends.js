@@ -80,13 +80,13 @@ Return exactly 4 signals.`;
   }
 }
 
-async function geminiWithRetry(url, body, retries = 2) {
-  for (let i = 0; i <= retries; i++) {
+async function geminiWithRetry(url, body) {
+  for (let i = 0; i < 2; i++) {
     try {
       const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await resp.json();
-      if (data.error && i < retries) { await new Promise(r => setTimeout(r, 1000 * (i + 1))); continue; }
+      if (data.error && i === 0) { await new Promise(r => setTimeout(r, 500)); continue; }
       return data;
-    } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+    } catch (e) { if (i === 1) throw e; await new Promise(r => setTimeout(r, 500)); }
   }
 }
