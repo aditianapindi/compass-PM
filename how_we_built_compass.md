@@ -238,6 +238,328 @@ The result appears as a structured card in North's chat — not just text, but a
 
 ---
 
+## Deep Dive: How Resume Parsing Works
+
+When a user drops their PDF into Compass, a two-stage pipeline kicks in — the first stage runs entirely in their browser, the second uses AI on the server.
+
+### Stage 1: Reading the PDF (Client-Side, in the Browser)
+
+We use an open-source library called **PDF.js** (built by Mozilla, the Firefox team). It runs directly in the user's browser — the PDF never leaves their machine at this point.
+
+Here's what happens:
+1. The user drops or selects a PDF file
+2. PDF.js reads the raw file bytes
+3. It extracts the text content from the **first 3 pages** (we cap it here because resumes are rarely longer, and sending more text just costs more and slows things down)
+4. The extracted text is a raw string — unformatted, no structure, just all the words from the PDF in reading order
+
+At this point, we have raw text like: `"Arjun Sharma Senior Software Engineer Infosys 2020-2024 Built internal deployment pipeline..."`
+
+### Stage 2: Structuring with AI (Server-Side)
+
+Raw text isn't useful. We need structured data — a name field, a role field, a list of skills. So we send the first 3,000 characters of the extracted text to our `/api/parse-resume` endpoint, which calls **Google's Gemini 2.5 Flash** model.
+
+The prompt tells Gemini exactly what to return:
+
+```
+"You are a PM hiring expert. Analyse this resume and return ONLY a JSON object..."
+```
+
+We give it a precise schema:
+- **name** — the person's full name
+- **currentRole** — their most recent job title and company (e.g., "Senior Engineer at Infosys")
+- **totalExperience** — years of work experience as a string (e.g., "6 years")
+- **experience** — up to 5 most recent positions
+- **skills** — up to 8 most relevant skills
+- **pmHighlights** — exactly 4 observations about PM-relevant signals, each classified as:
+  - **strength** — something that signals PM readiness (e.g., "Led cross-functional migration affecting 3 teams")
+  - **warning** — something that may need reframing (e.g., "All experience is at a service company, not a product company")
+  - **action** — something missing they should build (e.g., "No evidence of user research or direct customer interaction")
+
+**Why this matters:** The highlights aren't generic career advice. They're specific to THIS resume's actual content. The AI reads the resume and picks out what a PM hiring manager would notice.
+
+**Temperature: 0.1** — We set this very low because resume parsing needs to be deterministic. The same resume should always produce the same structured output. Higher temperature would make the AI creative, which is exactly what we don't want for data extraction.
+
+The JSON comes back, and we immediately populate the user's profile page — name, role, experience timeline, skill tags, and the PM highlights cards with colour-coded icons.
+
+---
+
+## Deep Dive: How Answer Scoring Works
+
+Compass scores user writing in three different contexts — the onboarding gate task, the readiness assessment, and daily practice tasks. Each uses the same AI model but with very different prompts and rubrics.
+
+### Gate Task Scoring (First Impression)
+
+When the user submits their product teardown on the gate screen, we send their text + their background (from Q1) to `/api/score-gate`.
+
+**The prompt structure:**
+1. We tell Gemini it's a "PM hiring expert"
+2. We include the user's background so scoring is contextual (an engineer writing about technical feasibility is different from a consultant doing the same)
+3. We provide a 4-tier rubric:
+   - **80–100:** Identifies the user, the problem, AND the metric. All three present with specificity.
+   - **60–79:** Has two of three clearly. One dimension is weak or generic.
+   - **40–59:** Leads with a solution before diagnosing the problem. This is the most common trap for new PM thinkers.
+   - **0–39:** Too generic — could apply to any product. No evidence of structured thinking.
+4. We ask for structured JSON: a numeric score, a one-line headline, one strength (referencing their actual words), one gap (referencing their actual words)
+
+**Temperature: 0.2** — Low, for scoring consistency. The same quality answer should get roughly the same score every time.
+
+**What the AI returns:**
+```json
+{
+  "score": 62,
+  "thinkingStyle": "user-first",
+  "headline": "Strong user empathy, but no metric to measure success",
+  "strength": "Grounded the analysis in a specific user segment — gig workers using the app on slow connections",
+  "gap": "No measurable outcome proposed — 'better experience' isn't a metric, DAU retention or task completion rate would be"
+}
+```
+
+The feedback appears instantly on the screen as an inline card — no page navigation. The user sees exactly where they scored, what they did well, and what was missing.
+
+### Readiness Scoring (6-Dimension Assessment)
+
+This is the most complex scoring in Compass. After the gate task, we send EVERYTHING we know about the user to `/api/score-readiness`:
+- Their background (Q1 answer)
+- Their target company
+- Their full resume data (parsed from PDF)
+- Their gate task result (score, headline, strength, gap)
+
+**What makes this scoring rigorous:**
+
+**1. Evidence signals per dimension.** For each of the 6 dimensions, we tell the AI exactly what evidence to look for. For example, for Analytical Depth: "Does the resume show data/metrics work? Did the gate task reference a metric? SQL, analytics, A/B testing experience?" For Technical Credibility: "Engineering roles, CS degree, system design, API work."
+
+**2. Background baselines.** We provide a table of starting score ranges. An engineer starts at 70–85 on Technical Credibility but 25–35 on Business Framing. A management consultant starts the opposite. This prevents the AI from scoring everyone the same.
+
+| Background | Product Sense | Analytical | Business | Technical | AI Fluency | Behavioural |
+|---|---|---|---|---|---|---|
+| Software Engineer | 35–45 | 50–60 | 25–35 | 70–85 | 30–45 | 35–45 |
+| Consultant / MBA | 40–50 | 45–55 | 55–70 | 20–35 | 20–30 | 50–65 |
+| Designer / UX | 55–65 | 30–40 | 30–40 | 25–35 | 20–30 | 40–50 |
+| Data Scientist | 35–45 | 65–80 | 35–45 | 50–60 | 45–60 | 30–40 |
+
+**3. Cross-validation rules.** Dimensions are linked to prevent gaming:
+- If the gate score is below 40, Product Sense cannot exceed 55 (the gate task IS a live sample of product thinking — it overrides resume claims)
+- If the resume shows no quantitative results and the gate task had no metric reasoning, Analytical Depth is capped at 45
+- If the resume shows only individual contributor work with no team language, Behavioural is capped at 50
+
+**4. Calibration examples.** We give the AI three full example profiles with expected scores, so it has concrete anchors for what a "42 in Product Sense" vs a "72 in Analytical Depth" actually looks like.
+
+**5. Scoring bands.** Explicit definitions: 0–30 = no evidence, 31–50 = early signals, 51–65 = developing, 66–80 = solid, 81–100 = exceptional (rare).
+
+**6. Anti-inflation rules.** "Most career switchers should have 2–3 dimensions in the 30–50 range. If all 6 are above 50, you are likely inflating." This prevents the AI from being generous.
+
+**Temperature: 0.3** — Slightly higher than gate scoring because we want the AI to exercise judgement across many signals, but still consistent enough that re-running with the same data gives similar scores.
+
+**The overall score** uses fixed weights: Product Sense 25%, Analytical 20%, Business 15%, Technical 15%, AI Fluency 10%, Behavioural 15%. These weights reflect how PM interviews are actually structured — product sense is tested most heavily.
+
+### Daily Task Scoring (8 Different Rubrics)
+
+Each of the 8 task types has its own scoring rubric in `/api/score-task`. The AI doesn't use one generic rubric — it uses the right one for the task type.
+
+Examples:
+
+**Metric Diagnosis rubric:**
+- 80–100: Structured decomposition, multiple hypotheses with data sources, prioritised by likelihood and impact
+- 40–59: Lists possible causes but doesn't structure the diagnosis. No prioritisation.
+
+**Networking rubric:**
+- 80–100: Personalised to the specific person and company, references real product work, has a clear and easy-to-accept ask. Would actually get a response.
+- 40–59: Template-sounding. Could be sent to anyone at any company.
+
+**Portfolio rubric:**
+- 80–100: Clear problem framing grounded in user evidence, structured reasoning, specific metrics. Demonstrates PM thinking — not just description.
+- 40–59: Describes what happened but doesn't frame it as PM impact. Tells instead of shows.
+
+After scoring, the AI also estimates **dimension impact** — how many points this practice would add to the user's score:
+- Excellent response (80–100): +3 to +5 points
+- Good response (60–79): +2 to +3 points
+- Developing response (40–59): +1 point
+- Weak response (0–39): +0 points
+
+This creates the core feedback loop: each task you complete makes your score go up by a visible, earned amount.
+
+---
+
+## Deep Dive: How North Responds
+
+North is the AI assistant — a floating chat bubble that appears on every screen after onboarding. Here's exactly what happens when a user sends a message.
+
+### Step 1: Assemble Context
+
+Before the message even reaches the AI, the frontend bundles everything we know about this user into a context string:
+
+```
+Name: Arjun Sharma
+Background: Software / Data Engineer
+Target company: Fintech and payments
+Overall readiness: 56/100
+Dimensions: Product Sense 58, Analytical 44, Business 53, Technical 81, AI Fluency 37, Behavioural 62
+Gate task: 62/100 — "Strong user empathy, but no metric to measure success"
+Resume highlights: 6 years experience, Senior Engineer at Infosys, skills: Python, SQL, React...
+```
+
+This context gets sent alongside the user's message to the API.
+
+### Step 2: Retrieve Relevant Data (RAG)
+
+This is where RAG happens. The user might ask: "What companies should I apply to given my scores?"
+
+**Vector search (primary path):**
+1. The user's message is converted into an **embedding** — a list of 3,072 numbers that represent its meaning — using Gemini's `gemini-embedding-001` model
+2. This embedding is sent to Supabase, where it's compared against the 50 pre-stored embeddings (12 companies, 24 jobs, 8 trends, 6 transition profiles)
+3. The comparison uses **cosine similarity** — a mathematical measure of how similar two embeddings are. Items with the most similar "meaning" score highest.
+4. The top 5 most relevant items are returned
+5. These items are injected into the AI's prompt as "Retrieved Market Intelligence"
+
+**Keyword fallback:** If vector search is unavailable (network issue, Supabase down), we fall back to simple keyword matching — look up the user's target company by name in the JSON file and pull its data directly. Less flexible, but never breaks.
+
+### Step 3: Generate Response
+
+Now we have the user's message, their full context, and the 5 most relevant pieces of market data. These all go into a prompt for Gemini 2.5 Flash.
+
+**North's personality is defined in the prompt:**
+- Honest and direct. Not a cheerleader. Never says "great question!"
+- Specific to this user's actual data — never generic PM advice
+- Concise: 2–4 sentences max per response
+- Gives signal and next action, not motivation
+- References the user's actual background, scores, and gaps
+- Addresses the user by first name naturally
+- Uses the real company data from RAG, not generic advice
+
+**Temperature: 0.7** — Higher than scoring because we want North to feel conversational and varied. The same question asked twice should get a slightly different but equally helpful response.
+
+**What comes back:** A plain text response, grounded in the user's actual data and the real company information from the dataset. Plus a `ragSource` field ("vector" or "keyword") so we know which retrieval method was used.
+
+### Special Case: "I Got Rejected"
+
+When the user clicks the "I got rejected" chip or says something about rejection, North doesn't just chat — it triggers the **rejection agent**, a multi-step AI pipeline that makes 3 separate Gemini API calls:
+
+1. **IDENTIFY** (Gemini call #1): Extract the company name and interview round from the message. If the user didn't name a company, return `needsInfo: true` — North will ask them before continuing.
+
+2. **RETRIEVE** (Vector search): Search the dataset for that specific company's hiring bar, interview format, common rejection reasons, and switcher notes.
+
+3. **DIAGNOSE + GENERATE** (Gemini call #2): A single large prompt that compares the user's scores against the company's actual hiring bar, identifies which specific gaps caused the rejection, and builds a 2-week day-by-day recovery plan with concrete daily exercises.
+
+The result is a structured JSON object rendered as a diagnosis card in the chat — not just text, but visual score comparisons, gap indicators, and a full plan with daily tasks and time estimates.
+
+---
+
+## Deep Dive: The Technology Stack and Integrations
+
+### The AI Model: Google Gemini 2.5 Flash
+
+Every AI feature in Compass uses **Gemini 2.5 Flash**, Google's fast language model, accessed through the `generativelanguage.googleapis.com` API.
+
+**Why Gemini 2.5 Flash:**
+- Fast — responses come back in 1–3 seconds, which matters for inline scoring feedback
+- Cheap — Flash pricing is a fraction of larger models, critical for a prototype handling multiple API calls per user session
+- Structured output — reliable at returning valid JSON when instructed, which we need for scores, diagnoses, and plans
+
+**Configuration that matters:**
+- `thinkingBudget: 0` — This is critical. Gemini 2.5 Flash has a "thinking" mode where it uses some of its output budget to reason internally before responding. We set this to zero so ALL the output budget goes to the actual response. Without this, responses get truncated — the AI "thinks" for 400 tokens and then only has 600 tokens left for the answer.
+- `temperature` varies by use case: 0.1 for resume parsing (deterministic), 0.2 for gate scoring (consistent), 0.3 for readiness scoring and task scoring, 0.7 for North chat (conversational)
+- `maxOutputTokens` varies: 200 for identification (short extraction), 600–1000 for scoring and matches, 1200 for readiness (6 dimensions), 2500 for the rejection agent (full recovery plan)
+
+### Embedding Model: Gemini Embedding-001
+
+For RAG (finding relevant data), we use a separate model: **gemini-embedding-001**. This model doesn't generate text — it converts text into **3,072-dimensional vectors** (lists of 3,072 numbers).
+
+Two texts with similar meaning produce similar vectors, even if they use completely different words. "Razorpay's analytical bar is very high" and "Which fintech companies need strong data skills?" would produce similar vectors, so a search for the second would find the first.
+
+### Supabase (Database + Auth + Vector Search)
+
+**Supabase** serves three roles:
+
+1. **Authentication:** Google OAuth sign-in and email/password sign-in. Handles session management, token refresh, and user accounts. The frontend uses Supabase's JavaScript client library loaded from a CDN.
+
+2. **Database:** A PostgreSQL database with a `profiles` table that stores all user data — onboarding answers (q1–q8), resume data, gate score, readiness scores, and task progress. All stored as JSONB (structured JSON inside PostgreSQL).
+
+3. **Vector search (pgvector):** A PostgreSQL extension that stores embedding vectors and can search them by similarity. We have an `embeddings` table with 50 rows (one per company, job, trend, and transition profile). A custom function called `match_embeddings` takes a query vector and returns the most similar stored vectors using cosine distance.
+
+### PDF.js (Resume Reading)
+
+**PDF.js** is Mozilla's open-source PDF renderer, loaded via CDN. It runs entirely in the browser — no server involved. We use it to extract text from uploaded resumes. It handles the complexity of PDF formatting (columns, tables, headers) and gives us a plain text string.
+
+### Vercel (Hosting + Serverless Functions)
+
+**Vercel** hosts the frontend (the single HTML file) and runs the backend (10 serverless functions in the `api/` folder). Every git push to GitHub triggers an automatic deploy — code is live in about 30 seconds.
+
+The serverless functions are Node.js files. Each one handles one API endpoint (e.g., `/api/parse-resume`, `/api/score-task`). They run on demand — no server to manage, no scaling to configure. Vercel also securely stores environment variables (API keys) that are never exposed in the code.
+
+### Integration Summary
+
+| Tool | What It Does | How It's Used |
+|---|---|---|
+| **Gemini 2.5 Flash** | Text generation, scoring, planning | All 10 API endpoints (resume parsing, scoring, chat, job matching, trends, rejection agent) |
+| **Gemini Embedding-001** | Text → vector conversion | RAG: embedding user messages + one-time embedding of 50 market data items |
+| **Supabase Auth** | User sign-in | Google OAuth + email/password, session management |
+| **Supabase PostgreSQL** | Data storage | User profiles, onboarding data, scores, task progress (JSONB) |
+| **Supabase pgvector** | Semantic search | 50 embedded items searched by cosine similarity for RAG |
+| **PDF.js** | PDF text extraction | Client-side resume parsing (first 3 pages) |
+| **Vercel** | Hosting + serverless | Auto-deploys from GitHub, runs 10 API endpoints, stores env vars |
+| **Tailwind CSS** | Styling (via CDN) | Utility classes for layout, responsive design |
+| **Google Fonts** | Typography | Syne (headings) + DM Sans (body text) |
+
+---
+
+## Deep Dive: How RAG Works in Compass
+
+RAG stands for **Retrieval-Augmented Generation**. It's the technique that makes Compass's AI responses specific and grounded rather than generic.
+
+### The Problem RAG Solves
+
+Without RAG, if you ask the AI "What does Razorpay look for in PM candidates?", it would answer based on its general training data — which might be outdated, vague, or wrong. It doesn't know Razorpay's actual hiring bar, interview format, or common rejection reasons.
+
+With RAG, before the AI answers, we first **retrieve** the actual Razorpay data from our curated dataset and include it in the question. Now the AI has real, specific facts to work with.
+
+### Step 1: Build the Knowledge Base (One-Time Setup)
+
+We curated a dataset of 50 items in `data/pm-market-data.json`:
+- 12 company profiles (Flipkart, Razorpay, Meesho, Swiggy, etc.) with hiring bars, interview formats, salary ranges, rejection reasons
+- 24 job listings with specific skill requirements per dimension
+- 8 market trends with sources
+- 6 transition profiles (how engineers, consultants, designers, etc. convert into PM roles)
+
+### Step 2: Convert Everything to Vectors (One-Time Setup)
+
+We ran a script (`scripts/embed-market-data.js`) that:
+1. Reads each of the 50 items
+2. Converts each one into a human-readable text description (e.g., "Razorpay is a growth-stage fintech company in Bangalore. Hiring bar: Product Sense 75, Analytical Depth 80...")
+3. Sends each text to Google's `gemini-embedding-001` model
+4. Gets back a list of 3,072 numbers (the "embedding") that represents the meaning of that text
+5. Stores the text + its embedding in Supabase's pgvector table
+
+This is done once. The 50 embeddings sit in the database, ready to be searched.
+
+### Step 3: Search at Query Time (Every Chat Message)
+
+When a user sends a message to North:
+
+1. **Embed the question:** The user's message is sent to `gemini-embedding-001` and converted into a 3,072-number vector
+2. **Search for matches:** This vector is compared against all 50 stored vectors using cosine similarity — a mathematical measure of how close two vectors are in meaning
+3. **Return top 5:** The 5 items with the highest similarity score are returned. These might be company profiles, job listings, trends, or transition profiles — whatever is most relevant to the question
+4. **Inject into prompt:** The text of these 5 items is added to the AI prompt as "Retrieved Market Intelligence"
+5. **Generate response:** Gemini 2.5 Flash now answers the question using both the user's context AND the retrieved real data
+
+### Why Vectors Beat Keywords
+
+**Keyword search** only works when the user uses the exact same words as the data. If the data says "Razorpay" and the user asks about "fintech companies," keyword search finds nothing.
+
+**Vector search** understands meaning. "Which fintech companies need strong data skills?" would match with Razorpay's profile (a fintech company with high analytical depth requirements) even though those exact words don't appear anywhere in the data. The vectors for "fintech companies with strong data requirements" and "Razorpay — Analytical Depth 80" are mathematically similar.
+
+### The Fallback
+
+If vector search is unavailable (network issue, Supabase down), Compass falls back to keyword matching — look up the user's target company by exact name and pull its data from the JSON file directly. It's less flexible (can't handle fuzzy or natural-language queries) but it never breaks. The user experience degrades gracefully.
+
+### Where RAG Is Used
+
+- **North AI chat** — every message retrieves relevant data before responding
+- **Rejection agent** — searches for the specific company that rejected the user
+- **Job matches** — company data is loaded for comparison against user scores
+- **Trend signals** — market trends are loaded and personalised
+
+---
+
 ## Understanding the Flows
 
 This section explains the key user flows in Compass — how screens connect, when AI is called, and how data moves through the system. Useful for anyone navigating the codebase or extending the prototype.
