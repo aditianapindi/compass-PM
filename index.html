@@ -3021,6 +3021,7 @@ async function submitDailyTask() {
       if (errFb) {
         errFb.style.display = 'block';
         errFb.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+        errFb.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       return;
     }
@@ -3056,6 +3057,7 @@ async function submitDailyTask() {
     if (errFb) {
       errFb.style.display = 'block';
       errFb.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+      errFb.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 }
@@ -3561,6 +3563,7 @@ async function submitGate() {
     if (errEl) {
       errEl.style.display = 'block';
       errEl.innerHTML = '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:20px;text-align:center"><p style="font-size:15px;font-weight:600;color:var(--rose);margin-bottom:8px">Scoring failed — please try again</p><p style="font-size:13px;color:var(--muted)">Your answer is still here. Check your connection and resubmit.</p></div>';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 }
