@@ -18,7 +18,7 @@ A Career Navigation Platform for Aspiring Product Managers, serving both India a
 **Compass** — "Like Google Maps, but for your PM career."
 
 ## Current Stage
-Prototype live on Vercel with full AI pipeline: Supabase auth, PDF resume parsing, AI gate scoring, AI readiness scoring (6 dimensions), RAG-powered North AI assistant (vector search + keyword fallback), daily task system (23 tasks across 4 phases) with score improvement, post-rejection agentic remediation, job matching, trend signals, and mock interview room. Deployed at `compass-pm.vercel.app`. GitHub repo: `aditianapindi/compass-PM`. Next step: validate with 5–10 real users, then pursue technical co-founder or pre-seed raise.
+Prototype live on Vercel with full AI pipeline: Supabase auth, PDF resume parsing, AI gate scoring, AI readiness scoring (6 dimensions), RAG-powered North AI assistant (vector search + keyword fallback), daily task system (21 tasks across 4 phases) with score improvement, post-rejection agentic remediation, job matching, trend signals, and mock interview room. Deployed at `compass-pm.vercel.app`. GitHub repo: `aditianapindi/compass-PM`. Next step: validate with 5–10 real users, then pursue technical co-founder or pre-seed raise.
 
 ## Key Files
 - `index.html` — Full interactive prototype (single HTML file). 13 screens, vanilla JS, Tailwind CDN, Supabase JS CDN, PDF.js CDN, Google Fonts (Syne + DM Sans). Supabase anon key inlined (safe to commit).
@@ -150,7 +150,7 @@ Side: Profile (s-profile), Interview Room (s-interview), Jobs+Trends (s-jobs)
 | Screen ID | What It Does |
 |---|---|
 | `s-landing` | Hero, pain points, 7-step how-it-works, footer CTA. No `active` class in HTML — shown by `onAuthStateChange` when no session. |
-| `s-signin` | Sign in / create account (Google OAuth via Supabase, email/password) |
+| `s-signin` | Sign in / create account (Google OAuth via Supabase, email/password). Smart flow: if user tries to create account with existing email, auto-switches to sign-in mode. |
 | `s-connect` | Connect LinkedIn, Teal, resume upload (PDF.js + Gemini), GitHub, writing samples |
 | `s-q1`–`s-q8` | 8 onboarding questions — auto-advance on selection, no Next button. Q3=experience signals (checkboxes), Q5=skills (multi-select pills) |
 | `s-loading` | Spinning compass, 10 rotating motivational quotes, animated check items (12 companies, not 40+), auto-advances to verdict |
@@ -158,10 +158,10 @@ Side: Profile (s-profile), Interview Room (s-interview), Jobs+Trends (s-jobs)
 | `s-gate` | Dual-purpose screen: onboarding gate task OR daily practice tasks. charLimit varies by task (500–2000). AI scoring, inline feedback card with dimension impact. "Next Task →" CTA after completion. |
 | `s-readiness` | Animated radar chart (6 dimensions) + score ring + confidence indicator (measured vs estimated) + stat cards. Scores driven by AI (score-readiness.js) |
 | `s-paywall` | Monetisation screen — Monthly (₹999/mo) vs Annual (₹7,999/yr) pricing cards |
-| `s-dashboard` | **Merged path + dashboard (Duolingo-style).** Compact progress header (tasks done, progress bar X/23, streak grid). Tasks grouped by dimension sorted weakest-first, each clickable via `startSpecificTask(taskId)`. Mock interview milestone card (unlocks at 12+ tasks). Job matches section. `s-path` redirects here via `showScreen`. |
+| `s-dashboard` | **Merged path + dashboard (Duolingo-style).** Compact progress header (tasks done, progress bar X/21, streak grid). Tasks grouped by dimension sorted weakest-first, each clickable via `startSpecificTask(taskId)`. Mock interview milestone card (unlocks at 12+ tasks). Job matches section. `s-path` redirects here via `showScreen`. |
 | `s-interview` | Interview Room — Riva AI avatar, round selector (Product Sense/Metrics/Behavioural), company selector, pressure level. Start button is enabled. Uses hardcoded responses (backend is prototype-level). |
 | `s-jobs` | **Merged Jobs + Trends.** Job listings with fit percentages + personalized trend signals in one screen. |
-| `s-profile` | User profile — connected accounts, PM highlights, skills, dimension scores. Edit Profile modal for resume re-upload. Retake Assessment button. |
+| `s-profile` | User profile — connected accounts, detected skills, PM type verdict, dimension scores (left column); resume snapshot, PM highlights, fix card (right column). Edit Profile modal for resume re-upload. Retake Assessment button. Log out button at bottom with user email display. |
 
 ### Key Design Decisions
 - **Free flow:** Landing → Q1–Q8 → Fit Verdict (no login required)
@@ -211,7 +211,7 @@ Scoring uses background-type baselines (engineer starts 70–85 on Technical but
 - Powers the animated radar chart on s-readiness
 - Temperature: 0.3
 
-### 4. Daily Task System (23 tasks × 8 types × 4 phases)
+### 4. Daily Task System (21 tasks × 8 types × 4 phases)
 - **Phase 1 (Weeks 1–2):** Product Sense — 4 product teardown tasks
 - **Phase 2 (Weeks 3–4):** Analytical Depth (4 metric diagnosis tasks) + Business Framing (2 business case tasks)
 - **Phase 3 (Weeks 5–6):** AI Fluency (2 ai-feature-design tasks) + Technical Credibility (1 technical-tradeoff task) + Behavioural (2 stakeholder-conflict tasks)
@@ -220,7 +220,7 @@ Scoring uses background-type baselines (engineer starts 70–85 on Technical but
 - **Task selection:** Targets user's 2–3 weakest dimensions (`selectDailyTask()`), filters out completed tasks
 - **Clickable task list:** `renderTaskList()` groups tasks by dimension sorted weakest-first. Each task is clickable via `startSpecificTask(taskId)`. Current task shows pulsing indicator + "Start Task →" button.
 - Score improvement: each task adds +0 to +5 points to the relevant dimension
-- Progress tracked: tasks completed counter, progress bar (X/23), full task list with scores, streak grid
+- Progress tracked: tasks completed counter, progress bar (X/21), full task list with scores, streak grid
 - **Mock interview milestone:** Card appears at bottom of task list. Locked until 12+ tasks completed, then shows CTA to enter Interview Room.
 - Persistence: localStorage (immediate) + Supabase `task_progress` column (async)
 - `currentTaskMode` variable switches s-gate between onboarding ('gate') and daily practice ('daily')
@@ -284,6 +284,7 @@ The auth system uses a **dual-path approach**:
 1. **Sign-in/sign-up handlers navigate directly** — after `signInWithPassword()` or `signUp()` succeeds, the handler itself calls `loadProfile()` and `showScreen()`. This is the primary navigation path for interactive sign-in/sign-up.
 2. **`onAuthStateChange` handles page-load and OAuth redirects** — fires on `INITIAL_SESSION` (page load with existing session) and after Google OAuth redirect. Uses `_authHandled` flag to prevent double-navigation.
 3. **`loadProfile(existingSession)` accepts optional session** — avoids redundant `getSession()` calls that can race with session storage.
+4. **Smart sign-in for existing accounts** — when a user clicks "Create Account" with an email that already exists (Supabase returns `identities.length === 0`), the UI auto-switches to sign-in mode: button becomes "Sign in →", password field clears and focuses. Changing the email resets back to create mode.
 
 **Critical:** Never remove direct `showScreen()` calls from sign-in/sign-up handlers. Supabase v2 fires `onAuthStateChange` asynchronously via `setTimeout(0)` — it is NOT reliable as the sole navigator.
 
@@ -297,7 +298,8 @@ Key variables:
 - `s-path` redirects to `s-dashboard` (merged screens)
 - `_showScreenTimer` prevents overlapping transitions — always cancelled before `!cur` early return to prevent timer conflicts
 - Hides ALL screens (not just active) in the timer callback to prevent bleed-through
-- Screen-specific triggers fire inside the timer callback (e.g., s-readiness animates radar, s-dashboard renders tasks/jobs)
+- `onScreenReady(id)` — extracted function containing all screen-specific triggers (dashboard renderers, radar animations, North bubble, etc.). Called from both the `!cur` fast path (OAuth redirect) and the normal 180ms transition callback. This ensures screens render correctly regardless of entry path.
+- Dashboard renderers (`renderDashboardTask`, `renderStreak`, `renderTaskList`) are each wrapped in try/catch so one failure doesn't block the rest
 - North bubble visibility managed per-screen
 
 ### RAG Pipeline
@@ -366,7 +368,9 @@ userData = {
 - `fetchReadinessScores()` — calls score-readiness API, stores result
 - `fetchJobMatches()` / `fetchJobListings()` / `fetchTrendSignals()` — dashboard/jobs data fetchers
 - `applyName()` — updates all avatar initials and profile name across all screens
-- `showScreen(id)` — handles screen transitions, cancels pending timers, triggers screen-specific renderers
+- `onScreenReady(id)` — extracted screen-specific hooks (dashboard renderers, radar, North bubble). Called from both `!cur` and transition paths.
+- `logOut()` — signs out of Supabase, clears all userData and localStorage, navigates to landing
+- `showScreen(id)` — handles screen transitions, cancels pending timers, calls `onScreenReady(id)`
 - `saveProfile()` / `loadProfile(existingSession?)` — Supabase persistence with localStorage backup. loadProfile accepts optional session to avoid getSession() race.
 - `saveProgressLocal()` / `loadLocal()` / `saveLocal()` — localStorage helpers
 - `getReturningScreen(profile)` — determines which screen to show for returning users based on profile progress
@@ -393,11 +397,11 @@ userData = {
 
 ### TASK_BANK Structure
 ```javascript
-// 23 tasks across 4 phases, 8 types, 6 dimensions
-// Phase 1: ps-1 to ps-4 (Product Sense, product-teardown)
-// Phase 2: ad-1 to ad-4 (Analytical Depth, metric-diagnosis) + bf-1, bf-2 (Business Framing, business-case)
-// Phase 3: ai-1, ai-2 (AI Fluency, ai-feature-design) + tc-1 (Technical Credibility, technical-tradeoff) + bh-1, bh-2 (Behavioural, stakeholder-conflict)
-// Phase 4: nw-1 to nw-3 (Networking: cold outreach, referral mapping, coffee chat prep) + pf-1 to pf-3 (Portfolio: case study, project brief, impact narrative)
+// 21 tasks across 4 phases, 8 types, 6 dimensions
+// Phase 1 (4): ps-1 to ps-4 (Product Sense, product-teardown)
+// Phase 2 (6): ad-1 to ad-4 (Analytical Depth, metric-diagnosis) + bf-1, bf-2 (Business Framing, business-case)
+// Phase 3 (5): ai-1, ai-2 (AI Fluency, ai-feature-design) + tc-1 (Technical Credibility, technical-tradeoff) + bh-1, bh-2 (Behavioural, stakeholder-conflict)
+// Phase 4 (6): nw-1 to nw-3 (Networking: cold outreach, referral mapping, coffee chat prep) + pf-1 to pf-3 (Portfolio: case study, project brief, impact narrative)
 // Each task: { id, type, dimension, phase, title, prompt, minutes, charLimit }
 // {company} placeholder in title/prompt resolved from companyMap[userData.q4]
 ```

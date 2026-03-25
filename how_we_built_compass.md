@@ -178,7 +178,7 @@ When the user opens the dashboard, two things happen in parallel — both using 
 
 ## Step 12: Add the Daily Task System and Score Improvement
 
-After the paywall, the user enters their 6-week navigation path. We built a **daily task system** with 17 tasks across 6 different types:
+After the paywall, the user enters their 6-week navigation path. We built a **daily task system** with 21 tasks across 8 different types:
 
 | Task Type | What It Tests | Example |
 |---|---|---|
@@ -188,6 +188,8 @@ After the paywall, the user enters their 6-week navigation path. We built a **da
 | AI Feature Design | AI Fluency | "Design an AI-native capability for Razorpay. Not a wrapper." |
 | Technical Tradeoff | Technical Credibility | "Build in-house vs third-party API. What are the tradeoffs?" |
 | Stakeholder Conflict | Behavioural | "Your engineering lead disagrees with your prioritisation. Respond." |
+| Networking | Behavioural | "Write a personalised LinkedIn message to a PM at your target company." |
+| Portfolio | Product Sense / Business | "Write a 1-page case study of a feature you'd redesign." |
 
 Each task is personalised — the company name comes from the user's target, and the task selected each day targets their weakest dimension.
 
@@ -236,13 +238,146 @@ The result appears as a structured card in North's chat — not just text, but a
 
 ---
 
+## Understanding the Flows
+
+This section explains the key user flows in Compass — how screens connect, when AI is called, and how data moves through the system. Useful for anyone navigating the codebase or extending the prototype.
+
+### Flow 1: First-Time User (Landing to Dashboard)
+
+```
+Landing Page → Q1–Q8 (onboarding questions, auto-advance) → Loading Screen → Fit Verdict
+→ Sign In (login wall) → Connect Profiles (resume upload) → Gate Task → Readiness Score
+→ Paywall → Dashboard
+```
+
+**What happens at each step:**
+
+1. **Landing → Q1–Q8:** No login required. User answers 8 questions about their background, experience signals, skills, target company, networking level, practice habits, and biggest blocker. Each question auto-advances on selection — no "Next" button.
+2. **Loading screen:** Shows a spinning compass with motivational quotes while the system processes. Auto-advances to Verdict after a timed animation.
+3. **Fit Verdict:** Shows the user's PM type (e.g., "Growth PM") based on their Q1 answer. Score ring is locked — shows `?` until they complete the gate task and upload a resume. A login wall sits at the bottom: "Login to unlock my full path — it's free."
+4. **Sign In:** Google OAuth (one click) or email/password. If a user tries to create an account with an existing email, the UI auto-switches to sign-in mode. After sign-in, returning users are routed to their last screen (dashboard if they've been through readiness, gate if they uploaded a resume, etc.).
+5. **Connect Profiles:** Upload resume (PDF parsed by AI), connect LinkedIn/Teal/GitHub. Resume parsing extracts name, role, experience, skills, and PM-relevant highlights.
+6. **Gate Task:** A product teardown writing exercise (up to 1500 characters). AI scores it 0–100 against a rubric and shows inline feedback: score, headline, strength, gap.
+7. **Readiness Score:** AI scores the user across 6 PM dimensions using resume + gate score + background. Animated radar chart and score ring. Each dimension gets a status: Gap, Developing, Solid, or Strong.
+8. **Paywall:** Monthly (₹999/mo) or Annual (₹7,999/yr). Free = diagnosis. Paid = navigation.
+9. **Dashboard:** The main screen after onboarding. Shows progress (tasks completed, streak grid), today's task, full task list grouped by dimension, and job fit matches.
+
+### Flow 2: Returning User (Sign In to Dashboard)
+
+```
+Sign In → (profile loaded from Supabase) → Routed to correct screen
+```
+
+When a returning user signs in (Google or email), the system loads their saved profile from Supabase and routes them to the right screen based on progress:
+
+| What's saved | Where they land |
+|---|---|
+| Readiness scores exist | Dashboard |
+| Gate score exists | Readiness Score screen |
+| Resume data exists | Gate Task screen |
+| Only Q1–Q8 answers | Connect Profiles screen |
+| Nothing | Connect Profiles screen |
+
+This logic lives in `getReturningScreen(profile)`. Google OAuth users go through a page reload, so the `onAuthStateChange` handler picks them up and routes them.
+
+### Flow 3: Daily Practice (Dashboard to Task to Score Update)
+
+```
+Dashboard → Click task (or "Start Task") → Gate screen (daily mode) → Submit
+→ AI scores response → Dimension score updates → Next Task or Back to Dashboard
+```
+
+1. **Task selection:** The system picks the next uncompleted task targeting the user's 2–3 weakest dimensions. Users can also click any task from the list.
+2. **Gate screen (daily mode):** Same screen as onboarding gate, but in daily mode it shows the selected task's prompt and character limit.
+3. **Submit:** Response is sent to `/api/score-task` with the task type, prompt, dimension, and user context. The AI scores it against a type-specific rubric.
+4. **Feedback:** Score, strength, gap, and dimension impact (+0 to +5 points) shown inline.
+5. **Score update:** The relevant dimension score updates immediately. The overall readiness score recalculates with weights. Progress saves to both localStorage (instant) and Supabase (async).
+6. **After completion:** "Next Task →" button to continue, or "Back to Path" to return to dashboard.
+
+### Flow 4: North AI Chat (Any Screen)
+
+```
+Click North bubble → Chat opens → Type message or pick quick chip
+→ Message + user context sent to API → RAG retrieval → AI response
+```
+
+North is a floating chat bubble visible on all post-onboarding screens. The flow:
+
+1. **User sends message** (typed or via quick chips: "I'm feeling stuck", "How am I doing?", "Mock Interview", "What to do today?", "I got rejected")
+2. **Context assembly:** User's name, background, target company, readiness scores, gate score, and resume highlights are bundled into context
+3. **RAG retrieval:** The message is embedded via Gemini and searched against the vector database (50 items: companies, jobs, trends, profiles). Top 5 results injected into the prompt.
+4. **AI response:** Gemini generates a grounded, personalised response using the retrieved data + user context
+5. **Special case — "I got rejected":** Triggers the rejection agent (see Flow 5)
+
+### Flow 5: Post-Rejection Remediation (North Chat)
+
+```
+"I got rejected" → Agent asks for company (if unknown) → Vector search for company data
+→ Compare user scores vs hiring bar → Generate 2-week recovery plan
+```
+
+This is a multi-step agentic flow:
+
+1. **IDENTIFY:** Extract company and interview round from the user's message. If the company isn't mentioned, North asks before proceeding.
+2. **RETRIEVE:** Vector search for the company's hiring bar, interview format, and common rejection reasons from the RAG dataset.
+3. **DIAGNOSE:** Compare the user's dimension scores against the company's required scores. Identify the root cause gap(s).
+4. **GENERATE:** Build a 2-week, day-by-day recovery plan targeting the specific gaps. Each day has a concrete exercise.
+5. **Render:** The result appears as a structured diagnosis card in the chat with score vs. bar comparisons, progress bars, and the full recovery plan.
+
+### Flow 6: Job Matching (Dashboard + Jobs Screen)
+
+**Dashboard (AI matches):**
+```
+Dashboard loads → User scores + company data sent to Gemini → 4 personalised matches returned
+```
+
+If the API call is slow (>12 seconds) or fails, static fallback matches are shown based on the user's target company.
+
+**Jobs screen (math-based):**
+```
+Jobs screen loads → For each of 24 listings: fit = avg(user score / required score per dimension)
+```
+
+No AI call — pure math. Also loads personalised trend signals connecting the user's gaps to market movements.
+
+### Flow 7: Authentication Details
+
+The auth system has two paths that work together:
+
+**Interactive sign-in/sign-up:** When the user clicks a button on the sign-in screen, the handler navigates directly with `showScreen()` and loads the profile in the background. This is the primary path.
+
+**OAuth redirect (Google):** The page reloads after Google auth. `onAuthStateChange` fires, detects the session, loads the profile, and navigates. The `onScreenReady(id)` function ensures screen-specific renderers (like dashboard task list) fire correctly even when there's no previous active screen.
+
+**Smart sign-in:** If a user clicks "Create Account" with an email that already exists, the button automatically switches to "Sign in →" mode. The password field clears and focuses. Changing the email resets it back.
+
+**Log out:** Available on the Profile screen. Clears all local state (userData, localStorage) and signs out of Supabase, returning to the landing page.
+
+### Key Data Flow Summary
+
+```
+Resume PDF → PDF.js (browser) → /api/parse-resume (Gemini) → userData.resumeData → Profile screen
+Q1–Q8 answers → userData.q1–q8 → personalize() → All screens
+Gate task text → /api/score-gate (Gemini) → userData.gateScore → Verdict/Readiness
+All user data → /api/score-readiness (Gemini) → userData.readinessScores → Radar chart
+Daily task text → /api/score-task (Gemini) → dimension delta → Score update → Dashboard
+Chat message → /api/north-chat (embed + vector search + Gemini) → Chat response
+"I got rejected" → /api/rejection-agent (3 Gemini calls) → Diagnosis card
+User scores → /api/job-matches (Gemini) → Dashboard matches
+User scores → /api/job-listings (math) → Jobs screen
+User gaps → /api/job-trends (Gemini) → Trend signals
+```
+
+All data is persisted to Supabase (profiles table) with localStorage as a backup for task progress and readiness scores.
+
+---
+
 ## What It Took
 
 - **1 HTML file** for the entire prototype
-- **9 AI endpoints** (resume parsing, gate scoring, readiness scoring, task scoring, North chat, job matches, trend signals, semantic search, rejection agent)
+- **10 API endpoints** (resume parsing, gate scoring, readiness scoring, task scoring, North chat, job matches, job listings, trend signals, semantic search, rejection agent)
 - **1 curated dataset** with 50 embedded items (12 companies, 24 job listings, 8 market trends, 6 transition profiles)
 - **Vector search (pgvector)** in Supabase for semantic RAG retrieval
-- **17 daily tasks** across 6 task types with per-type AI scoring rubrics
+- **21 daily tasks** across 8 task types with per-type AI scoring rubrics
 - **1 agentic flow** (post-rejection remediation: 5-step autonomous chain)
 - **1 auth provider** (Supabase — Google sign-in + email)
 - **1 hosting platform** (Vercel — auto-deploys from GitHub)
