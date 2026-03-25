@@ -40,19 +40,11 @@ Scoring guide:
 
 Be ruthlessly specific to their actual words. Do not give generic PM feedback.`;
 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } } };
+
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } }
-        })
-      }
-    );
-    const data = await response.json();
+    const data = await geminiWithRetry(url, body);
     if (data.error) return res.status(200).json({ error: data.error.message });
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     if (!content) return res.status(200).json({ error: 'Empty response' });
@@ -67,5 +59,16 @@ Be ruthlessly specific to their actual words. Do not give generic PM feedback.`;
     }
   } catch (e) {
     return res.status(500).json({ error: e.message });
+  }
+}
+
+async function geminiWithRetry(url, body, retries = 2) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await resp.json();
+      if (data.error && i < retries) { await new Promise(r => setTimeout(r, 1000 * (i + 1))); continue; }
+      return data;
+    } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
   }
 }

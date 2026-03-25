@@ -204,18 +204,15 @@ Return ONLY valid JSON, no markdown, no backticks:
 }
 
 async function callGemini(apiKey, prompt, temperature, maxTokens) {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature, maxOutputTokens: maxTokens, thinkingConfig: { thinkingBudget: 0 } }
-      })
-    }
-  );
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature, maxOutputTokens: maxTokens, thinkingConfig: { thinkingBudget: 0 } } };
+  for (let i = 0; i <= 2; i++) {
+    try {
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await resp.json();
+      if (data.error && i < 2) { await new Promise(r => setTimeout(r, 1000 * (i + 1))); continue; }
+      if (data.error) throw new Error(data.error.message);
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } catch (e) { if (i === 2) throw e; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+  }
 }
