@@ -799,7 +799,7 @@
 <div id="s-gate" class="screen">
   <div style="min-height:100vh;display:flex;flex-direction:column">
     <nav class="navbar">
-      <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
         <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
         <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
       </div>
@@ -1020,7 +1020,7 @@
 <!-- ============================================================ -->
 <div id="s-paywall" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1119,7 +1119,7 @@
 <!-- ============================================================ -->
 <div id="s-path" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1167,7 +1167,7 @@
 <!-- ============================================================ -->
 <div id="s-dashboard" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1231,7 +1231,7 @@
 <!-- ============================================================ -->
 <div id="s-jobs" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1510,7 +1510,7 @@
 <!-- ============================================================ -->
 <div id="s-profile" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
@@ -1993,6 +1993,10 @@ function applyName() {
   if (subEl && userData.q1) subEl.textContent = `${userData.q1} · transitioning to PM`;
   const liSub = document.getElementById('linkedin-subtext');
   if (liSub && userData.firstName) liSub.textContent = `${userData.firstName.toLowerCase()} · Connected`;
+}
+
+function goHome() {
+  showScreen(userData.profileConnected ? 's-dashboard' : 's-landing');
 }
 
 async function logOut() {
