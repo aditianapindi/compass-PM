@@ -117,6 +117,18 @@
 </head>
 <body>
 
+<!-- Returning user loader — shown while auth checks session -->
+<div id="returning-loader" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg, #09090B);align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <svg width="40" height="40" viewBox="0 0 28 28" fill="none" style="animation:spin 2s linear infinite">
+    <circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/>
+    <polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/>
+    <polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/>
+    <circle cx="14" cy="14" r="2" fill="#FBBF24"/>
+  </svg>
+  <p style="font-family:'DM Sans',sans-serif;font-size:14px;color:#71717A">Loading your path...</p>
+</div>
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+
 <!-- ============================================================ -->
 <!-- SCREEN: LANDING                                               -->
 <!-- ============================================================ -->
@@ -1996,6 +2008,7 @@ async function logOut() {
   localStorage.removeItem('compass_task_progress');
   localStorage.removeItem('compass_readiness_scores');
   localStorage.removeItem('compass_v2_enriched');
+  localStorage.removeItem('compass_logged_in');
   showScreen('s-landing');
 }
 
@@ -3455,10 +3468,26 @@ function updateDropZone(name) {
   }
 }
 
-// Fix initial screen opacity
+// Fix initial screen opacity — returning users skip landing
 document.addEventListener('DOMContentLoaded', () => {
-  const landing = document.getElementById('s-landing');
-  if (landing) { landing.style.display = 'block'; landing.style.opacity = '1'; }
+  if (localStorage.getItem('compass_logged_in')) {
+    // Returning user — show loading state, not landing
+    var loader = document.getElementById('returning-loader');
+    if (loader) loader.style.display = 'flex';
+    // Safety: if auth hasn't resolved in 3s, fall back to landing
+    window._returningTimeout = setTimeout(function() {
+      var active = document.querySelector('.screen.active');
+      if (!active) {
+        var loader = document.getElementById('returning-loader');
+        if (loader) loader.style.display = 'none';
+        var landing = document.getElementById('s-landing');
+        if (landing) { landing.style.display = 'block'; landing.style.opacity = '1'; }
+      }
+    }, 3000);
+  } else {
+    var landing = document.getElementById('s-landing');
+    if (landing) { landing.style.display = 'block'; landing.style.opacity = '1'; }
+  }
   // responsive: hide signin left panel on mobile
   const style = document.createElement('style');
   style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}#jobs-grid{grid-template-columns:1fr!important}.verdict-grid{grid-template-columns:1fr!important}}`;
@@ -3956,11 +3985,18 @@ function northAutoPopup(screenId, message, delay) {
   // Auth handler — handles page load session check, sign-in/sign-out, and OAuth redirects
   sb.auth.onAuthStateChange(async function (event, session) {
     console.log('[Compass] Auth event:', event, session ? 'session exists' : 'no session');
+    // Clear returning timeout if it's pending
+    if (window._returningTimeout) { clearTimeout(window._returningTimeout); window._returningTimeout = null; }
+    // Hide returning loader
+    var rl = document.getElementById('returning-loader');
+    if (rl) rl.style.display = 'none';
     if (!session) {
+      localStorage.removeItem('compass_logged_in');
       var cur = document.querySelector('.screen.active');
       if (!cur) showScreen('s-landing');
       return;
     }
+    localStorage.setItem('compass_logged_in', 'true');
     try {
       var user = session.user;
       var authName = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || null;
