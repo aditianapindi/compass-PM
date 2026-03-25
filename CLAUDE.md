@@ -449,6 +449,25 @@ userData = {
 - ALL 8 endpoints have `geminiWithRetry()` — 1 retry with 500ms delay on transient Gemini API errors (capacity/overload). Do NOT increase retries (demo latency).
 - Frontend error messages: "Our AI is warming up — try again in a moment" (not "Scoring failed").
 
+### Mobile Responsiveness
+- Single `@media(max-width:700px)` block (injected via JS) handles ALL responsive overrides.
+- Grids that collapse to `1fr` on mobile: `.signin-grid`, `.dash-grid`, `.profile-grid`, `.interview-grid`, `#jobs-grid`, `.verdict-grid`, `#job-matches-list`, `#trend-signals-list`, `#dim-list`, `#readiness-insights`, `.paywall-pricing`, `.paywall-features`, `.landing-steps-3`, `.interview-sub-grid`.
+- `.landing-steps-4` collapses to `repeat(2,1fr)` on mobile (2x2 grid).
+- `.nav-links` hidden on mobile — avatar provides navigation to Profile where all links are accessible.
+- `#north-panel` uses `width:calc(100vw - 32px)` on mobile to prevent overflow.
+
+### Logout Cleanup (CRITICAL — prevents stale state between users)
+- `logOut()` must reset ALL module-level variables: `currentTaskMode = 'gate'`, `_rejectionPending = false`, `northAutoShown = {}`, `jobListingsCache = null`, `northOpen = false`.
+- `logOut()` must clear North chat DOM (reset to default greeting).
+- `logOut()` removes all localStorage keys: `compass_task_progress`, `compass_readiness_scores`, `compass_v2_enriched`, `compass_recovery_plan`, `compass_logged_in`.
+
+### Duplicate Function Prevention
+- `handleDrop`, `handleFileSelect`, `handleConnect` must each have ONE definition (at ~line 2088-2106). Later duplicate definitions were removed — they overwrote the real AI-parsing versions with cosmetic-only ones.
+- `_rejectionPending` resets when North panel closes (`toggleNorth`) to prevent user getting stuck in rejection agent mode.
+
+### Job Filter
+- "Your Target" filter uses `companyMap[userData.q4].company` to resolve the actual company name (e.g. Q4="Fintech and payments" → company="Razorpay"). Direct comparison of `userData.q4` against `job.company` will never match.
+
 ---
 
 ## Open Threads (Not Yet Built)
