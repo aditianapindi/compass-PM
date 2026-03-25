@@ -200,7 +200,7 @@
     <h2 style="text-align:center;font-size:28px;font-weight:700;margin-bottom:48px;letter-spacing:-0.5px">Your route from here to hired</h2>
 
     <!-- Row 1: Steps 1–4 -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px">
+    <div class="landing-steps-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px">
       <div style="text-align:center;padding:20px 12px">
         <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">1</div>
         <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Connect Your Signal</h4>
@@ -224,7 +224,7 @@
     </div>
 
     <!-- Row 2: Steps 5–7 centred -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:750px;margin:0 auto">
+    <div class="landing-steps-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:750px;margin:0 auto">
       <div style="text-align:center;padding:20px 12px">
         <div style="width:44px;height:44px;border-radius:50%;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-weight:800;font-size:16px;color:var(--accent)">5</div>
         <h4 style="font-size:14px;font-weight:700;margin-bottom:6px">Build Your Portfolio</h4>
@@ -328,11 +328,11 @@
 <!-- ============================================================ -->
 <div id="s-connect" class="screen">
   <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="showScreen('s-landing')">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="goHome()">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -803,7 +803,7 @@
         <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
         <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
       </div>
-      <div style="display:flex;gap:20px">
+      <div class="nav-links" style="display:flex;gap:20px">
         <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
         <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
   
@@ -900,7 +900,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -995,7 +995,7 @@
     </div>
 
     <!-- ===== SECTION 3: Key Insights (2-col) ===== -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:52px">
+    <div id="readiness-insights" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:52px">
       <div id="gaps-card" class="card" style="padding:22px;border-left:3px solid var(--rose);background:rgba(248,113,113,0.04)">
         <p style="font-size:11px;color:var(--rose);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:10px">Critical Gaps</p>
         <p id="gaps-text" style="font-size:14px;color:var(--text);line-height:1.6"><strong>Analytical Depth (44)</strong> and <strong>AI Fluency (37)</strong> are your priority gaps. These are explicitly tested in round 1 at Razorpay and Meesho.</p>
@@ -1026,7 +1026,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -1053,7 +1053,7 @@
     <p style="color:var(--muted);font-size:15px;margin-bottom:36px">Everything you've done so far is free. The path — and every practice round, peer review, and score update after it — is Compass Pro.</p>
 
     <!-- Pricing cards -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+    <div class="paywall-pricing" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
 
       <!-- Monthly -->
       <div class="card" style="padding:28px;position:relative">
@@ -1084,7 +1084,7 @@
     <!-- What's included -->
     <div class="card" style="padding:24px;margin-bottom:20px">
       <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Everything in Compass Pro</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="paywall-features" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted)">
           <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:2px"><polyline points="1.5,7 5,10.5 12.5,3" stroke="#34D399" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
           Personalized 6-week path
@@ -1125,7 +1125,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -1173,7 +1173,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -1237,7 +1237,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--accent);font-weight:600;cursor:pointer">Jobs</span>
 
@@ -1295,7 +1295,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -1450,7 +1450,7 @@
         </div>
 
         <!-- Company + mode -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="interview-sub-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div class="card" style="padding:20px">
             <p style="font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Interviewing For</p>
             <div style="display:flex;flex-wrap:wrap;gap:8px" id="company-selector">
@@ -1516,7 +1516,7 @@
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#818CF8" stroke-width="1.5"/><polygon points="14,4 16,14 14,12 12,14" fill="#818CF8"/><polygon points="14,24 12,14 14,16 16,14" fill="#52525B"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg>
       <span style="font-weight:800;font-size:16px;font-family:'Syne',sans-serif">Compass</span>
     </div>
-    <div style="display:flex;gap:20px">
+    <div class="nav-links" style="display:flex;gap:20px">
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-dashboard')">Path</span>
       <span style="font-size:14px;color:var(--muted);cursor:pointer" onclick="showScreen('s-jobs')">Jobs</span>
 
@@ -2080,6 +2080,17 @@ async function logOut() {
   localStorage.removeItem('compass_v2_enriched');
   localStorage.removeItem('compass_recovery_plan');
   localStorage.removeItem('compass_logged_in');
+  // Reset module-level state to prevent leaking between sessions
+  currentTaskMode = 'gate';
+  _rejectionPending = false;
+  northAutoShown = {};
+  jobListingsCache = null;
+  northOpen = false;
+  // Clear North chat messages
+  var northMsgs = document.getElementById('north-messages');
+  if (northMsgs) {
+    northMsgs.innerHTML = '<div style="display:flex;gap:8px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><svg width="10" height="10" viewBox="0 0 28 28" fill="none"><polygon points="14,3 16.5,14 14,11.5 11.5,14" fill="white"/><circle cx="14" cy="14" r="2" fill="#FBBF24"/></svg></div><div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:10px 14px;max-width:270px"><p id="north-greeting" style="font-size:13px;color:var(--text);line-height:1.6">Hey. I\'m North — your Compass guide. I give honest signal, not motivation. What\'s on your mind?</p></div></div>';
+  }
   showScreen('s-landing');
 }
 
@@ -2817,7 +2828,7 @@ function renderJobCards(jobs, filter) {
   // Apply filter
   let filtered = jobs;
   if (filter === 'best-fit') filtered = jobs.filter(j => j.fit >= 75);
-  else if (filter === 'your-target') filtered = jobs.filter(j => (userData.q4 || '').toLowerCase() === (j.company || '').toLowerCase());
+  else if (filter === 'your-target') { var targetCo = (companyMap[userData.q4] || {}).company || ''; filtered = jobs.filter(j => targetCo && (j.company || '').toLowerCase() === targetCo.toLowerCase()); }
   else if (filter === 'switcher') filtered = jobs.filter(j => j.switcherFriendly);
 
   if (subtitle) subtitle.textContent = `${filtered.length} role${filtered.length !== 1 ? 's' : ''} matched to your readiness profile`;
@@ -3616,44 +3627,16 @@ function validateGate() {
   const counter = document.getElementById('gate-counter');
   if (!ta || !btn || !counter) return;
   const len = ta.value.length;
-  const remaining = 1500 - len;
-  counter.textContent = remaining === 1500 ? '1500 characters remaining'
+  const limit = ta.maxLength > 0 ? ta.maxLength : 1500;
+  const remaining = limit - len;
+  counter.textContent = remaining === limit ? limit + ' characters remaining'
     : remaining === 0 ? 'Character limit reached'
     : `${remaining} character${remaining === 1 ? '' : 's'} remaining`;
   counter.style.color = remaining <= 0 ? 'var(--rose)' : remaining <= 100 ? 'var(--amber)' : 'var(--faint)';
   btn.disabled = len < 20;
 }
 
-function handleConnect(service) {
-  const btn = document.getElementById(service + '-btn');
-  if (!btn) return;
-  btn.style.background = 'rgba(52,211,153,0.12)';
-  btn.style.color = 'var(--emerald)';
-  btn.style.border = '1px solid rgba(52,211,153,0.3)';
-  btn.disabled = true;
-
-  if (service === 'li') {
-    // Simulate LinkedIn OAuth name extraction (production: read from LinkedIn API response)
-    btn.textContent = '✓ Connected';
-    if (!userData.name) { userData.name = 'Connected User'; applyName(); }
-    userData.profileConnected = true;
-  } else {
-    btn.textContent = '✓ Connected';
-  }
-}
-
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) updateDropZone(file.name);
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  const dz = document.getElementById('drop-zone');
-  if (dz) dz.classList.remove('dragging');
-  const file = e.dataTransfer.files[0];
-  if (file) updateDropZone(file.name);
-}
+// handleConnect, handleFileSelect, handleDrop defined earlier (lines ~2088-2106) — no duplicates
 
 function updateDropZone(name) {
   const label = document.getElementById('drop-label');
@@ -3694,7 +3677,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // responsive: hide signin left panel on mobile
   const style = document.createElement('style');
-  style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}#jobs-grid{grid-template-columns:1fr!important}.verdict-grid{grid-template-columns:1fr!important}}`;
+  style.textContent = `@media(max-width:700px){.signin-grid{grid-template-columns:1fr!important}.signin-left{display:none!important}.signin-right{max-width:100%!important;padding:40px 24px!important}.dash-grid{grid-template-columns:1fr!important}.profile-grid{grid-template-columns:1fr!important}.interview-grid{grid-template-columns:1fr!important}#jobs-grid{grid-template-columns:1fr!important}.verdict-grid{grid-template-columns:1fr!important}#job-matches-list{grid-template-columns:1fr!important}#trend-signals-list{grid-template-columns:1fr!important}#dim-list{grid-template-columns:1fr!important}#readiness-insights{grid-template-columns:1fr!important}.paywall-pricing{grid-template-columns:1fr!important}.paywall-features{grid-template-columns:1fr!important}.landing-steps-4{grid-template-columns:repeat(2,1fr)!important}.landing-steps-3{grid-template-columns:1fr!important}.interview-sub-grid{grid-template-columns:1fr!important}.nav-links{display:none!important}.nav-hamburger{display:flex!important}#north-panel{width:calc(100vw - 32px)!important;right:16px!important;left:16px!important}}`;
   document.head.appendChild(style);
 });
 </script>
@@ -3800,9 +3783,8 @@ function rivaSetSpeaking(on) {
 function startInterview() {
   var live = document.getElementById('riva-live');
   var status = document.getElementById('riva-status');
-  if (live) live.style.display = 'block';
+  if (live) { live.style.display = 'block'; live.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   if (status) status.innerHTML = '<div style="width:7px;height:7px;border-radius:50%;background:var(--rose);animation:bubblePulse 1.5s ease-in-out infinite"></div><span style="font-size:11px;font-weight:600;color:var(--rose)">In Session</span>';
-  live.scrollIntoView({ behavior: 'smooth', block: 'start' });
   rivaSeconds = 0;
   rivaTimerInterval = setInterval(function() {
     rivaSeconds++;
@@ -3912,6 +3894,7 @@ function toggleNorth() {
     if (badge) badge.style.display = 'none';
   } else {
     panel.style.display = 'none';
+    _rejectionPending = false; // reset so user isn't stuck in rejection mode
   }
 }
 
