@@ -2947,7 +2947,7 @@ function populateGateScreen(task) {
   set('gate-btn', 'Submit Response →');
   // Reset UI
   var input = document.getElementById('gate-input');
-  if (input) { input.value = ''; input.maxLength = task.charLimit || 1500; }
+  if (input) { input.value = ''; input.maxLength = task.charLimit || 1500; input.style.maxHeight = ''; input.style.overflow = ''; input.style.opacity = '1'; input.readOnly = false; }
   var btn = document.getElementById('gate-btn');
   if (btn) { btn.disabled = true; btn.style.display = ''; btn.style.opacity = '1'; btn.textContent = 'Submit Response →'; }
   var fb = document.getElementById('gate-feedback');
@@ -2973,6 +2973,8 @@ function resetGateToOnboarding() {
   set('gate-btn', 'Submit and See My Path →');
   var cta = document.getElementById('gate-cta');
   if (cta) { cta.textContent = 'See My Full Readiness Score →'; cta.onclick = function() { showScreen('s-readiness'); }; }
+  var gateInput = document.getElementById('gate-input');
+  if (gateInput) { gateInput.style.maxHeight = ''; gateInput.style.overflow = ''; gateInput.style.opacity = '1'; gateInput.readOnly = false; }
   var impact = document.getElementById('gate-dim-impact');
   if (impact) impact.style.display = 'none';
   var learning = document.getElementById('gate-learning');
@@ -3107,10 +3109,14 @@ function showTaskFeedback(data, task) {
     renderLearningResources(task);
   }
 
+  // Collapse textarea so feedback is immediately visible
+  var input = document.getElementById('gate-input');
+  if (input) { input.style.maxHeight = '80px'; input.style.overflow = 'hidden'; input.style.opacity = '0.5'; input.readOnly = true; }
+
   var feedback = document.getElementById('gate-feedback');
   if (feedback) {
     feedback.style.display = 'block';
-    feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   var btn = document.getElementById('gate-btn');
   if (btn) btn.style.display = 'none';
@@ -3535,10 +3541,14 @@ async function submitGate() {
     set('gate-strength',  data.strength);
     set('gate-gap',       data.gap);
 
+    // Collapse textarea so feedback is immediately visible
+    const gateInput = document.getElementById('gate-input');
+    if (gateInput) { gateInput.style.maxHeight = '80px'; gateInput.style.overflow = 'hidden'; gateInput.style.opacity = '0.5'; gateInput.readOnly = true; }
+
     const feedback = document.getElementById('gate-feedback');
     if (feedback) {
       feedback.style.display = 'block';
-      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     btn.style.display = 'none';
 
