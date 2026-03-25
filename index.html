@@ -880,6 +880,8 @@
                 <p id="gate-gap" style="font-size:13px;color:var(--text);line-height:1.65"></p>
               </div>
             </div>
+            <!-- Learning resources (shown after daily task scoring) -->
+            <div id="gate-learning" style="display:none;margin-bottom:18px"></div>
             <button id="gate-cta" class="btn-primary" style="width:100%;font-size:15px;padding:14px" onclick="showScreen('s-readiness')">See My Full Readiness Score →</button>
           </div>
         </div>
@@ -1734,6 +1736,60 @@ const TASK_BANK = [
   { id:'pf-2', type:'portfolio', dimension:'Business Framing', phase:4, title:'Portfolio: Side Project Product Brief', prompt:'Draft a product brief for a side project that demonstrates PM skills. Include: (1) Problem — who has this problem and how painful is it, (2) Target User — be specific, (3) MVP Scope — what\'s in v1 and what\'s explicitly NOT, (4) 3 Success Metrics, (5) Why this project — what PM skill does building this prove? This brief should convince a hiring manager you think like a PM.', minutes:20, charLimit:2000 },
   { id:'pf-3', type:'portfolio', dimension:'Behavioural', phase:4, title:'Portfolio: Impact Narrative', prompt:'Write a 5-sentence narrative from your current or most recent role, framed as PM-style impact: (1) Context — what was the situation, (2) Your Role — what did you specifically do, (3) The Metric — what moved, (4) The Result — quantify the outcome, (5) The Insight — what you learned that applies to PM. This is your interview story — make every sentence count.', minutes:15, charLimit:1500 },
 ];
+
+// ── Learning Resources — curated content mapped to dimensions & task types ──
+const LEARNING_RESOURCES = [
+  // Product Sense
+  { dimension:'Product Sense', taskType:'product-teardown', creator:'Lenny Rachitsky', title:'How to develop product sense', url:'https://www.lennysnewsletter.com/p/product-sense', format:'Article + Podcast', takeaway:'Jules Walter (Slack, YouTube) shares 4 concrete habits that sharpen product intuition.' },
+  { dimension:'Product Sense', taskType:'product-teardown', creator:'Lenny Rachitsky', title:'Building product sense, navigating AI, the messy middle', url:'https://www.lennysnewsletter.com/p/lessons-on-building-product-sense', format:'Podcast', takeaway:'Scott Belsky (Adobe) on first mile optimization and developing taste.' },
+  { dimension:'Product Sense', taskType:'product-teardown', creator:'Shreyas Doshi', title:'Good Product Managers, Great Product Managers', url:'https://x.com/shreyas/status/1249039638829793280', format:'X Thread', takeaway:'What separates good from great PMs — a thread worth re-reading monthly.' },
+  { dimension:'Product Sense', taskType:'product-teardown', creator:'Shreyas Doshi', title:'What is product management? (a memo)', url:'https://x.com/shreyas/status/1633854780648083456', format:'X Thread', takeaway:'Product management is the art, science, and practice of making products successful.' },
+  { dimension:'Product Sense', taskType:'product-teardown', creator:'Shravan Tickoo', title:'How to solve PM case studies — explained simply', url:'https://www.youtube.com/c/TheSwagWalaPM', format:'YouTube', takeaway:'India-focused walkthrough of product sense interview questions.' },
+
+  // Analytical Depth
+  { dimension:'Analytical Depth', taskType:'metric-diagnosis', creator:'Aakash Gupta', title:'Product Metrics Interview: Ultimate Guide', url:'https://www.news.aakashg.com/p/product-metrics-interview', format:'Article', takeaway:'Frameworks + 8 real Q&A transcripts for cracking metrics interviews.' },
+  { dimension:'Analytical Depth', taskType:'metric-diagnosis', creator:'Aakash Gupta', title:'How to ace Success Metrics interviews', url:'https://www.news.aakashg.com/p/success-metrics-interview', format:'Article', takeaway:'Proven frameworks and rubrics — success metrics make up 21% of PM interview questions.' },
+  { dimension:'Analytical Depth', taskType:'metric-diagnosis', creator:'Aakash Gupta', title:'How Top PMs Define Their North Star Metric', url:'https://www.aakashg.com/north-star-metric/', format:'Article', takeaway:'A great NSM measures customer value, represents strategy, and predicts revenue.' },
+  { dimension:'Analytical Depth', taskType:'metric-diagnosis', creator:'Shreyas Doshi', title:'Pre-mortems, LNO framework, 3 levels of product work', url:'https://www.lennysnewsletter.com/p/episode-3-shreyas-doshi', format:'Podcast', takeaway:'How to predict problems before they happen and prioritize ruthlessly.' },
+  { dimension:'Analytical Depth', taskType:'metric-diagnosis', creator:'Shreyas Doshi', title:'PM Frameworks mega-thread', url:'https://twitter.com/shreyas/status/1399042778613485578', format:'X Thread', takeaway:'A collection of product management frameworks in one thread.' },
+
+  // Business Framing
+  { dimension:'Business Framing', taskType:'business-case', creator:'Lenny Rachitsky', title:'The art and science of pricing', url:'https://www.lennysnewsletter.com/p/the-art-and-science-of-pricing-madhavan', format:'Podcast', takeaway:'Madhavan Ramanujam on why 95% of companies get pricing wrong and how to fix it.' },
+  { dimension:'Business Framing', taskType:'business-case', creator:'Aakash Gupta', title:'SaaS Pricing Models guide', url:'https://www.aakashg.com/pricing-models-for-saas/', format:'Article', takeaway:'5 dominant pricing models with a framework for testing willingness-to-pay.' },
+  { dimension:'Business Framing', taskType:'business-case', creator:'Shreyas Doshi', title:'Why product management is hard (15-part)', url:'https://x.com/shreyas/status/1360784465560182788', format:'X Thread', takeaway:'Deep thread on what makes PM uniquely difficult — essential for business framing.' },
+
+  // Technical Credibility
+  { dimension:'Technical Credibility', taskType:'technical-tradeoff', creator:'Aakash Gupta', title:'System Design Interview for PMs', url:'https://www.news.aakashg.com/p/system-design-interview', format:'Article', takeaway:'What Google, Stripe, and Amazon expect — think like an engineer, communicate like a leader.' },
+  { dimension:'Technical Credibility', taskType:'technical-tradeoff', creator:'Aakash Gupta', title:'A PM\'s Guide to the Tech Stack Diagram', url:'https://www.aakashg.com/tech-stack-diagram/', format:'Article', takeaway:'How to read and leverage tech stack diagrams to build credibility with engineers.' },
+
+  // AI Fluency
+  { dimension:'AI Fluency', taskType:'ai-feature-design', creator:'Lenny Rachitsky', title:'Becoming an AI PM — Aman Khan', url:'https://www.lennysnewsletter.com/p/becoming-an-ai-pm-aman-khan', format:'Podcast', takeaway:'What separates top 5% AI PMs — from ex-Spotify, Apple, Cruise AI PM leader.' },
+  { dimension:'AI Fluency', taskType:'ai-feature-design', creator:'Aakash Gupta', title:'Your Guide to AI Product Strategy', url:'https://www.news.aakashg.com/p/ai-product-strategy', format:'Article', takeaway:'How AI shifts product strategy from personalization to augmentation.' },
+  { dimension:'AI Fluency', taskType:'ai-feature-design', creator:'Aakash Gupta', title:'Complete AI PM Learning Path (free)', url:'https://aakashgupta.medium.com/the-complete-ai-product-manager-learning-path-2-000-worth-of-education-completely-free-40a700946b78', format:'Article', takeaway:'$2,000 worth of AI PM education curated into one free learning path.' },
+
+  // Behavioural
+  { dimension:'Behavioural', taskType:'stakeholder-conflict', creator:'Lenny Rachitsky', title:'A PM\'s guide to influence', url:'https://www.lennysnewsletter.com/p/a-pms-guide-to-influence', format:'Article', takeaway:'Jules Walter on how to build influence as a PM without formal authority.' },
+  { dimension:'Behavioural', taskType:'stakeholder-conflict', creator:'Aakash Gupta', title:'Cross-Functional Team Management', url:'https://www.aakashg.com/cross-functional-team-management/', format:'Article', takeaway:'100% accountable, 0% authority — a framework for leading teams you can use in 48 hours.' },
+  { dimension:'Behavioural', taskType:'networking', creator:'Shravan Tickoo', title:'Live PM Mock Interviews', url:'https://www.youtube.com/c/TheSwagWalaPM', format:'YouTube', takeaway:'Live product sense and execution mock interviews — India PM interview prep.' },
+
+  // General / All dimensions
+  { dimension:'all', taskType:'all', creator:'Aakash Gupta', title:'Free PM MBA — 15 courses, 112 classes', url:'https://www.news.aakashg.com/p/complete-courses-pm', format:'Course', takeaway:'Complete PM curriculum: strategy, discovery, B2B pricing, AI PM, and more.' },
+  { dimension:'all', taskType:'all', creator:'Aakash Gupta', title:'Complete AI PM Course + Roadmaps', url:'https://www.news.aakashg.com/p/ai-pm-learning-roadmap', format:'Course', takeaway:'Structured AI PM course covering prompting, PRDs, fine-tuning, RAG, and agents.' },
+];
+
+function getResourcesForTask(task) {
+  if (!task) return [];
+  var matches = LEARNING_RESOURCES.filter(function(r) {
+    return r.dimension === task.dimension || r.taskType === task.type || r.dimension === 'all';
+  });
+  // Prefer dimension + taskType exact matches, then dimension-only, then 'all'
+  matches.sort(function(a, b) {
+    var scoreA = (a.dimension === task.dimension ? 2 : 0) + (a.taskType === task.type ? 2 : 0) + (a.dimension === 'all' ? -1 : 0);
+    var scoreB = (b.dimension === task.dimension ? 2 : 0) + (b.taskType === task.type ? 2 : 0) + (b.dimension === 'all' ? -1 : 0);
+    return scoreB - scoreA;
+  });
+  return matches.slice(0, 2);
+}
 
 function initTaskProgress() {
   if (!userData.taskProgress) {
@@ -2889,6 +2945,8 @@ function populateGateScreen(task) {
   if (fb) fb.style.display = 'none';
   var impact = document.getElementById('gate-dim-impact');
   if (impact) impact.style.display = 'none';
+  var learning = document.getElementById('gate-learning');
+  if (learning) learning.style.display = 'none';
   var backLink = document.getElementById('gate-back-link');
   if (backLink) backLink.style.display = 'block';
   validateGate();
@@ -2908,6 +2966,8 @@ function resetGateToOnboarding() {
   if (cta) { cta.textContent = 'See My Full Readiness Score →'; cta.onclick = function() { showScreen('s-readiness'); }; }
   var impact = document.getElementById('gate-dim-impact');
   if (impact) impact.style.display = 'none';
+  var learning = document.getElementById('gate-learning');
+  if (learning) learning.style.display = 'none';
   var backLink = document.getElementById('gate-back-link');
   if (backLink) backLink.style.display = 'none';
 }
@@ -3033,6 +3093,11 @@ function showTaskFeedback(data, task) {
     backLink.innerHTML = '<button style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:8px 0" onclick="currentTaskMode=\'gate\';showScreen(\'s-dashboard\')">← Back to Path</button>';
   }
 
+  // Show learning resources for daily tasks
+  if (currentTaskMode === 'daily') {
+    renderLearningResources(task);
+  }
+
   var feedback = document.getElementById('gate-feedback');
   if (feedback) {
     feedback.style.display = 'block';
@@ -3040,6 +3105,33 @@ function showTaskFeedback(data, task) {
   }
   var btn = document.getElementById('gate-btn');
   if (btn) btn.style.display = 'none';
+}
+
+function renderLearningResources(task) {
+  var container = document.getElementById('gate-learning');
+  if (!container) return;
+  var resources = getResourcesForTask(task);
+  if (resources.length === 0) { container.style.display = 'none'; return; }
+
+  var formatIcons = { 'Podcast':'🎧', 'Article':'📄', 'X Thread':'🧵', 'YouTube':'▶️', 'Course':'📚' };
+  var html = '<div style="background:rgba(129,140,248,0.04);border:1px solid rgba(129,140,248,0.12);border-radius:10px;padding:14px">' +
+    '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Deepen this skill</div>';
+
+  resources.forEach(function(r) {
+    var icon = formatIcons[r.format] || '📄';
+    html += '<a href="' + r.url + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;padding:10px 12px;border-radius:8px;margin-bottom:6px;background:var(--elevated);border:1px solid var(--border);transition:border-color 0.15s;cursor:pointer" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+        '<span style="font-size:12px">' + icon + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:var(--text)">' + r.title + '</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:3px">' + r.takeaway + '</div>' +
+      '<div style="font-size:11px;color:var(--faint)">' + r.creator + ' · ' + r.format + '</div>' +
+    '</a>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+  container.style.display = 'block';
 }
 
 function renderDashboardTask() {
