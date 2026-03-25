@@ -8,6 +8,7 @@
 - **Do not swap models or dependencies without confirming availability.** `gemini-2.0-flash` is DEPRECATED for this API key. All endpoints MUST use `gemini-2.5-flash`.
 - **Before pushing a fix, mentally trace the exact user flow** ("click sign in → what function runs → what showScreen is called → what screen appears") through the new code.
 - **All 8 API endpoints use `gemini-2.5-flash` with `thinkingConfig: { thinkingBudget: 0 }`** — this is critical for speed and preventing response truncation. Do NOT remove `thinkingBudget: 0`.
+- **All 8 API endpoints have `geminiWithRetry()` auto-retry** — 1 retry with 500ms delay on transient Gemini errors. Do NOT increase retries beyond 1 (demo latency concern).
 
 ---
 
@@ -150,15 +151,15 @@ Side: Profile (s-profile), Interview Room (s-interview), Jobs+Trends (s-jobs)
 | Screen ID | What It Does |
 |---|---|
 | `s-landing` | Hero, pain points, 7-step how-it-works, footer CTA. No `active` class in HTML — shown by `onAuthStateChange` when no session. |
-| `s-signin` | Sign in / create account (Google OAuth via Supabase, email/password). Smart flow: if user tries to create account with existing email, auto-switches to sign-in mode. |
+| `s-signin` | Sign in / create account (Google OAuth via Supabase, email/password). No LinkedIn button. Smart flow: if user tries to create account with existing email, auto-switches to sign-in mode. |
 | `s-connect` | Connect LinkedIn, Teal, resume upload (PDF.js + Gemini), GitHub, writing samples |
 | `s-q1`–`s-q8` | 8 onboarding questions — auto-advance on selection, no Next button. Q3=experience signals (checkboxes), Q5=skills (multi-select pills) |
 | `s-loading` | Spinning compass, 10 rotating motivational quotes, animated check items (12 companies, not 40+), auto-advances to verdict |
 | `s-verdict` | PM Type card, locked score ring (unlocks after LinkedIn + gate task), background pattern hypothesis |
-| `s-gate` | Dual-purpose screen: onboarding gate task OR daily practice tasks. charLimit varies by task (500–2000). AI scoring, inline feedback card with dimension impact. "Next Task →" CTA after completion. |
+| `s-gate` | Dual-purpose screen: onboarding gate task OR daily practice tasks. charLimit varies by task (500–2000). AI scoring, inline feedback card with dimension impact, learning resources after daily tasks. Textarea collapses after scoring for scroll UX. "Next Task →" CTA after completion. |
 | `s-readiness` | Animated radar chart (6 dimensions) + score ring + confidence indicator (measured vs estimated) + stat cards. Scores driven by AI (score-readiness.js) |
 | `s-paywall` | Monetisation screen — Monthly (₹999/mo) vs Annual (₹7,999/yr) pricing cards |
-| `s-dashboard` | **Merged path + dashboard (Duolingo-style).** Compact progress header (tasks done, progress bar X/21, streak grid). Tasks grouped by dimension sorted weakest-first, each clickable via `startSpecificTask(taskId)`. Mock interview milestone card (unlocks at 12+ tasks). Job matches section. `s-path` redirects here via `showScreen`. |
+| `s-dashboard` | **Merged path + dashboard (Duolingo-style).** Recovery plan card (if rejection agent used, persisted in localStorage). Compact progress header (tasks done, progress bar X/21, streak grid). Tasks grouped by dimension sorted weakest-first, each clickable via `startSpecificTask(taskId)`. Mock interview milestone card (unlocks at 12+ tasks). Job matches section. `s-path` redirects here via `showScreen`. |
 | `s-interview` | Interview Room — Riva AI avatar, round selector (Product Sense/Metrics/Behavioural), company selector, pressure level. Start button is enabled. Uses hardcoded responses (backend is prototype-level). |
 | `s-jobs` | **Merged Jobs + Trends.** Job listings with fit percentages + personalized trend signals in one screen. |
 | `s-profile` | User profile — connected accounts, detected skills, PM type verdict, dimension scores (left column); resume snapshot, PM highlights, fix card (right column). Edit Profile modal for resume re-upload. Retake Assessment button. Log out button at bottom with user email display. |
@@ -171,8 +172,9 @@ Side: Profile (s-profile), Interview Room (s-interview), Jobs+Trends (s-jobs)
 - **Score locked on verdict:** Shows `?` ring until LinkedIn/resume + gate task completed. Then unlocks with confidence indicator.
 - **Gate task (dual-purpose):** Onboarding mode = product teardown for gate scoring. Daily mode = varied task types targeting weakest dimensions.
 - **Personalization:** `pmTypeMap` + `companyMap` + `personalize()` — all post-verdict text reflects Q1 background + Q4 target company. Name comes from Google profile or LinkedIn, not a form field.
-- **Full navbar:** Visible on all screens from s-gate onward (Path, Jobs, Interview Room, Profile tabs + avatar).
+- **Full navbar:** Visible on all screens from s-gate onward (Path, Jobs, Interview Room, Profile tabs + avatar). Compass logo calls `goHome()` — routes signed-in users to dashboard, others to landing.
 - **Score=0 handling:** Use `data.score == null` (not `!data.score`) — zero is a valid score.
+- **Returning user flow:** `compass_logged_in` localStorage flag enables fast return path. Cleared on `logOut()`.
 
 ### The 6 PM Dimensions
 | Dimension | Weight | Evidence Sources |
@@ -225,17 +227,19 @@ Scoring uses background-type baselines (engineer starts 70–85 on Technical but
 - Persistence: localStorage (immediate) + Supabase `task_progress` column (async)
 - `currentTaskMode` variable switches s-gate between onboarding ('gate') and daily practice ('daily')
 - **After task completion:** "Next Task →" button (calls startDailyTask) with "← Back to Path" secondary link
+- **Learning resources after daily tasks:** `LEARNING_RESOURCES` array (32 curated entries from Lenny Rachitsky, Aakash Gupta, Shreyas Doshi, Shravan Tickoo) mapped by dimension + taskType. `getResourcesForTask(task)` returns top 2 matches. `renderLearningResources(task)` shows "Deepen this skill" card in feedback. Only appears for daily tasks (not gate).
+- **Post-scoring scroll UX:** Textarea collapses to 80px with opacity 0.5 after successful scoring. Feedback card uses `scrollIntoView({ block: 'start' })`. Error messages also scroll into view. Textarea resets in `populateGateScreen()` and `resetGateToOnboarding()`.
 
 ### 5. North AI Assistant (Gemini 2.5 Flash + RAG)
 - Floating compass bubble (bottom-right), visible on all post-onboarding screens
-- 5 quick-reply chips: "I'm feeling stuck", "How am I doing?", "Mock Interview", "What to do today?", "I got rejected"
+- 5 quick-reply chips: "I'm feeling stuck", "How am I doing?", "Mock Interview" (navigates to Interview Room), "What to do today?", "I got rejected"
 - **RAG pipeline:** User message → embed via gemini-embedding-001 → search Supabase pgvector (top 5 results) → inject into Gemini prompt → grounded response
 - **Fallback:** If vector search unavailable, keyword matching from pm-market-data.json
 - Returns `ragSource` field ("vector" or "keyword") for verification
 - Context includes: name, background, target company, readiness scores, gate score, resume highlights
 - North personality: honest, not a cheerleader, 2–4 sentences, specific to user data
 - Temperature: 0.7
-- **Auto-popup tooltip:** Shows on dashboard and verdict screens with personalized intro message, fades after 5s
+- **Auto-popup tooltip:** Shows on dashboard and verdict screens with personalized intro message, fades after 5s. Uses `<span id="north-tooltip-text">` to avoid wiping arrow caret div. `max-width:280px` with `white-space:normal`.
 
 ### 6. Post-Rejection Remediation Agent (Agentic AI)
 - Triggered by "I got rejected" chip or natural language in North chat
@@ -244,6 +248,7 @@ Scoring uses background-type baselines (engineer starts 70–85 on Technical but
 - **Step 3 — DIAGNOSE + GENERATE:** Compares user scores vs company hiring bar, generates 2-week day-by-day remediation plan
 - Returns structured JSON: headline, rootCause (primary + secondary with scores/bars/gaps), recoveryPlan (2 weeks × 5 days), reapplySignal
 - Frontend renders structured diagnosis card in North chat with progress bars and recovery plan
+- **Recovery plan persisted:** Saved to `userData.recoveryPlan` + `compass_recovery_plan` in localStorage. Loaded in `loadProfile()`. Rendered on dashboard via `renderRecoveryPlan()` with week tabs (`switchRecoveryWeek()`), dismiss button (`dismissRecoveryPlan()`). Cleared on `logOut()`.
 
 ### 7. Job Matching (AI + Math)
 - **AI matches (dashboard):** Sends user scores + company data to Gemini → 4 personalized matches with fit percentages
@@ -334,13 +339,19 @@ userData = {
     lastTaskDate,     // ISO date string
     completedTasks: [{ id, type, dimension, score, delta, date }],
     currentTask       // currently selected task object
+  },
+  recoveryPlan: {   // from rejection-agent API, persisted in localStorage
+    company, round, headline,
+    rootCause: { primary: { dimension, userScore, companyBar, gap, explanation }, secondary: {...} },
+    recoveryPlan: { duration, focusAreas, weeks: [{ week, theme, days: [{ day, task, output, time }] }] },
+    reapplySignal
   }
 }
 ```
 
 ### Persistence
 - **Supabase `profiles` table:** q1–q8, resume_data, gate_score, readiness_scores, task_progress, exp_signals, skills (all JSONB)
-- **localStorage backup:** task_progress and readiness_scores saved to `compass_task_progress` and `compass_readiness_scores` keys
+- **localStorage backup:** task_progress (`compass_task_progress`), readiness_scores (`compass_readiness_scores`), recovery_plan (`compass_recovery_plan`), logged_in flag (`compass_logged_in`), enriched flag (`compass_v2_enriched`)
 - **Resilient saves:** `saveProfile()` retries without `task_progress` if column doesn't exist, so other data still saves
 - **Load priority:** Supabase → localStorage fallback for task_progress and readiness_scores
 - `ensureReadinessScores()` guarantees scores exist (from Supabase → localStorage → hardcoded defaults) so task system always works
@@ -369,7 +380,14 @@ userData = {
 - `fetchJobMatches()` / `fetchJobListings()` / `fetchTrendSignals()` — dashboard/jobs data fetchers
 - `applyName()` — updates all avatar initials and profile name across all screens
 - `onScreenReady(id)` — extracted screen-specific hooks (dashboard renderers, radar, North bubble). Called from both `!cur` and transition paths.
-- `logOut()` — signs out of Supabase, clears all userData and localStorage, navigates to landing
+- `goHome()` — routes signed-in users (`userData.profileConnected`) to dashboard, others to landing. Used by all post-auth navbar Compass logos.
+- `getResourcesForTask(task)` — filters LEARNING_RESOURCES by dimension + taskType match, returns top 2
+- `renderLearningResources(task)` — renders "Deepen this skill" card with 2 curated resources in feedback area
+- `renderRecoveryPlan()` — renders pinned recovery card on dashboard with week tabs, daily tasks, dismiss button
+- `switchRecoveryWeek(weekNum)` — toggles week tab visibility in recovery plan
+- `dismissRecoveryPlan()` — clears recoveryPlan from userData, localStorage, and dashboard
+- `showTaskFeedback(data, task)` — shared function rendering score results for both gate and daily tasks, collapses textarea, scrolls into view
+- `logOut()` — signs out of Supabase, clears all userData and localStorage (including compass_logged_in, compass_recovery_plan), navigates to landing
 - `showScreen(id)` — handles screen transitions, cancels pending timers, calls `onScreenReady(id)`
 - `saveProfile()` / `loadProfile(existingSession?)` — Supabase persistence with localStorage backup. loadProfile accepts optional session to avoid getSession() race.
 - `saveProgressLocal()` / `loadLocal()` / `saveLocal()` — localStorage helpers
@@ -428,6 +446,8 @@ userData = {
 - ALL 8 endpoints use `gemini-2.5-flash` with `thinkingConfig: { thinkingBudget: 0 }`.
 - `gemini-2.0-flash` is DEPRECATED and unavailable for this API key — never use it.
 - `thinkingBudget: 0` is essential — without it, Gemini uses thinking tokens from the output budget, causing truncated responses.
+- ALL 8 endpoints have `geminiWithRetry()` — 1 retry with 500ms delay on transient Gemini API errors (capacity/overload). Do NOT increase retries (demo latency).
+- Frontend error messages: "Our AI is warming up — try again in a moment" (not "Scoring failed").
 
 ---
 
@@ -435,10 +455,9 @@ userData = {
 1. **Resume-to-verdict personalization** — s-verdict copy should reference actual resume data (currentRole, experience) not just Q1 answer
 2. **Riva interview backend** — currently hardcoded responses. Real version needs Claude API or Gemini live chat.
 3. **Voice input for Riva** — Web Speech API (text-first for now)
-4. **North → Riva handoff** — Mock Interview chip in North should open Interview Room
-5. **Cohort/peer group feature**
-6. **Stripe/Razorpay integration** for paywall
-7. **Domain** — check and acquire compass domain
+4. **Cohort/peer group feature**
+5. **Stripe/Razorpay integration** for paywall
+6. **Domain** — check and acquire compass domain
 
 ## Next Steps (Recommended Order)
 1. Validate prototype with 5–10 real users (share `compass-pm.vercel.app`)
